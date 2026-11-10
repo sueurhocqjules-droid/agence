@@ -1,0 +1,135 @@
+{
+ "titre": "E se um único grão de arroz dobrasse a cada segundo?",
+ "description": "Um grão de 25 mg, dobrando a cada segundo: {n_elephant} segundos para um elefante, {n_navire} para um navio de carga gigante, {annees} anos de colheitas mundiais na 64ª casa do tabuleiro, e no segundo {n_max} uma pilha mais alta que o Everest, ou uma camada de grãos sobre toda a Terra.\nSources: USDA, FAO, NOAA, NASA.",
+ "regle": [
+  "UM GRÃO DE ARROZ",
+  "DOBRA A CADA SEGUNDO"
+ ],
+ "regle2": [
+  "UMA CASA POR SEGUNDO",
+  "64 CASAS PARA PREENCHER"
+ ],
+ "pli": "SEG",
+ "suite": "PRÓXIMO: {cible}",
+ "restant": "FALTAM {n} SEGUNDOS",
+ "restant1": "FALTA 1 SEGUNDO",
+ "grain1": "GRÃO",
+ "grains": "GRÃOS",
+ "unites": [
+  {
+   "max": 1000000000,
+   "diviseur": 1000000,
+   "nom": "MILHÃO DE GRÃOS",
+   "nom1": "MILHÃO DE GRÃOS"
+  },
+  {
+   "max": 1000000000000,
+   "diviseur": 1000000000,
+   "nom": "BILHÃO DE GRÃOS",
+   "nom1": "BILHÃO DE GRÃOS"
+  },
+  {
+   "max": 1000000000000000,
+   "diviseur": 1000000000000,
+   "nom": "TRILHÃO DE GRÃOS",
+   "nom1": "TRILHÃO DE GRÃOS"
+  },
+  {
+   "max": 1000000000000000000,
+   "diviseur": 1000000000000000,
+   "nom": "QUADRILHÃO DE GRÃOS",
+   "nom1": "QUADRILHÃO DE GRÃOS"
+  },
+  {
+   "max": 1e+21,
+   "diviseur": 1000000000000000000,
+   "nom": "QUINTILHÃO DE GRÃOS",
+   "nom1": "QUINTILHÃO DE GRÃOS"
+  }
+ ],
+ "separateurs": {
+  "milliers": ".",
+  "decimale": ","
+ },
+ "planete": [
+  "ESPALHADO, COBRE",
+  "O PLANETA INTEIRO"
+ ],
+ "boule": [
+  "AGORA PARECE",
+  "UMA BOLA DE ARROZ"
+ ],
+ "faim": [
+  "ALGUÉM",
+  "ESTAVA COM FOME"
+ ],
+ "chute": [
+  "UM GRÃO",
+  "CAIU"
+ ],
+ "paliers": {
+  "tasse": {
+   "cible": "UMA XÍCARA DE ARROZ",
+   "legende": [
+    "ISSO JÁ É",
+    "UMA XÍCARA CHEIA"
+   ]
+  },
+  "sac": {
+   "cible": "UM SACO DE 25 KG",
+   "legende": [
+    "MAIS PESADO QUE",
+    "UM SACO DE 25 KG"
+   ]
+  },
+  "elephant": {
+   "cible": "UM ELEFANTE",
+   "legende": [
+    "MAIS PESADO QUE",
+    "UM ELEFANTE"
+   ]
+  },
+  "baleine": {
+   "cible": "UMA BALEIA AZUL",
+   "legende": [
+    "MAIS PESADA QUE",
+    "UMA BALEIA AZUL"
+   ]
+  },
+  "navire": {
+   "cible": "UM NAVIO DE CARGA",
+   "legende": [
+    "ENCHERIA UM",
+    "NAVIO DE CARGA GIGANTE"
+   ]
+  },
+  "pyramide": {
+   "cible": "A GRANDE PIRÂMIDE",
+   "legende": [
+    "MAIOR QUE A",
+    "GRANDE PIRÂMIDE"
+   ]
+  },
+  "recolte": {
+   "cible": "A COLHEITA MUNDIAL",
+   "legende": [
+    "UM ANO INTEIRO DA",
+    "COLHEITA MUNDIAL DE ARROZ"
+   ]
+  },
+  "echiquier": {
+   "cible": "A ÚLTIMA CASA",
+   "legende": [
+    "A 64ª CASA:",
+    "{annees} ANOS DE COLHEITAS"
+   ]
+  },
+  "everest": {
+   "cible": "EVEREST",
+   "legende": [
+    "A PILHA AGORA É",
+    "MAIS ALTA QUE O EVEREST"
+   ]
+  }
+ }
+}

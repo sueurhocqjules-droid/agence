@@ -12,7 +12,7 @@ Colonnes : ce qu'elle sait faire, ce qu'elle coûte, quand elle est libre, si l'
 | Moteur de `chaines-studio` (Remotion, calculs, rendu GitHub) | Fabriquer une vidéo « chaque seconde » à partir d'un sujet | 0 € | Toujours | Non |
 | Abonnement Claude (`claude -p`) | Écrire un sujet, trancher, juger | Compte dans la limite de l'abonnement de Jules : budget < 20 % de la semaine | Toujours, à doser | Non, dans le budget |
 | `edge-tts` | Voix de synthèse en, es, pt, sans clé | 0 € | Toujours | Non |
-| Modèles gratuits (Groq, Cerebras, OpenRouter) | Texte : titres, traduction, analyse | 0 €, quotas à retester à l'étape 3 | À tester | Non |
+| Modèles gratuits Groq, Gemini (projet « Claude_machine_contenu_101126 » de prod.hack05), OpenRouter | Texte : traduction, stats, idées de sujets. Poste par poste : `agence/postes.py` | 0 €. Groq : quota par minute serré (qwen refuse les grosses demandes). Gemini Flash : saturé par moments le soir. OpenRouter sans crédit : 50 appels par jour. Cerebras écarté (carte, 5 $ puis payant) | Toujours, avec un secours par poste | Non |
 
 ## Pas encore disponibles
 

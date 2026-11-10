@@ -31,3 +31,4 @@ python -m agents.stats
 | Agent | Fait | Coût |
 |---|---|---|
 | `stats` | Relève vues, likes, commentaires de chaque vidéo des trois chaînes | 0 jeton, ~10 unités de quota YouTube |
+| `banc` | Banc d'essai des modèles gratuits sur les vrais postes (local, lit `../chaines-studio`). Verdict : `banc/README.md` | 0 jeton, ~30 appels gratuits |
