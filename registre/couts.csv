@@ -1,3 +1,4 @@
 debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-10T20:35:10+00:00,stats,5,0,0,0,"ok : 27 vidéos, 6811 vues"
 2026-11-10T20:41:34+00:00,stats,1,0,0,0,echec : JSONDecodeError: Unexpected UTF-8 BOM (decode using utf-8-sig): line 1 column 1 (char 0)
+2026-11-10T20:42:34+00:00,stats,2,0,0,0,"ok : 27 vidéos, 6788 vues"
