@@ -9,6 +9,7 @@ Entreprise de contenu menée par des agents : scripts pour le routinier, modèle
 | `agence/` | Code partagé : `registre.py` (lecture et écriture du registre, coût de chaque passage), `youtube.py` (accès aux chaînes) |
 | `agents/` | Un fichier par agent, lancé par `python -m agents.<nom>` |
 | `registre/` | Mémoire commune versionnée : stock, stats, coûts, décisions. Colonnes dans `registre/README.md` |
+| `outils/synchro_rendu.py` | Copie le moteur de rendu de `chaines-studio` vers le dépôt public `studio-rendu`, liste blanche seulement (ni jetons, ni publication, ni nightworks) |
 | `ressources/catalogue.md` | Ce que l'agence a le droit d'utiliser, avec coût et accord nécessaire |
 | `.github/workflows/reveil.yml` | Réveil programmé sur GitHub, PC éteint, qui commite le registre |
 
@@ -16,7 +17,7 @@ Entreprise de contenu menée par des agents : scripts pour le routinier, modèle
 
 - **Un agent = une commande** et une `registre.seance("<nom>")` qui écrit son coût, même en cas d'échec. C'est ce qui permettra de brancher Paperclip plus tard (adaptateur « processus maison ») sans rien réécrire
 - **Le registre ne se réécrit pas** : on ajoute des lignes. Une décision note sa prédiction et la mesure qui la jugera, le verdict revient au critique
-- **Secrets** : jamais dans le dépôt. Sur GitHub, en secrets d'Actions (`YT_TOKEN_EN`, `YT_TOKEN_ES`, `YT_TOKEN_PT`). En local, `agence/youtube.py` lit les jetons de `chaines-studio/.secrets/`
+- **Secrets** : jamais dans le dépôt. Sur GitHub, en secrets d'Actions (`YT_TOKEN_EN`, `YT_TOKEN_ES`, `YT_TOKEN_PT`, `GROQ_API_KEY`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY`). En local, `agence/youtube.py` lit les jetons de `chaines-studio/.secrets/`
 - **0 € tant que l'agence ne gagne rien**
 
 ## Lancer en local
