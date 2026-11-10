@@ -1,0 +1,43 @@
+# Réveil programmé de l'agence : tourne sur les machines de GitHub, PC éteint.
+# Chaque agent se lance par une seule commande (python -m agents.<nom>) et écrit son coût dans registre/couts.csv.
+# Le registre modifié est commité par le robot GitHub.
+name: Reveil
+
+on:
+  schedule:
+    - cron: "17 5,17 * * *"   # 6h17 et 18h17 à Paris (UTC+1 l'hiver)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: registre     # un seul écrivain du registre à la fois
+  cancel-in-progress: false
+
+jobs:
+  agents:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Stats des chaînes
+        env:
+          YT_TOKEN_EN: ${{ secrets.YT_TOKEN_EN }}
+          YT_TOKEN_ES: ${{ secrets.YT_TOKEN_ES }}
+          YT_TOKEN_PT: ${{ secrets.YT_TOKEN_PT }}
+          PYTHONUTF8: "1"
+        run: python -m agents.stats
+      - name: Commiter le registre
+        if: always()
+        run: |
+          git config user.name "agence-robot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add registre
+          git diff --cached --quiet || git commit -q -m "Registre : réveil du $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull -q --rebase && git push -q
