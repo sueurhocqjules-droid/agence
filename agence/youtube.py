@@ -32,7 +32,7 @@ def client(langue):
         if not fichier.exists():
             raise RuntimeError(f"Pas de jeton YouTube pour {langue} (YT_TOKEN_{langue.upper()} ou {fichier})")
         brut = fichier.read_text(encoding="utf-8")
-    creds = Credentials.from_authorized_user_info(json.loads(brut), SCOPES)
+    creds = Credentials.from_authorized_user_info(json.loads(brut.lstrip("﻿")), SCOPES)  # BOM ajouté par PowerShell 5
     creds.refresh(Request())  # jeton d'accès en mémoire seulement, rien n'est réécrit
     return build("youtube", "v3", credentials=creds, cache_discovery=False)
 
