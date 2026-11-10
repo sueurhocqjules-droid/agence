@@ -1,0 +1,27 @@
+"""Modèle gratuit de chaque poste, choisi au banc d'essai du 10/11 (banc/2026-11-10), avec ses secours dans l'ordre.
+
+Les offres gratuites saturent par moments (Gemini en 503, Groq au quota par minute) : on passe au suivant.
+"""
+from agence.modeles import appeler
+
+POSTES = {
+    # Le plus proche des traductions validées par Jules ; qwen garde la structure, un peu moins naturel.
+    "traduction": [("gemini", "gemini-flash-lite-latest", 4000), ("groq", "qwen/qwen3.8-27b", 4000)],
+    # Les trois modèles testés sont justes sur les chiffres ; gpt-oss-120b est le plus rapide.
+    "stats": [("groq", "openai/gpt-oss-120b", 4000), ("gemini", "gemini-flash-lite-latest", 4000)],
+    # Ordres de grandeur et sources plausibles, mais des erreurs : toute proposition passe par le critique.
+    "sujets": [("gemini", "gemini-flash-latest", 9000),
+               ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 9000)],
+}
+
+
+def demander(poste, consigne):
+    """Renvoie (texte, modele, jetons_entree, jetons_sortie, duree_s) du premier modèle qui répond."""
+    erreurs = []
+    for fournisseur, modele, plafond in POSTES[poste]:
+        try:
+            texte, entree, sortie, duree = appeler(fournisseur, modele, consigne, plafond)
+            return texte, modele, entree, sortie, duree
+        except Exception as e:  # noqa: BLE001 : on note et on passe au secours
+            erreurs.append(f"{modele} : {str(e)[:120]}")
+    raise RuntimeError(f"aucun modèle du poste {poste} n'a répondu ({' ; '.join(erreurs)})")

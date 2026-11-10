@@ -1,0 +1,135 @@
+{
+ "titre": "¿Qué pasa si un grano de arroz se duplica cada segundo?",
+ "description": "Un grano de 25 mg, duplicado cada segundo: {n_elephant} segundos para un elefante, {n_navire} para un carguero gigante, {annees} años de cosechas mundiales en la casilla 64 del tablero, y en el segundo {n_max} un montón más alto que el Everest, o una capa de granos sobre toda la Tierra.\nFuentes: USDA, FAO, NOAA, NASA.",
+ "regle": [
+  "UN GRANO DE ARROZ",
+  "SE DUPLICA CADA SEGUNDO"
+ ],
+ "regle2": [
+  "UNA CASILLA CADA SEGUNDO",
+  "64 CASILLAS PARA LLENAR"
+ ],
+ "pli": "SEG",
+ "suite": "SIGUIENTE: {cible}",
+ "restant": "{n} SEGUNDOS RESTANTES",
+ "restant1": "1 SEGUNDO RESTANTE",
+ "grain1": "GRANO",
+ "grains": "GRANOS",
+ "unites": [
+  {
+   "max": 1000000000,
+   "diviseur": 1000000,
+   "nom": "MILLÓN DE GRANOS",
+   "nom1": "MILLÓN DE GRANOS"
+  },
+  {
+   "max": 1000000000000,
+   "diviseur": 1000000000,
+   "nom": "MIL MILLONES DE GRANOS",
+   "nom1": "MIL MILLONES DE GRANOS"
+  },
+  {
+   "max": 1000000000000000,
+   "diviseur": 1000000000000,
+   "nom": "BILLÓN DE GRANOS",
+   "nom1": "BILLÓN DE GRANOS"
+  },
+  {
+   "max": 1000000000000000000,
+   "diviseur": 1000000000000000,
+   "nom": "BILLARDO DE GRANOS",
+   "nom1": "BILLARDO DE GRANOS"
+  },
+  {
+   "max": 1e+21,
+   "diviseur": 1000000000000000000,
+   "nom": "BILLÓN DE GRANOS",
+   "nom1": "BILLÓN DE GRANOS"
+  }
+ ],
+ "separateurs": {
+  "milliers": ".",
+  "decimale": ","
+ },
+ "planete": [
+  "ESPARCIDO, COBRE",
+  "TODO EL PLANETA"
+ ],
+ "boule": [
+  "AHORA PARECE",
+  "UNA BOLA DE ARROZ"
+ ],
+ "faim": [
+  "ALGUIEN",
+  "TENÍA HAMBRE"
+ ],
+ "chute": [
+  "UN GRANO",
+  "SE CAYÓ"
+ ],
+ "paliers": {
+  "tasse": {
+   "cible": "UNA TAZA DE ARROZ",
+   "legende": [
+    "ESO YA ES",
+    "UNA TAZA LLENA"
+   ]
+  },
+  "sac": {
+   "cible": "UN SACO DE 25 KG",
+   "legende": [
+    "MÁS PESADO QUE",
+    "UN SACO DE 25 KG"
+   ]
+  },
+  "elephant": {
+   "cible": "UN ELEFANTE",
+   "legende": [
+    "MÁS PESADO QUE",
+    "UN ELEFANTE"
+   ]
+  },
+  "baleine": {
+   "cible": "UNA BALLENA AZUL",
+   "legende": [
+    "MÁS PESADO QUE",
+    "UNA BALLENA AZUL"
+   ]
+  },
+  "navire": {
+   "cible": "UN CARGUERO",
+   "legende": [
+    "LLENARÍA",
+    "UN CARGUERO GIGANTE"
+   ]
+  },
+  "pyramide": {
+   "cible": "LA GRAN PIRÁMIDE",
+   "legende": [
+    "MÁS GRANDE QUE LA",
+    "GRAN PIRÁMIDE"
+   ]
+  },
+  "recolte": {
+   "cible": "LA COSECHA MUNDIAL",
+   "legende": [
+    "UN AÑO COMPLETO DE LA",
+    "COSECHA MUNDIAL DE ARROZ"
+   ]
+  },
+  "echiquier": {
+   "cible": "LA ÚLTIMA CASILLA",
+   "legende": [
+    "LA CASILLA 64:",
+    "{annees} AÑOS DE COSECHAS"
+   ]
+  },
+  "everest": {
+   "cible": "EVEREST",
+   "legende": [
+    "EL MONTÓN ES AHORA",
+    "MÁS ALTO QUE EL EVEREST"
+   ]
+  }
+ }
+}

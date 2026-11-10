@@ -1,0 +1,18 @@
+modele,tache,mesure,controle
+gemini:gemini-flash-latest,trad-es,"échec : HTTP 503 : [{
+  ""error"": {
+    ""code"": 503,
+    ""message"": ""This model is currently experiencing high demand. Spikes in demand are usually temporary. ",
+gemini:gemini-flash-latest,trad-pt,"231.5 s, 1254+1267 jetons",ok | identiques à la réf : 11/17
+gemini:gemini-flash-latest,sujets,"échec : HTTP 503 : [{
+  ""error"": {
+    ""code"": 503,
+    ""message"": ""This model is currently experiencing high demand. Spikes in demand are usually temporary. ",
+gemini:gemini-flash-latest,stats,"échec : HTTP 503 : [{
+  ""error"": {
+    ""code"": 503,
+    ""message"": ""This model is currently experiencing high demand. Spikes in demand are usually temporary. ",
+gemini:gemini-flash-lite-latest,trad-es,"3.9 s, 1261+1240 jetons",ok | identiques à la réf : 6/17
+gemini:gemini-flash-lite-latest,trad-pt,"24.1 s, 1254+1269 jetons",ok | identiques à la réf : 9/17
+gemini:gemini-flash-lite-latest,sujets,"12.6 s, 325+2080 jetons",JSON invalide
+gemini:gemini-flash-lite-latest,stats,"6.6 s, 1309+210 jetons",134 mots

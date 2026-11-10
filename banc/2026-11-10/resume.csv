@@ -1,0 +1,37 @@
+modele,tache,mesure,controle
+groq:qwen/qwen3.8-27b,trad-es,"3.0 s, 1301+1287 jetons",ok | identiques à la réf : 7/17
+groq:qwen/qwen3.8-27b,trad-pt,"13.9 s, 1294+1293 jetons",ok | identiques à la réf : 6/17
+groq:qwen/qwen3.8-27b,sujets,"échec : HTTP 429 : {""error"":{""message"":""Request too large for model `qwen/qwen3.8-27b` in organization `org_01m73m7sa8ezbrxvmt6j9sngqf` service tier `on_deman",
+groq:qwen/qwen3.8-27b,stats,"échec : HTTP 429 : {""error"":{""message"":""Request too large for model `qwen/qwen3.8-27b` in organization `org_01m73m7sa8ezbrxvmt6j9sngqf` service tier `on_deman",
+groq:openai/gpt-oss-20b,trad-es,"6.8 s, 1158+5149 jetons",ok | identiques à la réf : 3/17
+groq:openai/gpt-oss-20b,trad-pt,"5.1 s, 1151+4198 jetons",ok | identiques à la réf : 5/17
+groq:openai/gpt-oss-20b,sujets,"53.9 s, 382+8976 jetons","8 sujets, ok"
+groq:openai/gpt-oss-20b,stats,"échec : HTTP 413 : {""error"":{""message"":""Request too large for model `openai/gpt-oss-20b` in organization `org_01m73m7sa8ezbrxvmt6j9sngqf` service tier `on_dem",
+openrouter:nvidia/nemotron-3-ultra-550b-a55b:free,trad-es,"102.3 s, 1255+7067 jetons",ok | identiques à la réf : 6/17
+openrouter:nvidia/nemotron-3-ultra-550b-a55b:free,trad-pt,"32.1 s, 1248+2739 jetons",ok | identiques à la réf : 7/17
+openrouter:nvidia/nemotron-3-ultra-550b-a55b:free,sujets,"121.8 s, 357+4766 jetons","8 sujets, ok"
+openrouter:nvidia/nemotron-3-ultra-550b-a55b:free,stats,"27.3 s, 2551+1363 jetons",103 mots
+openrouter:google/gemma-4-31b-it:free,trad-es,"échec : HTTP 429 : {""error"":{""message"":""Provider returned error"",""code"":429,""metadata"":{""raw"":""google/gemma-4-31b-it:free is temporarily rate-limited upstream",
+openrouter:google/gemma-4-31b-it:free,trad-pt,"échec : HTTP 429 : {""error"":{""message"":""Provider returned error"",""code"":429,""metadata"":{""raw"":""google/gemma-4-31b-it:free is temporarily rate-limited upstream",
+openrouter:google/gemma-4-31b-it:free,sujets,"échec : HTTP 429 : {""error"":{""message"":""Provider returned error"",""code"":429,""metadata"":{""raw"":""google/gemma-4-31b-it:free is temporarily rate-limited upstream",
+openrouter:google/gemma-4-31b-it:free,stats,"échec : HTTP 429 : {""error"":{""message"":""Provider returned error"",""code"":429,""metadata"":{""raw"":""google/gemma-4-31b-it:free is temporarily rate-limited upstream",
+openrouter:thinkingmachines/inkling-2-small:free,trad-es,"échec : HTTP 403 : {""error"":{""message"":""This model is not available in your region."",""code"":403,""metadata"":{""routing_funnel"":[{""step"":""Initial Endpoints"",""end",
+openrouter:thinkingmachines/inkling-2-small:free,trad-pt,"échec : HTTP 403 : {""error"":{""message"":""This model is not available in your region."",""code"":403,""metadata"":{""routing_funnel"":[{""step"":""Initial Endpoints"",""end",
+openrouter:thinkingmachines/inkling-2-small:free,sujets,"échec : HTTP 403 : {""error"":{""message"":""This model is not available in your region."",""code"":403,""metadata"":{""routing_funnel"":[{""step"":""Initial Endpoints"",""end",
+openrouter:thinkingmachines/inkling-2-small:free,stats,"échec : HTTP 403 : {""error"":{""message"":""This model is not available in your region."",""code"":403,""metadata"":{""routing_funnel"":[{""step"":""Initial Endpoints"",""end",
+gemini:gemini-2.5-flash,trad-es,"échec : HTTP 404 : [{
+  ""error"": {
+    ""code"": 404,
+    ""message"": ""This model models/gemini-2.5-flash is no longer available to new users. Please update your",
+gemini:gemini-2.5-flash,trad-pt,"échec : HTTP 404 : [{
+  ""error"": {
+    ""code"": 404,
+    ""message"": ""This model models/gemini-2.5-flash is no longer available to new users. Please update your",
+gemini:gemini-2.5-flash,sujets,"échec : HTTP 404 : [{
+  ""error"": {
+    ""code"": 404,
+    ""message"": ""This model models/gemini-2.5-flash is no longer available to new users. Please update your",
+gemini:gemini-2.5-flash,stats,"échec : HTTP 404 : [{
+  ""error"": {
+    ""code"": 404,
+    ""message"": ""This model models/gemini-2.5-flash is no longer available to new users. Please update your",

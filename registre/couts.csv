@@ -2,3 +2,8 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-10T20:35:10+00:00,stats,5,0,0,0,"ok : 27 vidéos, 6811 vues"
 2026-11-10T20:41:34+00:00,stats,1,0,0,0,echec : JSONDecodeError: Unexpected UTF-8 BOM (decode using utf-8-sig): line 1 column 1 (char 0)
 2026-11-10T20:42:34+00:00,stats,2,0,0,0,"ok : 27 vidéos, 6788 vues"
+2026-11-10T21:10:55+00:00,banc,21,0,0,4,"ok : 4 appels, résultats dans banc/2026-11-10"
+2026-11-10T21:11:42+00:00,banc,110,0,0,4,"ok : 4 appels, résultats dans banc/2026-11-10"
+2026-11-10T21:13:40+00:00,banc,741,0,0,24,"ok : 24 appels, résultats dans banc/2026-11-10"
+2026-11-10T21:21:18+00:00,banc,293,0,0,8,"ok : 8 appels, résultats dans banc/2026-11-10"
+2026-11-10T21:26:38+00:00,banc,1526,0,0,16,"ok : 16 appels, résultats dans banc/2026-11-10"
