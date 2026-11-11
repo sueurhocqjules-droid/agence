@@ -168,8 +168,9 @@ def passage(essai):
             try:
                 video_id = envoyer(clients[langue], fichier, sujet_json, calcul_json, langue, quand)
             except HttpError as e:
-                if b"uploadLimitExceeded" in e.content or b"quotaExceeded" in e.content:
-                    print(f"LIMITE {nom} : plus d'envoi sur cette chaîne pour ce passage")
+                raison = next((r for r in ("uploadLimitExceeded", "quotaExceeded") if r.encode() in e.content), None)
+                if raison:
+                    print(f"LIMITE {nom} ({raison}) : plus d'envoi sur cette chaîne pour ce passage")
                     bloquees.add(langue)
                     continue
                 raise
