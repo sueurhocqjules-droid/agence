@@ -1,0 +1,2 @@
+date,id,par,texte,si_oui,si_non,etat,reponse,message_id
+2026-11-11T20:56:33+00:00,1111-2056-1,surete,"Test étape 6 : le flux est en pause (posée par la Sûreté), et la pause l'a bien bloqué. Je la lève ?",reprise:flux,rien,ouverte,,5

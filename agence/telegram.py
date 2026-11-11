@@ -51,7 +51,8 @@ def envoyer(texte, boutons=None):
 
 
 def clics(depuis):
-    """Clics de Jules sur des boutons depuis l'update `depuis` : (prochain décalage, [(id du clic, donnée, id du message)]).
+    """Clics de Jules sur des boutons depuis l'update `depuis` :
+    (prochain décalage, [(id de l'update, id du clic, donnée, id du message, date d'envoi du message en secondes)]).
 
     Tout ce qui ne vient pas de la conversation de Jules est ignoré. Les updates lues sont confirmées
     à Telegram au prochain appel avec le décalage renvoyé.
@@ -62,7 +63,8 @@ def clics(depuis):
         clic = update.get("callback_query")
         if not clic or clic["from"]["id"] != jules or clic.get("message", {}).get("chat", {}).get("id") != jules:
             continue
-        resultat.append((clic["id"], clic.get("data", ""), clic["message"]["message_id"]))
+        resultat.append((update["update_id"], clic["id"], clic.get("data", ""), clic["message"]["message_id"],
+                         clic["message"].get("date", 0)))
     return prochain, resultat
 
 
