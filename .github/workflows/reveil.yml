@@ -1,5 +1,5 @@
 # Réveil programmé de l'agence : tourne sur les machines de GitHub, PC éteint.
-# Chaque agent se lance par une seule commande (python -m agents.<nom>) et écrit son coût dans registre/couts.csv.
+# Tout passe par le lanceur (python -m agence.lancer <nom>) : pause, budget, journal. Une étape par agent, avec ses seuls secrets.
 # Le registre modifié est commité par le robot GitHub.
 name: Reveil
 
@@ -46,7 +46,7 @@ jobs:
           YT_TOKEN_ES: ${{ secrets.YT_TOKEN_ES }}
           YT_TOKEN_PT: ${{ secrets.YT_TOKEN_PT }}
           PYTHONUTF8: "1"
-        run: python -m agents.stats
+        run: python -m agence.lancer stats
       - name: Flux (rendu, contrôle, programmation)
         if: ${{ !cancelled() }}
         env:
@@ -56,7 +56,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}   # lecture des artefacts du dépôt public studio-rendu
           RENDU_DIR: rendu
           PYTHONUTF8: "1"
-        run: python -m agents.flux
+        run: python -m agence.lancer flux
       - name: Commiter le registre
         if: always()
         env:

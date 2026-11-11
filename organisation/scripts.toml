@@ -1,0 +1,12 @@
+# Scripts de l'agence : rien à juger, donc pas d'agent, mais chacun a un agent propriétaire (sa fiche dans postes/).
+# Le lanceur (python -m agence.lancer <nom>) ne leur transmet que les secrets listés ici.
+
+[stats]
+proprietaire = "chef-operations"
+module = "agents.stats"
+secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT"]
+
+[flux]
+proprietaire = "chef-contenu"
+module = "agents.flux"
+secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT", "GH_TOKEN"]
