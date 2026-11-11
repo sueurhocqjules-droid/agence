@@ -20,7 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      # Cloisonnement : le jeton du dépôt n'est pas laissé dans .git/config, seule l'étape de commit le reçoit
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       # Moteur public : sujets à lire, et file de rendu à pousser avec la clé de déploiement (écriture sur ce seul dépôt)
       - uses: actions/checkout@v5
         with:
@@ -56,7 +59,11 @@ jobs:
         run: python -m agents.flux
       - name: Commiter le registre
         if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
           git add registre
           git diff --cached --quiet || git commit -q -m "Registre : réveil du $(date -u +%Y-%m-%dT%H:%MZ)"
-          git pull -q --rebase && git push -q
+          git -c http.https://github.com/.extraheader="$auth" pull -q --rebase
+          git -c http.https://github.com/.extraheader="$auth" push -q
