@@ -5,7 +5,7 @@ name: Reveil
 
 on:
   schedule:
-    - cron: "17 5,17 * * *"   # 6h17 et 18h17 à Paris (UTC+1 l'hiver)
+    - cron: "17 5,11,17,23 * * *"   # 6h17, 12h17, 18h17, 0h17 à Paris : GitHub retarde ou saute parfois un créneau (11/11), le flux ne refait rien de déjà fait
   workflow_dispatch:
 
 permissions:
