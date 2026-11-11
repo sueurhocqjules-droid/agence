@@ -4,14 +4,14 @@ titre = "Responsable sûreté"
 superieur = "direction"
 ligne_directe = "jules"
 objectifs = [1, 2, 3]
-statut = "a_construire"
+statut = "en_service"
 etape = 6
-moteur = "scripts de seuils, modèle gratuit seulement pour résumer une alerte"
-reveil = "à chaque réveil de l'agence (2 par jour), et avant chaque publication"
-regle_de_deux = "[B][C] : jetons des chaînes pour lire leur statut et mettre en pause. Pas de [A] : les avertissements lui arrivent en champs structurés"
-secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT"]
+moteur = "scripts de seuils, 0 jeton (organisation/seuils.toml)"
+reveil = "à chaque réveil de l'agence (4 par jour), après les stats et avant le flux"
+regle_de_deux = "[B][C] : écrit les pauses et parle à Jules sur Telegram. Pas de [A] : le statut des vidéos lui arrive en champs structurés par stats.csv, les clics de Jules sont une liste fermée d'actions"
+secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
 budget = { claude_usd_semaine = 0, appels_gratuits_jour = 20 }
-scripts = ["compteur", "garde_fous", "pause"]
+scripts = ["garde_fous", "reponses"]
 equipe = []
 +++
 # Responsable sûreté
@@ -26,10 +26,10 @@ equipe = []
 Drapeaux de pause dans `registre/pauses.csv`, respectés par le lanceur et par tous les scripts de publication. Alerte immédiate à Jules et à la Direction. Le contrôle d'un outil avant sa fusion par la Maintenance (nouveaux appels réseau, lecture de secrets).
 
 ## Outils
-Scripts `compteur`, `garde_fous` et `pause`.
+Script `garde_fous` (`agents/surete.py` : compteur, seuils, sanctions, pannes) et `reponses` (`agence/questions.py` : lit les clics Oui/Non de Jules sur Telegram et applique l'action prévue). Les deux échappent à une pause générale (`hors_pause`), pour qu'une pause puisse toujours être levée.
 
 ## Secrets et permissions
-Les jetons des chaînes, seulement pour lire le statut et suspendre. Ne publie rien.
+Le jeton du bot Telegram, et le jeton GitHub du réveil en lecture des runs (minutes du mois). Aucun jeton de chaîne : une pause de chaîne est respectée par le flux. Ne publie rien.
 
 ## Mesure de réussite
 Zéro avertissement ou sanction de plateforme. Aucun budget dépassé sans le oui de Jules. Peu de pauses inutiles (levées sans incident).

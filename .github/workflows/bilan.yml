@@ -1,0 +1,49 @@
+# Bilan du lundi : une page écrite par script (0 jeton), en issue du dépôt (GitHub l'envoie par mail) et résumée sur Telegram.
+name: Bilan
+
+on:
+  schedule:
+    - cron: "37 6 * * 1"   # lundi 7h37 à Paris (8h37 en été), après le réveil de 6h17
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: registre     # même groupe que le réveil : un seul écrivain du registre à la fois
+  cancel-in-progress: false
+
+jobs:
+  bilan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: |
+          git config --global user.name "agence-robot"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Bilan de la semaine
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_TOKEN: ${{ github.token }}   # création de l'issue
+          PYTHONUTF8: "1"
+        run: python -m agence.lancer bilan
+      - name: Commiter le registre
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git add registre
+          git diff --cached --quiet || git commit -q -m "Registre : bilan du $(date -u +%Y-%m-%d)"
+          git -c http.https://github.com/.extraheader="$auth" pull -q --rebase
+          git -c http.https://github.com/.extraheader="$auth" push -q

@@ -1,0 +1,22 @@
+# Seuils de la Sûreté (agents/surete.py). Seul Jules les relève ; la Sûreté peut proposer un changement par question.
+# Semaine = depuis lundi 0h UTC, comme le lanceur.
+
+[claude]
+# Somme des budgets Claude des fiches : Auteur 30 $ + Direction 8 $ = 38 $ équivalent API par semaine
+alerte_usd_semaine = 38
+# Au-delà : pause des agents qui appellent Claude, et question à Jules pour reprendre
+pause_usd_semaine = 45
+pause_cibles = ["auteur"]
+# Étalon : combien de dollars équivalent API font 1 % de la limite hebdomadaire de Jules.
+# 0 = inconnu, le compteur ne donne alors que des dollars. À mesurer (barre d'état, ~/.claude/limites.jsonl).
+dollars_par_pourcent = 0
+# Objectif 2 de MISSION.md
+limite_pourcent = 20
+
+[github]
+# Offre gratuite : 2 000 minutes par mois pour les dépôts privés (studio-rendu est public, ses minutes sont gratuites)
+alerte_minutes_mois = 1500
+
+[echecs]
+# Passages en échec d'affilée d'un même agent ou script avant d'alerter Jules
+alerte_consecutifs = 3

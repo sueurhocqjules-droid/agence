@@ -93,6 +93,8 @@ def lancer(nom, arguments):
     postes, liste_scripts = organisation.fiches(), organisation.scripts()
     responsable, module, autorises, budget = preparer(nom, postes, liste_scripts)
     cibles = [nom] + organisation.chaine_de_commandement(responsable, postes) + [TOUT]
+    if liste_scripts.get(nom, {}).get("hors_pause"):
+        cibles = [nom]  # sûreté et réponses de Jules : une pause générale ne doit pas couper le moyen de la lever
     maintenant = datetime.now(timezone.utc)
 
     refus = None

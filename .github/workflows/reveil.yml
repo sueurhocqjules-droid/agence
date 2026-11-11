@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  actions: read       # la Sûreté compte les minutes GitHub du mois
 
 concurrency:
   group: registre     # un seul écrivain du registre à la fois
@@ -51,6 +52,14 @@ jobs:
           echo "$FFMPEG_SHA256  $RUNNER_TEMP/$FFMPEG" | sha256sum -c -
           sudo tar -xJf "$RUNNER_TEMP/$FFMPEG" -C /usr/local/bin --strip-components=2 --wildcards "*/bin/ffmpeg" "*/bin/ffprobe"
           ffmpeg -version | head -1
+      # Avant tout le reste : un « Oui » de Jules (reprise d'une pause) s'applique dès ce réveil
+      - name: Réponses de Jules (Telegram)
+        if: ${{ !cancelled() }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PYTHONUTF8: "1"
+        run: python -m agence.lancer reponses relever
       - name: Stats des chaînes
         if: ${{ !cancelled() }}
         env:
@@ -59,6 +68,15 @@ jobs:
           YT_TOKEN_PT: ${{ secrets.YT_TOKEN_PT }}
           PYTHONUTF8: "1"
         run: python -m agence.lancer stats
+      # Après les stats (une vidéo rejetée met sa chaîne en pause), avant le flux (qui respecte cette pause)
+      - name: Sûreté (compteur, seuils, sanctions)
+        if: ${{ !cancelled() }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_TOKEN: ${{ github.token }}   # lecture des runs du dépôt, pour les minutes du mois
+          PYTHONUTF8: "1"
+        run: python -m agence.lancer garde_fous
       - name: Flux (rendu, contrôle, programmation)
         if: ${{ !cancelled() }}
         env:
