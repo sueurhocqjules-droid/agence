@@ -1,1 +1,3 @@
 {"date": "2026-11-11T21:02:50+00:00", "quoi": "reponses", "resultat": "ok", "code": 0, "duree_s": 3, "sortie": "Réponse oui à 1111-2056-1 : reprise:flux\nok : 1 réponse(s) de Jules", "secrets_en_trop": ["CLAUDE_CODE_MESSAGING_TOKEN"]}
+{"date": "2026-11-11T21:14:13+00:00", "quoi": "reponses", "resultat": "ok", "code": 0, "duree_s": 0, "sortie": "ok : 0 réponse(s) de Jules"}
+{"date": "2026-11-11T21:14:16+00:00", "quoi": "garde_fous", "resultat": "ok", "code": 0, "duree_s": 1, "sortie": "Semaine du 2026-11-09 : 17.80 $ équivalent Claude (auteur 17.80 $), 56 appels gratuits\nGitHub : 57 minutes ce mois sur les dépôts privés\nok : 17.80 $ cette semaine, 0 alerte(s) envoyée(s)"}
