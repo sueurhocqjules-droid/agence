@@ -1,6 +1,6 @@
 # Catalogue de ressources
 
-Ce que l'agence a le droit d'utiliser. Seul Jules ajoute une ressource, la Recherche l'essaie et écrit son bilan dans la fiche. Ce qui n'est pas ici est hors de portée (les autres projets de Jules en particulier).
+Ce que l'agence a le droit d'utiliser. Seul Jules ajoute une ressource, la Recherche l'essaie et écrit son bilan dans la fiche. Ce qui n'est pas ici est hors de portée (les autres projets de Jules en particulier). Seule exception, en lecture : le Chercheur d'outils lit `ressources/boite-a-outils-jarvis.md`, copie de la boîte à outils de Jarvis, comme liste de candidats.
 
 Colonnes : ce qu'elle sait faire, ce qu'elle coûte, quand elle est libre, si l'accord de Jules est nécessaire pour s'en servir.
 
