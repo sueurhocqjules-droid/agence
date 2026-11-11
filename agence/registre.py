@@ -12,7 +12,7 @@ from pathlib import Path
 DOSSIER = Path(__file__).resolve().parent.parent / "registre"
 
 COLONNES = {
-    "stock": ["nom", "chaine", "sujet", "etat", "sortie_prevue", "video_id", "maj"],
+    "stock": ["nom", "chaine", "sujet", "etat", "sortie_prevue", "video_id", "maj", "note"],
     "stats": ["releve", "chaine", "video_id", "titre", "statut", "sortie", "vues", "likes", "commentaires"],
     "couts": ["debut", "agent", "duree_s", "jetons_claude", "dollars_equiv", "appels_gratuits", "resultat"],
 }

@@ -18,14 +18,25 @@ concurrency:
 jobs:
   agents:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
+      # Moteur public : sujets à lire, et file de rendu à pousser avec la clé de déploiement (écriture sur ce seul dépôt)
+      - uses: actions/checkout@v5
+        with:
+          repository: sueurhocqjules-droid/studio-rendu
+          path: rendu
+          ssh-key: ${{ secrets.RENDU_DEPLOY_KEY }}
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
           cache: pip
       - run: pip install -r requirements.txt
+      - name: ffmpeg pour le contrôle des vidéos
+        run: sudo apt-get update -q && sudo apt-get install -yq ffmpeg
+      - run: |
+          git config --global user.name "agence-robot"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Stats des chaînes
         env:
           YT_TOKEN_EN: ${{ secrets.YT_TOKEN_EN }}
@@ -33,11 +44,19 @@ jobs:
           YT_TOKEN_PT: ${{ secrets.YT_TOKEN_PT }}
           PYTHONUTF8: "1"
         run: python -m agents.stats
+      - name: Flux (rendu, contrôle, programmation)
+        if: ${{ !cancelled() }}
+        env:
+          YT_TOKEN_EN: ${{ secrets.YT_TOKEN_EN }}
+          YT_TOKEN_ES: ${{ secrets.YT_TOKEN_ES }}
+          YT_TOKEN_PT: ${{ secrets.YT_TOKEN_PT }}
+          GH_TOKEN: ${{ github.token }}   # lecture des artefacts du dépôt public studio-rendu
+          RENDU_DIR: rendu
+          PYTHONUTF8: "1"
+        run: python -m agents.flux
       - name: Commiter le registre
         if: always()
         run: |
-          git config user.name "agence-robot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add registre
           git diff --cached --quiet || git commit -q -m "Registre : réveil du $(date -u +%Y-%m-%dT%H:%MZ)"
           git pull -q --rebase && git push -q
