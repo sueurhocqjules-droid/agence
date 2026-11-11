@@ -29,7 +29,8 @@ Toute tâche se rattache à l'un d'eux (champ `objectifs` de chaque fiche). Peu 
 2. **Modèle le moins cher qui suffit :** script d'abord, modèle gratuit ensuite (choisi par l'expert en modèles), Claude seulement là où sa fiche le prévoit
 3. **Chaque réveil relit la mission, puis la fiche :** l'agent sait quoi faire et pourquoi, et ne dérive pas de sa tâche
 4. **Budget par agent** (champ `budget` de la fiche), en plus du compteur global tenu par la Sûreté. Un agent au bout de son budget s'arrête et le fait remonter. Dépasser un budget demande le oui de Jules
-5. **Journal d'audit :** chaque décision d'agent est notée dans `registre/decisions.jsonl`, au moins en une ligne, avec sa raison, et sa prédiction quand elle en a une. On ajoute, on ne réécrit jamais
+5. **Tout passe par le lanceur** (`python -m agence.lancer <nom>`) : il refuse un agent en pause (lui, un supérieur ou toute l'agence, `registre/pauses.csv`) ou au bout de son budget, ne lui passe que ses secrets et note chaque passage dans `registre/journal/<agent>.jsonl`. Les demandes de Jules à une équipe se lisent avec `agence.demandes`
+6. **Journal d'audit :** chaque décision d'agent est notée dans `registre/decisions.jsonl`, au moins en une ligne, avec sa raison, et sa prédiction quand elle en a une. On ajoute, on ne réécrit jamais
 
 ## Sécurité : la règle de deux
 

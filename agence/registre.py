@@ -15,6 +15,7 @@ COLONNES = {
     "stock": ["nom", "chaine", "sujet", "etat", "sortie_prevue", "video_id", "maj", "note"],
     "stats": ["releve", "chaine", "video_id", "titre", "statut", "sortie", "vues", "likes", "commentaires"],
     "couts": ["debut", "agent", "duree_s", "jetons_claude", "dollars_equiv", "appels_gratuits", "resultat"],
+    "pauses": ["date", "cible", "action", "par", "raison"],
 }
 
 
@@ -42,12 +43,26 @@ def lire(table):
         return list(csv.DictReader(f))
 
 
-def decider(auteur, decision, pourquoi, prediction, mesure, echeance):
-    """Note une décision avec ce qu'elle prédit : le critique la jugera sur les vrais chiffres à l'échéance."""
+def decider(auteur, decision, pourquoi, prediction=None, mesure=None, echeance=None):
+    """Note une décision au journal d'audit, avec sa raison.
+
+    Avec une prédiction, sa mesure et son échéance, le critique la jugera sur les vrais chiffres.
+    """
     entree = {"date": maintenant(), "auteur": auteur, "decision": decision, "pourquoi": pourquoi,
               "prediction": prediction, "mesure": mesure, "echeance": echeance, "verdict": None}
     with open(DOSSIER / "decisions.jsonl", "a", encoding="utf-8") as f:
         f.write(json.dumps(entree, ensure_ascii=False) + "\n")
+
+
+def pause(cible, par, raison, action="pause"):
+    """Met en pause (ou relance avec action="reprise") un agent, un script, une équipe par son chef, ou "tout".
+
+    La dernière ligne d'une cible fait foi. Le lanceur refuse tout ce qui est en pause, et la décision est notée.
+    """
+    if action not in ("pause", "reprise"):
+        raise ValueError(action)
+    ajouter("pauses", [{"date": maintenant(), "cible": cible, "action": action, "par": par, "raison": raison}])
+    decider(par, f"{action} : {cible}", raison)
 
 
 @contextmanager
