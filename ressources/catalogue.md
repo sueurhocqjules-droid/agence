@@ -9,7 +9,7 @@ Colonnes : ce qu'elle sait faire, ce qu'elle coûte, quand elle est libre, si l'
 | GitHub Actions (compte `sueurhocqjules-droid`) | Faire tourner les agents et les rendus, PC éteint | 0 €, 2 000 min par mois en dépôt privé, partagées avec `chaines-studio` (~400 min du 1er au 10/11). Illimité en dépôt public | Toujours | Non tant qu'on reste sous le quota gratuit |
 | API YouTube, projet Google `capi-studio` | Lire stats et vidéos, envoyer et programmer | 0 €, 10 000 unités par jour partagées avec Capi | Toujours | Non |
 | Chaînes Every Second (`en`), Cada Segundo (`es`), A Cada Segundo (`pt`) | Publier | 0 € | Toujours | Ouvrir, arrêter ou réorienter une chaîne : oui |
-| Dépôt public `studio-rendu` (GitHub Actions) | Rendre les vidéos sans entamer les 2 000 min du privé | 0 €, minutes illimitées. Ne contient que le moteur (liste blanche de `outils/synchro_rendu.py`), visible par tous | Toujours | Non |
+| Dépôt public `studio-rendu` (GitHub Actions) | Rendre les vidéos sans entamer les 2 000 min du privé | 0 €, minutes illimitées. Ne contient que le moteur (liste blanche de `chaines-studio/scripts/synchro_rendu.py`), visible par tous | Toujours | Non |
 | Moteur de `chaines-studio` (Remotion, calculs, rendu GitHub) | Fabriquer une vidéo « chaque seconde » à partir d'un sujet | 0 € | Toujours | Non |
 | Abonnement Claude (`claude -p`) | Écrire un sujet, trancher, juger | Compte dans la limite de l'abonnement de Jules : budget < 20 % de la semaine | Toujours, à doser | Non, dans le budget |
 | `edge-tts` | Voix de synthèse en, es, pt, sans clé | 0 € | Toujours | Non |

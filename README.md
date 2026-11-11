@@ -9,7 +9,7 @@ Entreprise de contenu menée par des agents : scripts pour le routinier, modèle
 | `agence/` | Code partagé : `registre.py` (lecture et écriture du registre, coût de chaque passage), `youtube.py` (accès aux chaînes) |
 | `agents/` | Un fichier par agent, lancé par `python -m agents.<nom>` |
 | `registre/` | Mémoire commune versionnée : stock, stats, coûts, décisions. Colonnes dans `registre/README.md` |
-| `outils/synchro_rendu.py` | Copie le moteur de rendu de `chaines-studio` vers le dépôt public `studio-rendu`, liste blanche seulement (ni jetons, ni publication, ni nightworks) |
+| `chaines-studio/scripts/synchro_rendu.py` (déplacé le 11/11) | Copie le moteur de rendu de `chaines-studio` vers le dépôt public `studio-rendu`, liste blanche seulement (ni jetons, ni publication, ni nightworks) |
 | `ressources/catalogue.md` | Ce que l'agence a le droit d'utiliser, avec coût et accord nécessaire |
 | `.github/workflows/reveil.yml` | Réveil programmé sur GitHub, PC éteint, qui commite le registre |
 
@@ -32,5 +32,5 @@ python -m agents.stats
 | Agent | Fait | Coût |
 |---|---|---|
 | `stats` | Relève vues, likes, commentaires de chaque vidéo des trois chaînes | 0 jeton, ~10 unités de quota YouTube |
-| `flux` | Compare les sujets du moteur (`studio-rendu`) aux vidéos des chaînes. Ce qui manque part en rendu (file `studio-rendu/file/attente.txt`), ce qui est rendu est contrôlé (`agence/controle.py` : durée, format, son, écran noir) puis programmé au prochain créneau (en 01h/18h, es 02h/19h, pt 16h/23h, Paris). `--essai` pour voir sans agir. Ne crée pas de sujet : un nouveau sujet s'écrit dans `chaines-studio`, puis `outils/synchro_rendu.py` | 0 jeton, ~1 600 unités de quota par envoi |
+| `flux` | Compare les sujets du moteur (`studio-rendu`) aux vidéos des chaînes. Ce qui manque part en rendu (file `studio-rendu/file/attente.txt`), ce qui est rendu est contrôlé (`agence/controle.py` : durée, format, son, écran noir) puis programmé au prochain créneau (en 01h/18h, es 02h/19h, pt 16h/23h, Paris). `--essai` pour voir sans agir. Ne crée pas de sujet : un nouveau sujet s'écrit dans `chaines-studio`, puis `scripts/synchro_rendu.py` de `chaines-studio` (l'atelier le fait seul, `chaines-studio/.github/workflows/atelier.yml`) | 0 jeton, ~1 600 unités de quota par envoi |
 | `banc` | Banc d'essai des modèles gratuits sur les vrais postes (local, lit `../chaines-studio`). Verdict : `banc/README.md` | 0 jeton, ~30 appels gratuits |
