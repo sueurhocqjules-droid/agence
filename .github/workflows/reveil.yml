@@ -36,6 +36,7 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
       - name: ffmpeg pour le contrôle des vidéos
+        timeout-minutes: 5   # un miroir apt qui pend ne bloque plus le réveil
         run: sudo apt-get update -q && sudo apt-get install -yq ffmpeg
       - run: |
           git config --global user.name "agence-robot"
