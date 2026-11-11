@@ -1,7 +1,9 @@
 """Tests de l'étape 6 : compteur, seuils, sanctions, pannes, questions à choix fermés, bilan.  python -m unittest discover tests"""
 import json
 import tempfile
+import time
 import unittest
+from unittest import mock
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -76,6 +78,18 @@ class Questions(unittest.TestCase):
         lignes = [{"id": "a", "etat": "ouverte"}, {"id": "a", "etat": "repondue"}, {"id": "b", "etat": "ouverte"}]
         etat = questions.etat_questions(lignes)
         self.assertEqual((etat["a"]["etat"], etat["b"]["etat"]), ("repondue", "ouverte"))
+
+    def releve(self, envoi):
+        with tempfile.TemporaryDirectory() as d,                 mock.patch.object(questions, "DECALAGE", Path(d, "telegram.json")),                 mock.patch.object(questions.registre, "lire", return_value=[]),                 mock.patch.object(questions, "telegram") as tg:
+            tg.clics.return_value = (43, [(42, "c1", "q:1111-2140-1:oui", 7, envoi)])
+            prises = questions.relever()
+            return prises, json.loads(questions.DECALAGE.read_text())["decalage"]
+
+    def test_clic_recent_sur_question_inconnue_garde(self):
+        self.assertEqual(self.releve(time.time() - 60), (0, 42))
+
+    def test_clic_ancien_sur_question_inconnue_oublie(self):
+        self.assertEqual(self.releve(time.time() - 7 * 3600), (0, 43))
 
 
 class HorsPause(unittest.TestCase):

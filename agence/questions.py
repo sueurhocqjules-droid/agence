@@ -11,11 +11,13 @@ import argparse
 import json
 import re
 import sys
+import time
 from datetime import datetime, timezone
 
 from agence import organisation, registre, telegram, youtube
 
 DECALAGE = registre.DOSSIER / "telegram.json"
+GARDE_S = 6 * 3600  # un clic sur une question inconnue plus récente que ça est gardé (registre en retard)
 CLIC = re.compile(r"^q:([0-9a-z-]{1,24}):(oui|non)$")
 
 
@@ -67,9 +69,15 @@ def relever():
     depuis = json.loads(DECALAGE.read_text(encoding="utf-8"))["decalage"] if DECALAGE.exists() else 0
     prochain, clics = telegram.clics(depuis)
     questions, prises = etat_questions(registre.lire("questions")), 0
-    for id_clic, donnee, id_message in clics:
+    for id_update, id_clic, donnee, id_message, envoi in clics:
         trouve = CLIC.match(donnee)
         question = questions.get(trouve.group(1)) if trouve else None
+        if trouve and not question and time.time() - envoi < GARDE_S:
+            # Question récente absente d'ici : ce registre est en retard sur celui qui l'a posée. On garde le clic
+            # (et les suivants) pour le prochain passage au lieu de le perdre.
+            print(f"Clic sur {trouve.group(1)}, question pas encore dans ce registre : gardé pour le prochain passage")
+            prochain = id_update
+            break
         if not question or question["etat"] != "ouverte":
             _accuser(id_clic, "Question inconnue ou déjà tranchée")
             continue
