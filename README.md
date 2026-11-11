@@ -11,6 +11,7 @@ Entreprise de contenu menée par des agents : scripts pour le routinier, modèle
 | `registre/` | Mémoire commune versionnée : stock, stats, coûts, décisions. Colonnes dans `registre/README.md` |
 | `chaines-studio/scripts/synchro_rendu.py` (déplacé le 11/11) | Copie le moteur de rendu de `chaines-studio` vers le dépôt public `studio-rendu`, liste blanche seulement (ni jetons, ni publication, ni nightworks) |
 | `ressources/catalogue.md` | Ce que l'agence a le droit d'utiliser, avec coût et accord nécessaire |
+| `ressources/boite-a-outils-jarvis.md` | Copie de la boîte à outils de Jarvis, envoyée par le hook de fin de session de Jarvis (`.claude/hooks/boite-vers-agence.sh`) dès qu'elle change. Lue par le seul Chercheur d'outils, ne pas modifier ici |
 | `.github/workflows/reveil.yml` | Réveil programmé sur GitHub, PC éteint, qui commite le registre |
 
 ## Règles de construction
