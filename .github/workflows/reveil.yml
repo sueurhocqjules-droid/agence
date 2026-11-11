@@ -40,10 +40,7 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: ffmpeg pour le contrôle des vidéos
         timeout-minutes: 8   # un miroir qui pend ne bloque plus le réveil
-        # Miroir principal d'Ubuntu plutôt que celui d'Azure, tombé le 11/11 (mêmes paquets signés)
-        run: |
-          echo "http://archive.ubuntu.com/ubuntu/" | sudo tee /etc/apt/apt-mirrors.txt
-          sudo apt-get update -q && sudo apt-get install -yq ffmpeg
+        run: sudo apt-get update -q && sudo apt-get install -yq ffmpeg
       - name: Stats des chaînes
         if: ${{ !cancelled() }}
         env:
