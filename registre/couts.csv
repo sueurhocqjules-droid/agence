@@ -23,3 +23,4 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-11T21:14:13+00:00,stats,2,0,0,0,"ok : 57 vidéos, 8143 vues"
 2026-11-11T21:14:15+00:00,garde_fous,1,0,0,0,"ok : 17.80 $ cette semaine, 0 alerte(s) envoyée(s)"
 2026-11-11T21:14:16+00:00,flux,24,0,0,0,"ok : 0 programmées, 0 rejetées, 0 en rendu"
+2026-11-11T21:22:40+00:00,bilan,3,0,0,0,ok : https://github.com/sueurhocqjules-droid/agence/issues/3
