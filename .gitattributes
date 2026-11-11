@@ -1,0 +1,4 @@
+# Journaux du registre, en ajout seul : deux runs qui ajoutent chacun leurs lignes (réveil et bilan, par exemple)
+# ne se bloquent plus au rebase, git garde les lignes des deux côtés. telegram.json, réécrit en entier, reste hors de la règle.
+registre/*.csv merge=union
+registre/**/*.jsonl merge=union
