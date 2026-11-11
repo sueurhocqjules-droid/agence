@@ -1,0 +1,2 @@
+date,cible,action,par,raison
+2026-11-11T20:44:42+00:00,flux,pause,surete,test étape 6 : la pause doit bloquer le flux
