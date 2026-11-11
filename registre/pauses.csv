@@ -1,2 +1,3 @@
 date,cible,action,par,raison
 2026-11-11T20:44:42+00:00,flux,pause,surete,test étape 6 : la pause doit bloquer le flux
+2026-11-11T21:02:47+00:00,flux,reprise,jules,"réponse oui de Jules à : Test étape 6 : le flux est en pause (posée par la Sûreté), et la pause l'a bien bloqué. Je la lève ?"

@@ -93,7 +93,7 @@ def page(maintenant):
 
     ouvertes = [q for q in questions.etat_questions(registre.lire("questions")).values() if q["etat"] == "ouverte"]
     lignes += ["## Questions pour toi", ""]
-    lignes += [f"- {q['texte']} (Oui : {q['si_oui']}, Non : {q['si_non']}), à trancher par les boutons Telegram" for q in ouvertes] \
+    lignes += [f"- {q['texte']} (Oui : {questions.en_clair(q['si_oui'])}), à trancher par les boutons Telegram" for q in ouvertes] \
         or ["- Aucune. Tu n'as rien à faire cette semaine."]
     lignes += ["", "_Bilan écrit par script, sans modèle. L'analyse (pourquoi, prédictions jugées) arrivera avec la Direction._"]
     resume = (f"Bilan de la semaine : +{total} vues, {prog} vidéos programmées, {c['dollars']:.2f} $ Claude"

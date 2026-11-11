@@ -22,6 +22,16 @@ jobs:
       - uses: actions/checkout@v5
         with:
           persist-credentials: false
+      # Coûts des séances de l'atelier (dépôt privé chaines-studio) : clé de déploiement en lecture seule,
+      # un seul fichier récupéré, clé retirée du disque après le checkout
+      - uses: actions/checkout@v5
+        with:
+          repository: sueurhocqjules-droid/chaines-studio
+          path: atelier-src
+          ssh-key: ${{ secrets.ATELIER_DEPLOY_KEY }}
+          persist-credentials: false
+          sparse-checkout: atelier/couts.csv
+          sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
@@ -35,6 +45,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GH_TOKEN: ${{ github.token }}   # création de l'issue
+          ATELIER_COUTS: atelier-src/atelier/couts.csv
           PYTHONUTF8: "1"
         run: python -m agence.lancer bilan
       - name: Commiter le registre

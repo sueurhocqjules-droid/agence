@@ -4,11 +4,13 @@
 [stats]
 proprietaire = "chef-operations"
 module = "agents.stats"
+description = "le relevé des vues des chaînes"
 secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT"]
 
 [flux]
 proprietaire = "chef-contenu"
 module = "agents.flux"
+description = "le rendu, le contrôle et la programmation des vidéos"
 secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT", "GH_TOKEN"]
 
 # hors_pause : seule une pause à son propre nom l'arrête (ni « tout », ni ses supérieurs), pour que la Sûreté
@@ -17,16 +19,19 @@ secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT", "GH_TOKEN"]
 [reponses]
 proprietaire = "surete"
 module = "agence.questions"
+description = "la lecture de tes réponses Telegram"
 secrets = ["TELEGRAM_BOT_TOKEN"]
 hors_pause = true
 
 [garde_fous]
 proprietaire = "surete"
 module = "agents.surete"
+description = "la surveillance des coûts et des sanctions"
 secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
 hors_pause = true
 
 [bilan]
 proprietaire = "direction"
 module = "agents.bilan"
+description = "le bilan du lundi"
 secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
