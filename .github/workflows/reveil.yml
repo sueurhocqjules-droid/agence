@@ -38,9 +38,19 @@ jobs:
       - run: |
           git config --global user.name "agence-robot"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      # ffmpeg statique figé dans la release « outils » de studio-rendu, empreinte vérifiée : plus d'apt-get,
+      # les serveurs d'Ubuntu sont tombés le 11/11/2026
       - name: ffmpeg pour le contrôle des vidéos
-        timeout-minutes: 8   # un miroir qui pend ne bloque plus le réveil
-        run: sudo apt-get update -q && sudo apt-get install -yq ffmpeg
+        timeout-minutes: 5
+        env:
+          OUTILS: https://github.com/sueurhocqjules-droid/studio-rendu/releases/download/outils
+          FFMPEG: ffmpeg-n8.1-latest-linux64-lgpl-8.1.tar.xz
+          FFMPEG_SHA256: e44961bca8e8429645843addd3e0b06397bea909f5526091a51fcfa300bf2915
+        run: |
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/$FFMPEG" "$OUTILS/$FFMPEG"
+          echo "$FFMPEG_SHA256  $RUNNER_TEMP/$FFMPEG" | sha256sum -c -
+          sudo tar -xJf "$RUNNER_TEMP/$FFMPEG" -C /usr/local/bin --strip-components=2 --wildcards "*/bin/ffmpeg" "*/bin/ffprobe"
+          ffmpeg -version | head -1
       - name: Stats des chaînes
         if: ${{ !cancelled() }}
         env:
