@@ -3,7 +3,7 @@
 Lancement : python -m agence.lancer bilan   (ou python -m agents.bilan --essai : affiche la page, n'envoie rien)
 
 Un lundi, la page couvre la semaine passée (lundi 0h à lundi 0h UTC). Un autre jour, la semaine en cours.
-Envoi : une issue du dépôt agence (GitHub l'envoie par mail à Jules), un résumé sur Telegram avec le lien,
+Envoi : une issue du dépôt agence qui mentionne Jules (la mention déclenche le mail de GitHub, le dépôt n'étant pas suivi), un résumé sur Telegram avec le lien,
 et une copie dans registre/bilans/. L'analyse (pourquoi, prédictions jugées) viendra avec la Direction, étape 7.
 """
 import subprocess
@@ -121,7 +121,7 @@ def main():
         (dossier / f"{debut:%Y-%m-%d}.md").write_text(texte, encoding="utf-8")
         titre = f"Bilan de la semaine du {debut.astimezone(PARIS):%d/%m}"
         r = subprocess.run(["gh", "issue", "create", "-R", DEPOT, "--title", titre, "--body-file", "-"],
-                           input=texte, capture_output=True, text=True, encoding="utf-8")
+                           input=f"{texte}\n\n@{DEPOT.split('/')[0]}", capture_output=True, text=True, encoding="utf-8")
         if r.returncode:
             raise RuntimeError(f"Issue non créée : {r.stderr.strip()[:300]}")
         lien = r.stdout.strip().splitlines()[-1]
