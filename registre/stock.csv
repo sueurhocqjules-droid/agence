@@ -11,3 +11,15 @@ pepper-pt,pt,pepper,en_rendu,,,2026-11-11T12:45:33+00:00,
 time-en,en,time,en_rendu,,,2026-11-11T12:45:33+00:00,
 time-es,es,time,en_rendu,,,2026-11-11T12:45:33+00:00,
 time-pt,pt,time,en_rendu,,,2026-11-11T12:45:33+00:00,
+pepper-en,en,pepper,programme,2026-11-16T00:00:00+00:00,dgEDHzTdD4A,2026-11-11T13:23:03+00:00,"artefact 13855672876, {'duree_s': 63.7, 'son_moyen_db': -18.0, 'noir_s': 0}"
+pepper-es,es,pepper,programme,2026-11-16T01:00:00+00:00,NSWSjL3R8VM,2026-11-11T13:23:12+00:00,"artefact 13855398398, {'duree_s': 63.7, 'son_moyen_db': -18.0, 'noir_s': 0}"
+pepper-pt,pt,pepper,programme,2026-11-15T22:00:00+00:00,a0xdaVeiWo0,2026-11-11T13:23:21+00:00,"artefact 13855364013, {'duree_s': 63.7, 'son_moyen_db': -18.0, 'noir_s': 0}"
+time-en,en,time,programme,2026-11-16T17:00:00+00:00,gTul_vA25_A,2026-11-11T13:23:30+00:00,"artefact 13856430998, {'duree_s': 69.72, 'son_moyen_db': -18.0, 'noir_s': 0}"
+time-es,es,time,programme,2026-11-16T18:00:00+00:00,iddH0kinwzY,2026-11-11T13:23:40+00:00,"artefact 13855479060, {'duree_s': 69.72, 'son_moyen_db': -18.0, 'noir_s': 0}"
+time-pt,pt,time,programme,2026-11-16T15:00:00+00:00,9EiTDeFuoXc,2026-11-11T13:23:50+00:00,"artefact 13855872750, {'duree_s': 69.72, 'son_moyen_db': -18.0, 'noir_s': 0}"
+heart-en,en,heart,en_rendu,,,2026-11-11T13:23:56+00:00,
+heart-es,es,heart,en_rendu,,,2026-11-11T13:23:56+00:00,
+heart-pt,pt,heart,en_rendu,,,2026-11-11T13:23:56+00:00,
+dive-en,en,dive,en_rendu,,,2026-11-11T13:23:56+00:00,
+dive-es,es,dive,en_rendu,,,2026-11-11T13:23:56+00:00,
+dive-pt,pt,dive,en_rendu,,,2026-11-11T13:23:56+00:00,
