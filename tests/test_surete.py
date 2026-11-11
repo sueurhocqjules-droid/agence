@@ -91,6 +91,28 @@ class Questions(unittest.TestCase):
     def test_clic_ancien_sur_question_inconnue_oublie(self):
         self.assertEqual(self.releve(time.time() - 7 * 3600), (0, 43))
 
+    def test_message_dit_pourquoi_et_quand(self):
+        texte = questions.message("Je reprends ?", "YouTube a refusé la vidéo X", "reprise:chaine:pt", "rien", "surete",
+                                  "regarde d'abord", datetime(2026, 11, 11, 21, 30, tzinfo=timezone.utc))
+        for attendu in ("Pourquoi : YouTube a refusé la vidéo X", "Pour t'aider à choisir : regarde d'abord",
+                        "Oui : je relance les envois sur la chaîne Cada Segundo (portugais)", "Non : ça reste en pause",
+                        "vers 00h17"):
+            self.assertIn(attendu, texte)
+
+    def test_question_sans_pourquoi_refusee(self):
+        with self.assertRaises(ValueError):
+            questions.poser("Je reprends ?", "reprise:flux")
+
+
+class BudgetLeveLundi(unittest.TestCase):
+    def test_seule_la_pause_de_budget_d_une_semaine_passee_se_leve(self):
+        pauses = [{"cible": "auteur", "action": "pause", "par": "surete", "raison": "budget semaine 2026-11-09 : 46 $"},
+                  {"cible": "flux", "action": "pause", "par": "surete", "raison": "budget semaine 2026-11-09 : 46 $"},
+                  {"cible": "direction", "action": "pause", "par": "jules", "raison": "budget semaine 2026-11-09"}]
+        cibles = ["auteur", "flux", "direction"]
+        self.assertEqual(surete.pauses_de_budget_perimees(cibles, pauses, "budget semaine 2026-11-16"), ["auteur", "flux"])
+        self.assertEqual(surete.pauses_de_budget_perimees(cibles, pauses, "budget semaine 2026-11-09"), [])
+
 
 class HorsPause(unittest.TestCase):
     def test_surete_et_reponses_echappent_a_la_pause_generale(self):

@@ -31,6 +31,16 @@ jobs:
           repository: sueurhocqjules-droid/studio-rendu
           path: rendu
           ssh-key: ${{ secrets.RENDU_DEPLOY_KEY }}
+      # Coûts des séances de l'atelier (dépôt privé chaines-studio) : clé de déploiement en lecture seule,
+      # un seul fichier récupéré, clé retirée du disque après le checkout
+      - uses: actions/checkout@v5
+        with:
+          repository: sueurhocqjules-droid/chaines-studio
+          path: atelier-src
+          ssh-key: ${{ secrets.ATELIER_DEPLOY_KEY }}
+          persist-credentials: false
+          sparse-checkout: atelier/couts.csv
+          sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
@@ -75,6 +85,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GH_TOKEN: ${{ github.token }}   # lecture des runs du dépôt, pour les minutes du mois
+          ATELIER_COUTS: atelier-src/atelier/couts.csv
           PYTHONUTF8: "1"
         run: python -m agence.lancer garde_fous
       - name: Flux (rendu, contrôle, programmation)

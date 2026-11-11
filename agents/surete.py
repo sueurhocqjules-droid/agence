@@ -21,7 +21,21 @@ from pathlib import Path
 
 from agence import lancer, organisation, questions, registre, telegram
 
-DEPOTS_PRIVES = ["sueurhocqjules-droid/agence"]  # chaines-studio aussi, quand le réveil pourra le lire
+DEPOTS_PRIVES = ["sueurhocqjules-droid/agence"]  # chaines-studio : la clé de lecture ne donne pas accès à l'API des runs
+
+# Raisons de refus de l'API YouTube (videos.status.rejectionReason), en clair, et si c'est grave pour la chaîne
+REFUS = {
+    "duplicate": ("c'est un doublon d'une vidéo déjà en ligne", False),
+    "length": ("la vidéo est trop longue", False),
+    "claim": ("un ayant droit revendique un contenu de la vidéo", True),
+    "copyright": ("YouTube y voit une atteinte aux droits d'auteur", True),
+    "trademark": ("YouTube y voit une atteinte à une marque", True),
+    "termsOfUse": ("YouTube y voit une infraction à ses conditions d'utilisation", True),
+    "inappropriate": ("YouTube juge le contenu inapproprié", True),
+    "legal": ("une raison légale", True),
+    "uploaderAccountClosed": ("le compte de la chaîne est fermé", True),
+    "uploaderAccountSuspended": ("le compte de la chaîne est suspendu", True),
+}
 
 
 def seuils():
@@ -104,6 +118,17 @@ def echecs_en_serie(dossier, seuil):
     return resultat
 
 
+def pauses_de_budget_perimees(cibles, pauses, marque):
+    """Cibles encore en pause de budget posée par la Sûreté une semaine passée : le compteur est reparti à zéro."""
+    perimees = []
+    for cible in cibles:
+        pause = lancer.pause_active([cible], pauses)
+        if pause and pause["par"] == "surete" and pause["raison"].startswith("budget semaine ") \
+                and not pause["raison"].startswith(marque):
+            perimees.append(cible)
+    return perimees
+
+
 class Surete:
     def __init__(self, essai):
         self.essai, self.envoyees, self.ratees = essai, 0, 0
@@ -127,16 +152,17 @@ class Surete:
         self.envoyees += 1
         return True
 
-    def mettre_en_pause(self, cible, raison, question):
-        """Pause (si pas déjà en pause) et question à Jules pour reprendre."""
+    def mettre_en_pause(self, cible, raison, question, pourquoi, conseil):
+        """Pause (si pas déjà en pause) et question à Jules pour reprendre, avec ce qui l'aide à trancher."""
         if lancer.pause_active([cible], registre.lire("pauses")):
             return
         print(f"PAUSE {cible} : {raison}")
         if self.essai:
+            print(questions.message(question, pourquoi, f"reprise:{cible}", "rien", "surete", conseil))
             return
         registre.pause(cible, "surete", raison)
         try:
-            questions.poser(question, f"reprise:{cible}", "rien", par="surete")
+            questions.poser(question, f"reprise:{cible}", "rien", par="surete", pourquoi=pourquoi, conseil=conseil)
         except RuntimeError as e:
             print(f"Question non envoyée : {e}")
             self.ratees += 1
@@ -152,14 +178,27 @@ def passage(essai):
           f"{c['appels']} appels gratuits" + ("" if c["atelier_lu"] else ", atelier de chaines-studio non lu"))
 
     cl = reglages["claude"]
+    marque = f"budget semaine {c['semaine']}"
+    for cible in pauses_de_budget_perimees(cl["pause_cibles"], registre.lire("pauses"), marque):
+        print(f"REPRISE {cible} : nouvelle semaine")
+        if not essai:
+            registre.pause(cible, "surete", f"nouvelle semaine ({c['semaine']}) : le compteur repart à zéro", action="reprise")
+            questions.clore(f"reprise:{cible}", f"nouvelle semaine, {questions.decrire(cible)} a repris tout seul.")
     if c["dollars"] >= cl["pause_usd_semaine"]:
         for cible in cl["pause_cibles"]:
-            s.mettre_en_pause(cible, f"{c['dollars']:.2f} $ Claude cette semaine, plafond {cl['pause_usd_semaine']} $",
-                              f"La semaine a déjà coûté {c['dollars']:.2f} $ équivalent Claude (plafond {cl['pause_usd_semaine']} $). "
-                              f"J'ai mis {cible} en pause. Le relancer quand même ?")
+            s.mettre_en_pause(
+                cible, f"{marque} : {c['dollars']:.2f} $ Claude, plafond {cl['pause_usd_semaine']} $",
+                f"Je relance {questions.decrire(cible)} malgré le plafond de la semaine ?",
+                f"depuis lundi, l'agence a dépensé {c['dollars']:.2f} $ équivalent Claude ({detail}). J'arrête à "
+                f"{cl['pause_usd_semaine']} $ pour rester sous 20 % de ta limite hebdomadaire, et il n'y a pas que les "
+                f"chaînes qui s'en servent. Donc j'ai mis en pause {questions.decrire(cible)}, le seul à consommer Claude. "
+                f"Les vidéos déjà rendues continuent de sortir.",
+                "Oui si tu acceptes de dépasser cette semaine (par exemple si tu n'as pas besoin de Claude pour autre chose). "
+                "Non si tu préfères garder ta marge : la pause se lève toute seule lundi, quand le compteur repart à zéro.")
     if c["dollars"] >= cl["alerte_usd_semaine"]:
         s.alerter(f"claude:{c['semaine']}", "budget", f"{c['dollars']:.2f} $ équivalent Claude depuis lundi{part} "
-                  f"({detail}). Seuil d'alerte : {cl['alerte_usd_semaine']} $, pause à {cl['pause_usd_semaine']} $.")
+                  f"({detail}). Je te préviens à {cl['alerte_usd_semaine']} $, j'arrête l'atelier à {cl['pause_usd_semaine']} $. "
+                  f"Rien à faire pour l'instant.")
     if c["pourcent"] is not None and c["pourcent"] >= cl["limite_pourcent"]:
         s.alerter(f"limite:{c['semaine']}", "budget", f"L'agence a passé {cl['limite_pourcent']} % de ta limite "
                   f"hebdomadaire ({c['pourcent']:.1f} %).")
@@ -172,16 +211,29 @@ def passage(essai):
                       f"sur 2 000 gratuites. Au-delà, les réveils s'arrêtent jusqu'au mois suivant.")
 
     for chaine, video_id, titre, statut in sanctions(registre.lire("stats")):
-        if s.alerter(f"sanction:{video_id}", "sanction", f"YouTube a rejeté « {titre} » ({video_id}, chaîne {chaine}) : {statut}. "
-                     f"La chaîne {chaine} est en pause."):
-            s.mettre_en_pause(f"chaine:{chaine}", f"vidéo {video_id} rejetée : {statut}",
-                              f"YouTube a rejeté « {titre} » sur la chaîne {chaine} ({statut}). Plus aucun envoi sur cette "
-                              f"chaîne d'ici ta réponse. Reprendre les envois ?")
+        code = statut.partition(":")[2]
+        raison, grave = REFUS.get(code, (f"raison donnée par YouTube : « {code or 'aucune'} »", True))
+        cible = f"chaine:{chaine}"
+        if s.alerter(f"sanction:{video_id}", "sanction", f"YouTube a refusé « {titre} » (https://youtu.be/{video_id}) : {raison}. "
+                     f"J'arrête les envois sur cette chaîne, une question suit."):
+            s.mettre_en_pause(
+                cible, f"vidéo {video_id} refusée : {statut}",
+                f"Je reprends {questions.decrire(cible)} ?",
+                f"YouTube a refusé la vidéo « {titre} » (https://youtu.be/{video_id}) : {raison}. J'ai arrêté les envois "
+                f"sur cette chaîne, parce qu'un deuxième refus peut valoir un avertissement à la chaîne entière, et trois "
+                f"avertissements la font fermer. Les autres chaînes continuent.",
+                "Ce refus est sans gravité pour la chaîne (souvent une erreur de fichier ou un doublon) : Oui, sans risque."
+                if not grave else
+                "Regarde d'abord la vidéo dans YouTube Studio pour comprendre ce qui coince. Tant que la cause n'est pas "
+                "corrigée (dis-le-moi à ta prochaine session), mieux vaut Non : la chaîne reste en pause jusqu'à ce que "
+                "tu me demandes de la relancer.")
 
     seuil = reglages["echecs"]["alerte_consecutifs"]
     for quoi, depuis, n in echecs_en_serie(registre.DOSSIER / "journal", seuil):
-        s.alerter(f"echec:{quoi}:{depuis}", "panne", f"{quoi} a échoué {n} fois d'affilée depuis le {depuis[:16]} UTC. "
-                  f"Rien n'est cassé ailleurs, mais ce programme ne fait plus son travail.")
+        description = organisation.scripts().get(quoi, {}).get("description", quoi)
+        s.alerter(f"echec:{quoi}:{depuis}", "panne", f"{description[0].upper() + description[1:]} ({quoi}) a échoué {n} fois "
+                  f"d'affilée depuis le {depuis[:16]} UTC. Le reste de l'agence tourne, mais ce travail-là n'est plus fait. "
+                  f"Rien à faire sur ton téléphone : dis-le à Claude à ta prochaine session, la cause est dans le journal.")
 
     return f"ok : {c['dollars']:.2f} $ cette semaine, {s.envoyees} alerte(s) envoyée(s)", s.ratees
 
