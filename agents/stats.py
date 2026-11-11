@@ -15,7 +15,10 @@ def relever(langues):
             s, st = v.get("statistics", {}), v["status"]
             lignes.append({
                 "releve": releve, "chaine": langue, "video_id": v["id"], "titre": v["snippet"]["title"],
-                "statut": st["privacyStatus"], "sortie": st.get("publishAt") or v["snippet"]["publishedAt"],
+                # une vidéo rejetée (droits d'auteur, règles...) est notée pour la Sûreté, qui met la chaîne en pause
+                "statut": st["privacyStatus"] if st.get("uploadStatus") != "rejected"
+                          else f"rejete:{st.get('rejectionReason', 'inconnu')}",
+                "sortie": st.get("publishAt") or v["snippet"]["publishedAt"],
                 "vues": s.get("viewCount", 0), "likes": s.get("likeCount", 0), "commentaires": s.get("commentCount", 0),
             })
     registre.ajouter("stats", lignes)

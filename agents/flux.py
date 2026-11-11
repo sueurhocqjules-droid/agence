@@ -22,7 +22,7 @@ from datetime import datetime, time, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from agence import controle, registre, youtube
+from agence import controle, lancer, registre, youtube
 
 DEPOT_RENDU = "sueurhocqjules-droid/studio-rendu"
 RENDU = Path(os.environ.get("RENDU_DIR") or Path(__file__).resolve().parents[2] / "studio-rendu")
@@ -141,6 +141,12 @@ def passage(essai):
     print(f"{len(sujets)} sujets, {len(manquants)} vidéos manquantes : {' '.join(f'{s}-{l}' for s, l in manquants) or 'aucune'}")
 
     a_rendre, programmees, rejetees, envois, bloquees = [], [], [], {l: 0 for l in clients}, set()
+    pauses = registre.lire("pauses")
+    for l in clients:  # une chaîne en pause (par la Sûreté ou par Jules) ne reçoit plus rien
+        ligne = lancer.pause_active([f"chaine:{l}"], pauses)
+        if ligne:
+            print(f"PAUSE chaîne {l} ({ligne['par']} : {ligne['raison']}) : aucun envoi")
+            bloquees.add(l)
     with tempfile.TemporaryDirectory() as dossier:
         for sujet, langue in manquants:
             nom = f"{sujet}-{langue}"

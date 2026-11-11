@@ -10,3 +10,23 @@ secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT"]
 proprietaire = "chef-contenu"
 module = "agents.flux"
 secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT", "GH_TOKEN"]
+
+# hors_pause : seule une pause à son propre nom l'arrête (ni « tout », ni ses supérieurs), pour que la Sûreté
+# continue de surveiller et que Jules puisse toujours lever une pause par Telegram.
+
+[reponses]
+proprietaire = "surete"
+module = "agence.questions"
+secrets = ["TELEGRAM_BOT_TOKEN"]
+hors_pause = true
+
+[garde_fous]
+proprietaire = "surete"
+module = "agents.surete"
+secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
+hors_pause = true
+
+[bilan]
+proprietaire = "direction"
+module = "agents.bilan"
+secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]

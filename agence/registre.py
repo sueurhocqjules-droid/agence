@@ -16,6 +16,8 @@ COLONNES = {
     "stats": ["releve", "chaine", "video_id", "titre", "statut", "sortie", "vues", "likes", "commentaires"],
     "couts": ["debut", "agent", "duree_s", "jetons_claude", "dollars_equiv", "appels_gratuits", "resultat"],
     "pauses": ["date", "cible", "action", "par", "raison"],
+    "questions": ["date", "id", "par", "texte", "si_oui", "si_non", "etat", "reponse", "message_id"],
+    "alertes": ["date", "cle", "niveau", "message"],
 }
 
 
