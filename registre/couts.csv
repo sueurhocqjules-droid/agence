@@ -7,3 +7,4 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-10T21:13:40+00:00,banc,741,0,0,24,"ok : 24 appels, résultats dans banc/2026-11-10"
 2026-11-10T21:21:18+00:00,banc,293,0,0,8,"ok : 8 appels, résultats dans banc/2026-11-10"
 2026-11-10T21:26:38+00:00,banc,1526,0,0,16,"ok : 16 appels, résultats dans banc/2026-11-10"
+2026-11-11T10:56:18+00:00,flux,13,0,0,0,"ok : 0 programmées, 0 rejetées, 3 en rendu"
