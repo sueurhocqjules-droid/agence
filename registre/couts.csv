@@ -37,3 +37,7 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-12T09:02:05+00:00,garde_fous,1,0,0,0,"ok : 17.80 $ cette semaine, 0 alerte(s) envoyée(s)"
 2026-11-12T09:02:06+00:00,flux,14,0,0,0,"ok : 0 programmées, 0 rejetées, 6 en rendu"
 2026-11-12T11:14:35+00:00,chercheur-outils,275,0,0,1,"ok : 5 candidat(s), 0 écarté(s), 96 liens collectés"
+2026-11-12T13:44:36+00:00,reponses,0,0,0,0,ok : 0 réponse(s) de Jules
+2026-11-12T13:44:36+00:00,stats,4,0,0,0,"ok : 63 vidéos, 8626 vues"
+2026-11-12T13:44:40+00:00,garde_fous,1,0,0,0,"ok : 25.63 $ cette semaine, 0 alerte(s) envoyée(s)"
+2026-11-12T13:44:42+00:00,flux,0,0,0,0,echec : UnboundLocalError: cannot access local variable 'mesures' where it is not associated with a value
