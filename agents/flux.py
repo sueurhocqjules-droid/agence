@@ -75,7 +75,10 @@ def pousser_file(noms):
     compositions = [f"{n.split('-')[0].capitalize()}-{n.split('-')[1].capitalize()}:{n}" for n in noms]
     subprocess.run(["git", "pull", "-q", "--rebase"], cwd=RENDU, check=True)
     (RENDU / "file").mkdir(exist_ok=True)
-    (RENDU / "file" / "attente.txt").write_text("\n".join(compositions) + "\n", encoding="utf-8", newline="\n")
+    # Ligne datée sans « : », ignorée par studio-rendu : la même file redemandée (rendu raté) fait quand même un commit
+    marque = f"#demande-{datetime.now(timezone.utc):%Y%m%dT%H%M%S}"
+    (RENDU / "file" / "attente.txt").write_text("\n".join(compositions + [marque]) + "\n", encoding="utf-8",
+                                               newline="\n")
     subprocess.run(["git", "add", "file/attente.txt"], cwd=RENDU, check=True)
     subprocess.run(["git", "commit", "-q", "-m", f"File de rendu : {' '.join(noms)}"], cwd=RENDU, check=True)
     subprocess.run(["git", "push", "-q"], cwd=RENDU, check=True)
