@@ -45,6 +45,15 @@ def lire(table):
         return list(csv.DictReader(f))
 
 
+def lire_jsonl(nom, depuis=None):
+    """Lignes de registre/<nom>.jsonl, celles datées depuis `depuis` (datetime) si donné."""
+    chemin = DOSSIER / f"{nom}.jsonl"
+    if not chemin.exists():
+        return []
+    lignes = [json.loads(l) for l in chemin.read_text(encoding="utf-8").splitlines() if l.strip()]
+    return [l for l in lignes if not depuis or datetime.fromisoformat(l["date"]) >= depuis]
+
+
 def decider(auteur, decision, pourquoi, prediction=None, mesure=None, echeance=None, avant=None, attendu=None,
             changement=None):
     """Note une décision au journal d'audit, avec sa raison, et renvoie son identifiant.

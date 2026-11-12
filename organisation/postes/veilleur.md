@@ -3,7 +3,9 @@ id = "veilleur"
 titre = "Veilleur des concepts et formats"
 superieur = "chef-recherche"
 objectifs = [1, 4]
-statut = "a_construire"
+statut = "en_service"
+module = "agents.veilleur"
+env = ["YOUTUBE_API_KEY", "GROQ_API_KEY", "GEMINI_API_KEY", "OPENROUTER_API_KEY"]
 etape = 8
 moteur = "script outliers (vidéos à au moins 3 fois la médiane de leur chaîne), modèle gratuit"
 reveil = "une fois par semaine"
@@ -22,10 +24,10 @@ Repérer dans le monde entier les concepts et formats qui surperforment et sont 
 Recherches publiques (YouTube et autres réseaux), vidéos envoyées par Jules (issue `equipe:recherche`).
 
 ## Sorties
-Fiches concept en champs structurés (lien, chiffres, pourquoi ça marche, faisable ou non, coût estimé), au Chef de la Recherche.
+Fiches concept en champs structurés (lien, chiffres, pourquoi ça marche, faisable ou non, coût estimé), au Chef de la Recherche. Concrètement : `registre/concepts.jsonl`, état `propose`, 5 au plus par semaine. Les chiffres (vues, médiane, ratio) et le coût (effort × coût réel d'un sujet) sont posés par le script, jamais par le modèle.
 
 ## Outils
-Script `outliers`, recherche web, lecture de transcriptions.
+Méthode `outliers` (melvynx/video-agent-skills) refaite dans `agents/veilleur.py` sans son service payant : au moins 3 fois la médiane de la chaîne, médiane sur ses vidéos de 7 à 180 jours, 10 au moins. Source : API YouTube Data en lecture publique (~1 200 unités par semaine sur 10 000 par jour).
 
 ## Secrets et permissions
 Une clé de lecture publique seulement.

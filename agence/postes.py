@@ -25,6 +25,13 @@ POSTES = {
     # Étape 8 : ~15k jetons de données en entrée, trop pour le quota par minute de Groq : Gemini d'abord
     "chercheur-outils": [("gemini", "gemini-flash-latest", 8000),
                          ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 8000)],
+    # Veilleur et Chef de la Recherche : ~3k jetons en entrée, Groq en 4 s ; Gemini en 503 (saturé) à l'essai du 12/11
+    "veilleur": [("groq", "openai/gpt-oss-120b", 6000), ("gemini", "gemini-flash-latest", 6000),
+                 ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 6000)],
+    "chef-recherche": [("groq", "openai/gpt-oss-120b", 5000), ("gemini", "gemini-flash-latest", 5000),
+                       ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 5000)],
+    # Chef des opérations : des chiffres à lire justes, peu de données
+    "chef-operations": [("groq", "openai/gpt-oss-120b", 3000), ("gemini", "gemini-flash-latest", 3000)],
 }
 
 
