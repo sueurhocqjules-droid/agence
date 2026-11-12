@@ -19,12 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       # Coûts des séances de l'atelier (dépôt privé chaines-studio) : clé de déploiement en lecture seule,
       # un seul fichier récupéré, clé retirée du disque après le checkout
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           repository: sueurhocqjules-droid/chaines-studio
           path: atelier-src
@@ -32,7 +32,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: atelier/couts.csv
           sparse-checkout-cone-mode: false
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
           cache: pip
