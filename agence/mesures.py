@@ -75,9 +75,11 @@ def jours_de_stock(stock, stats, heures, a, chaine=None):
 
 
 def cout_sujet(atelier, seances=4):
-    """Coût moyen d'un sujet (dollars équivalent Claude) sur les dernières séances de l'atelier qui notent leur
-    nombre de sujets, ou None tant qu'aucune ne le fait."""
-    lignes = [l for l in atelier if str(l.get("sujets") or "").strip() not in ("", "0")][-seances:]
+    """Coût réel d'un sujet livré (dollars équivalent Claude) depuis la `seances`-ième dernière séance qui a livré,
+    séances ratées comprises (elles coûtent sans livrer), ou None tant qu'aucune séance ne note ses sujets."""
+    notees = [l for l in atelier if str(l.get("sujets") or "").strip() != ""]
+    livrees = [i for i, l in enumerate(notees) if int(float(l["sujets"])) > 0]
+    lignes = notees[livrees[-seances]:] if len(livrees) >= seances else notees[livrees[0]:] if livrees else []
     sujets = sum(int(float(l["sujets"])) for l in lignes)
     return round(sum(float(l["dollars_equiv"] or 0) for l in lignes) / sujets, 2) if sujets else None
 
