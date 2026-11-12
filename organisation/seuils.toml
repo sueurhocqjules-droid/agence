@@ -8,8 +8,12 @@ alerte_usd_semaine = 38
 pause_usd_semaine = 45
 pause_cibles = ["auteur", "direction"]
 # Étalon : combien de dollars équivalent API font 1 % de la limite hebdomadaire de Jules.
-# 0 = inconnu, le compteur ne donne alors que des dollars. À mesurer (barre d'état, ~/.claude/limites.jsonl).
-dollars_par_pourcent = 0
+# 0 = inconnu, le compteur ne donne alors que des dollars. Mesuré le 13/11/2026 (barre d'état, ~/.claude/limites.jsonl) :
+# la semaine est passée de 77 % à 80 % pendant le nightwork (12/11 23:17 → 23:50 UTC, rien d'autre ne tournait)
+# pour 10,44 $ lus dans les journaux de Claude Code (prix officiels), soit 3,48 $ par point. Sur toute la semaine
+# (depuis le 6/11 23:00 UTC) : 213,91 $ en local + 33,66 $ d'atelier = 247,57 $ pour 80 %, soit 3,09 $ par point,
+# borne basse (claude.ai et l'app ne sont pas comptés). Les 20 % de l'objectif ≈ 70 $ par semaine.
+dollars_par_pourcent = 3.5
 # Objectif 2 de MISSION.md
 limite_pourcent = 20
 
