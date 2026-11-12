@@ -12,7 +12,10 @@ La mémoire commune de l'agence. Chaque agent y lit et y écrit, en ajout seulem
 | `alertes.csv` | une alerte envoyée par la Sûreté (sa `cle` empêche de la renvoyer) | `date`, `cle`, `niveau` (budget, quota, sanction, panne), `message` |
 | `telegram.json` | le dernier clic lu sur Telegram | `decalage` |
 | `bilans/<date>.md` | le bilan d'une semaine, copie de l'issue envoyée à Jules | |
+| `bilans/critique-<lundi>.md`, `bilans/direction-<lundi>.md` | la section du critique et le mot de la Direction, écrits le dimanche, repris en tête du bilan du lundi | |
 | `journal/<agent>.jsonl` | un passage d'un agent ou d'un de ses scripts, écrit par le lanceur | `date`, `quoi`, `resultat` (ok, echec, refuse), `code`, `duree_s`, `sortie` (dernières lignes), `bloquant` (ce qui doit remonter), `secrets_en_trop` |
-| `decisions.jsonl` | une décision, le journal d'audit | `date`, `auteur`, `decision`, `pourquoi`, `prediction`, `mesure` (le chiffre qui tranchera), `echeance`, `verdict` (rempli par le critique, jamais par l'auteur) |
+| `decisions.jsonl` | une décision, ou le verdict du critique sur une décision (ligne `"type": "verdict"`, on ne réécrit jamais la décision) | décision : `id`, `date`, `auteur`, `decision`, `pourquoi`, `prediction`, `mesure` (liste fermée de `agence/mesures.py`), `echeance`, `avant` et `attendu` (valeurs de la mesure), `changement` (s'il y en a : `poste`, `fichier`, `section`, `ancien`, `nouveau`, ce qui permet au critique de l'annuler). Verdict : `id` de la décision, `date`, `verdict` (juste, fausse, indeterminee), `valeur`, `commentaire` |
 
 Heures en UTC, format ISO 8601.
+
+Les réglages que les agents changent eux-mêmes vivent dans `organisation/` : `creneaux.toml` (heures de sortie par chaîne, au Programmateur), `plan.toml` (nombre de sujets de la semaine, au Chef de contenu, lu par l'atelier le lundi) et la section Retours des fiches de poste.

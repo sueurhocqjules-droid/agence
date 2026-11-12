@@ -1,0 +1,11 @@
+# Heures de sortie des vidéos, à Paris, par chaîne : le flux les applique, dans l'ordre de la journée.
+# Propriétaire : le Programmateur, un seul changement à la fois, jugé par le critique au bout de deux semaines.
+
+[en]
+heures = [1, 18]
+
+[es]
+heures = [2, 19]
+
+[pt]
+heures = [16, 23]

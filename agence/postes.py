@@ -12,6 +12,11 @@ POSTES = {
     # Ordres de grandeur et sources plausibles, mais des erreurs : toute proposition passe par le critique.
     "sujets": [("gemini", "gemini-flash-latest", 9000),
                ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 9000)],
+    # Postes de l'étape 7, en attendant le choix de l'Expert en modèles (étape 8) : les modèles justes sur les chiffres
+    "critique": [("groq", "openai/gpt-oss-120b", 3000), ("gemini", "gemini-flash-latest", 3000)],
+    "programmateur": [("groq", "openai/gpt-oss-120b", 4000), ("gemini", "gemini-flash-latest", 4000)],
+    # Gemini resté muet 5 min au premier essai du 12/11 : Groq d'abord
+    "chef-contenu": [("groq", "openai/gpt-oss-120b", 6000), ("gemini", "gemini-flash-latest", 6000)],
 }
 
 

@@ -45,15 +45,47 @@ def lire(table):
         return list(csv.DictReader(f))
 
 
-def decider(auteur, decision, pourquoi, prediction=None, mesure=None, echeance=None):
-    """Note une décision au journal d'audit, avec sa raison.
+def decider(auteur, decision, pourquoi, prediction=None, mesure=None, echeance=None, avant=None, attendu=None,
+            changement=None):
+    """Note une décision au journal d'audit, avec sa raison, et renvoie son identifiant.
 
-    Avec une prédiction, sa mesure et son échéance, le critique la jugera sur les vrais chiffres.
+    Avec une mesure (liste fermée de agence/mesures.py), sa valeur avant, la valeur attendue et l'échéance,
+    le critique la jugera sur les vrais chiffres. `changement` décrit un changement de consignes ou de réglage
+    (poste, fichier, section, ancien, nouveau), que le critique annule s'il n'a rien amélioré.
     """
-    entree = {"date": maintenant(), "auteur": auteur, "decision": decision, "pourquoi": pourquoi,
-              "prediction": prediction, "mesure": mesure, "echeance": echeance, "verdict": None}
+    ident = f"{auteur}-{datetime.now(timezone.utc):%Y%m%d%H%M%S%f}"
+    entree = {"id": ident, "date": maintenant(), "auteur": auteur, "decision": decision, "pourquoi": pourquoi,
+              "prediction": prediction, "mesure": mesure, "echeance": echeance, "avant": avant, "attendu": attendu,
+              "verdict": None}
+    if changement:
+        entree["changement"] = changement
     with open(DOSSIER / "decisions.jsonl", "a", encoding="utf-8") as f:
         f.write(json.dumps(entree, ensure_ascii=False) + "\n")
+    return ident
+
+
+def juger(ident, verdict, valeur, commentaire):
+    """Ajoute le verdict du critique sur une décision : une nouvelle ligne, le journal ne se réécrit jamais."""
+    if verdict not in ("juste", "fausse", "indeterminee"):
+        raise ValueError(verdict)
+    with open(DOSSIER / "decisions.jsonl", "a", encoding="utf-8") as f:
+        f.write(json.dumps({"type": "verdict", "id": ident, "date": maintenant(), "verdict": verdict,
+                            "valeur": valeur, "commentaire": commentaire}, ensure_ascii=False) + "\n")
+
+
+def decisions():
+    """Les décisions du journal d'audit, chacune avec son verdict s'il a été rendu (dict date, verdict, valeur, commentaire)."""
+    chemin = DOSSIER / "decisions.jsonl"
+    if not chemin.exists():
+        return []
+    lignes = [json.loads(l) for l in chemin.read_text(encoding="utf-8").splitlines() if l.strip()]
+    verdicts = {l["id"]: l for l in lignes if l.get("type") == "verdict"}
+    resultat = []
+    for l in lignes:
+        if l.get("type") != "verdict":
+            v = verdicts.get(l.get("id"))
+            resultat.append({**l, "verdict": {k: v[k] for k in ("date", "verdict", "valeur", "commentaire")} if v else None})
+    return resultat
 
 
 def pause(cible, par, raison, action="pause"):
