@@ -3,3 +3,5 @@ __pycache__/
 .secrets/
 *.mp4
 out/
+nightwork/
+.claude/settings.local.json
