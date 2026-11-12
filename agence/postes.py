@@ -17,6 +17,9 @@ POSTES = {
     "programmateur": [("groq", "openai/gpt-oss-120b", 4000), ("gemini", "gemini-flash-latest", 4000)],
     # Gemini resté muet 5 min au premier essai du 12/11 : Groq d'abord
     "chef-contenu": [("groq", "openai/gpt-oss-120b", 6000), ("gemini", "gemini-flash-latest", 6000)],
+    # Étape 8 : ~15k jetons de données en entrée, trop pour le quota par minute de Groq : Gemini d'abord
+    "chercheur-outils": [("gemini", "gemini-flash-latest", 8000),
+                         ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 8000)],
 }
 
 
