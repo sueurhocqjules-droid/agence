@@ -1,0 +1,151 @@
+{
+ "date": "2026-11-12T23:19:52+00:00",
+ "plus_proche": {
+  "chaine": "en",
+  "palier": "yt_fans",
+  "nom": "YouTube, palier fans (dons, Shopping)",
+  "progression": 0.0028,
+  "critere": "vues_shorts_90j",
+  "valeur": 8277,
+  "cible": 3000000,
+  "texte": "Every Second (en) : 8 277 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
+ },
+ "paliers": [
+  {
+   "chaine": "en",
+   "palier": "yt_fans",
+   "nom": "YouTube, palier fans (dons, Shopping)",
+   "criteres": [
+    {
+     "critere": "abonnes",
+     "valeur": 8,
+     "cible": 500
+    },
+    {
+     "critere": "videos_90j",
+     "valeur": 11,
+     "cible": 3
+    },
+    {
+     "critere": "vues_shorts_90j",
+     "valeur": 8277,
+     "cible": 3000000
+    }
+   ],
+   "progression": 0.0028,
+   "atteint": false,
+   "inconnu": []
+  },
+  {
+   "chaine": "en",
+   "palier": "yt_partenaire",
+   "nom": "YouTube, partage des revenus pub",
+   "criteres": [
+    {
+     "critere": "abonnes",
+     "valeur": 8,
+     "cible": 1000
+    },
+    {
+     "critere": "vues_shorts_90j",
+     "valeur": 8277,
+     "cible": 10000000
+    }
+   ],
+   "progression": 0.0008,
+   "atteint": false,
+   "inconnu": []
+  },
+  {
+   "chaine": "es",
+   "palier": "yt_fans",
+   "nom": "YouTube, palier fans (dons, Shopping)",
+   "criteres": [
+    {
+     "critere": "abonnes",
+     "valeur": 0,
+     "cible": 500
+    },
+    {
+     "critere": "videos_90j",
+     "valeur": 11,
+     "cible": 3
+    },
+    {
+     "critere": "vues_shorts_90j",
+     "valeur": 3,
+     "cible": 3000000
+    }
+   ],
+   "progression": 0.0,
+   "atteint": false,
+   "inconnu": []
+  },
+  {
+   "chaine": "es",
+   "palier": "yt_partenaire",
+   "nom": "YouTube, partage des revenus pub",
+   "criteres": [
+    {
+     "critere": "abonnes",
+     "valeur": 0,
+     "cible": 1000
+    },
+    {
+     "critere": "vues_shorts_90j",
+     "valeur": 3,
+     "cible": 10000000
+    }
+   ],
+   "progression": 0.0,
+   "atteint": false,
+   "inconnu": []
+  },
+  {
+   "chaine": "pt",
+   "palier": "yt_fans",
+   "nom": "YouTube, palier fans (dons, Shopping)",
+   "criteres": [
+    {
+     "critere": "abonnes",
+     "valeur": 4,
+     "cible": 500
+    },
+    {
+     "critere": "videos_90j",
+     "valeur": 12,
+     "cible": 3
+    },
+    {
+     "critere": "vues_shorts_90j",
+     "valeur": 1857,
+     "cible": 3000000
+    }
+   ],
+   "progression": 0.0006,
+   "atteint": false,
+   "inconnu": []
+  },
+  {
+   "chaine": "pt",
+   "palier": "yt_partenaire",
+   "nom": "YouTube, partage des revenus pub",
+   "criteres": [
+    {
+     "critere": "abonnes",
+     "valeur": 4,
+     "cible": 1000
+    },
+    {
+     "critere": "vues_shorts_90j",
+     "valeur": 1857,
+     "cible": 10000000
+    }
+   ],
+   "progression": 0.0002,
+   "atteint": false,
+   "inconnu": []
+  }
+ ],
+ "curseur_commentaires": "2026-11-12T20:25:58Z"
+}
