@@ -24,7 +24,7 @@ from pathlib import Path
 
 from agence import mesures, modeles, organisation, postes, registre
 from agence.modeles import propre
-from agents import surete
+from agents import analyste, surete
 
 RACINE = Path(__file__).resolve().parent.parent
 BOITE = RACINE / "ressources" / "boite-a-outils-jarvis.md"
@@ -34,6 +34,8 @@ MAX_CANDIDATS = 5
 GITHUB = ["remotion", "text to speech", "free llm api", "video generation", "youtube shorts automation", "local llm"]
 HACKER_NEWS = ["free LLM API", "open source TTS", "Remotion", "local LLM", "AI video generation", "free tier API"]
 AUTRES_POSTES = {"rendu", "son", "jules"}  # tâches sans fiche : rendu des vidéos, sons, travail manuel de Jules
+MAX_AMELIORATIONS = 5
+JETONS_SUJET = (300_000, 30_000)  # hypothèse : jetons d'entrée et de sortie pour écrire et coder un sujet
 
 
 def lire_json(url, entetes=None):
@@ -51,6 +53,67 @@ def modeles_gratuits():
     return [{"id": m["id"], "lien": f"https://openrouter.ai/{m['id']}", "contexte": m.get("context_length"),
              "sorti_le": datetime.fromtimestamp(m.get("created") or 0, timezone.utc).date().isoformat()}
             for m in gratuits[:40]]
+
+
+def modeles_payants():
+    """Modèles payants d'OpenRouter, prix exacts de l'API, ramenés à un sujet de l'Auteur (hypothèse JETONS_SUJET)."""
+    donnees = lire_json("https://openrouter.ai/api/v1/models")["data"]
+    payants = []
+    for m in donnees:
+        try:
+            entree, sortie = float(m["pricing"]["prompt"]), float(m["pricing"]["completion"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if entree > 0 and sortie > 0:
+            payants.append({"id": m["id"], "lien": f"https://openrouter.ai/{m['id']}", "created": m.get("created") or 0,
+                            "usd_million_entree": round(entree * 1e6, 4), "usd_million_sortie": round(sortie * 1e6, 4),
+                            "prix": round(entree * JETONS_SUJET[0] + sortie * JETONS_SUJET[1], 4), "devise": "USD",
+                            "periode": "usage"})
+    payants.sort(key=lambda m: m.pop("created"), reverse=True)
+    return payants[:25]
+
+
+def prix_boite(texte):
+    """Prix écrits dans la boîte à outils de Jarvis : « 19 $/mois », « ~5 €/mois », « 0,002 $ la requête ».
+    Un prix n'est retenu qu'avec le premier lien de sa ligne."""
+    prix = []
+    for ligne in texte.splitlines():
+        lien = sorted(liens(ligne))[:1]
+        if not lien:
+            continue
+        for montant, devise, unite in re.findall(r"(\d+(?:[,.]\d+)?)\s*(€|\$)\s*(/\s*mois|la requête|la page)", ligne):
+            prix.append({"lien": lien[0], "prix": float(montant.replace(",", ".")),
+                         "devise": "EUR" if devise == "€" else "USD", "periode": "mois" if "mois" in unite else "usage"})
+    return prix
+
+
+def valider_ameliorations(reponse, prix_connus, autorises, postes_connus, deja):
+    """Garde les améliorations payantes dont le prix est celui collecté pour ce lien, la source du gain un lien
+    collecté, et tous les champs dans les choix fermés de l'Analyste (aucun texte libre)."""
+    gardees, ecartees, ids = [], [], set()
+    for a in (reponse.get("ameliorations") or [])[:MAX_AMELIORATIONS]:
+        if not isinstance(a, dict):
+            continue
+        lien = normaliser(a.get("lien"))
+        a = {**a, "lien": lien, "source_gain": normaliser(a.get("source_gain"))}
+        prix = [p for p in prix_connus if normaliser(p["lien"]) == lien]
+        if not prix:
+            raison = "prix inconnu : lien sans prix dans les données collectées"
+        elif not any(abs(p["prix"] - (a.get("prix") or 0)) < 1e-6 and p["devise"] == a.get("devise")
+                     and p["periode"] == a.get("periode") for p in prix):
+            raison = "prix, devise ou période différents de ceux collectés"
+        elif a["source_gain"] not in autorises:
+            raison = "source du gain absente des données collectées"
+        elif a.get("id") in ids or (a.get("id"), lien) in deja:
+            raison = "déjà proposée"
+        elif not analyste.lire_ameliorations([a], postes_connus):
+            raison = "champ hors des choix fermés ou texte libre"
+        else:
+            gardees.append(a)
+            ids.add(a["id"])
+            continue
+        ecartees.append({"id": a.get("id"), "lien": lien, "raison": raison})
+    return gardees, ecartees
 
 
 def depots_github(maintenant):
@@ -107,6 +170,7 @@ def collecter(maintenant):
     """Données de la semaine et ensemble des liens autorisés (seuls liens qu'un candidat peut porter)."""
     donnees, erreurs = {}, []
     for nom, source in (("modeles_gratuits_openrouter", modeles_gratuits),
+                        ("modeles_payants_openrouter", modeles_payants),
                         ("depots_github_recents", lambda: depots_github(maintenant)),
                         ("hacker_news_30j", lambda: sujets_hacker_news(maintenant))):
         try:
@@ -120,8 +184,10 @@ def collecter(maintenant):
     compte = surete.compteur(maintenant, couts["couts"], couts["atelier"], surete.seuils())
     donnees["ou_part_l_argent"] = {"dollars_claude_semaine_par_agent": compte["par_agent"],
                                    "atelier_capacite_cout_par_sujet_budget": mesures.capacite(surete.couts_atelier())}
+    donnees["prix_boite_a_outils"] = prix_boite(BOITE.read_text(encoding="utf-8"))
     autorises = liens(json.dumps({k: v for k, v in donnees.items() if k != "catalogue_actuel"}, ensure_ascii=False))
-    return donnees, autorises, erreurs
+    prix = donnees["prix_boite_a_outils"] + donnees.get("modeles_payants_openrouter", [])
+    return donnees, autorises, erreurs, prix
 
 
 def deja_proposes():
@@ -173,16 +239,36 @@ def consigne(donnees, postes_connus):
         '"gratuit": true, "licence": "...", "risque": "...", "compte_requis": false, '
         '"essai": "le test concret que la Maintenance doit faire pour le valider", "economie_usd_semaine": 0}]}\n'
         "En français, sans tiret long. N'invente aucun lien ni aucun chiffre : economie_usd_semaine vaut null si tu ne "
-        "peux pas l'estimer à partir des coûts fournis."
+        "peux pas l'estimer à partir des coûts fournis.\n\n"
+        f"Ajoute au même objet une seconde liste, \"ameliorations\" : au plus {MAX_AMELIORATIONS} achats payants qui "
+        "feraient progresser l'agence (ils ne seront pas achetés : l'Analyste les simule, Jules décide). Seulement des "
+        "prix présents dans modeles_payants_openrouter ou prix_boite_a_outils, recopiés tels quels (prix, devise, "
+        "periode). Champs fermés, aucun texte libre :\n"
+        '"ameliorations": [{"id": "court-en-minuscules", "poste": "un poste existant", "lien": "le lien du prix", '
+        '"source_gain": "un lien des données qui appuie le gain", "prix": 0.5, "devise": "EUR ou USD", '
+        '"periode": "mois ou usage", "poche": "eur (argent de Jules) ou claude_usd (limite Claude)", '
+        f'"mesure": "un de {analyste.MESURES_GAIN}", "gain_annonce": 20, "unite": "% (jours pour jours_stock)"}}]\n'
+        "Liste vide si rien ne s'appuie sur les données."
     )
 
 
 def passage(essai):
     maintenant = datetime.now(timezone.utc)
-    donnees, autorises, erreurs = collecter(maintenant)
+    donnees, autorises, erreurs, prix = collecter(maintenant)
     postes_connus = set(organisation.fiches()) | AUTRES_POSTES
     texte, modele, *_ = postes.demander("chercheur-outils", consigne(donnees, postes_connus))
-    gardes, ecartes = valider(modeles.extraire_json(texte) or {}, autorises, postes_connus, deja_proposes())
+    reponse = modeles.extraire_json(texte) or {}
+    gardes, ecartes = valider(reponse, autorises, postes_connus, deja_proposes())
+    deja = {(a.get("id"), normaliser(a.get("lien"))) for a in registre.lire_jsonl(analyste.AMELIORATIONS.stem)}
+    ameliorations, refusees = valider_ameliorations(reponse, prix, autorises, set(organisation.fiches()), deja)
+    for a in refusees:
+        print(f"AMÉLIORATION ÉCARTÉE {a['id']} ({a['lien']}) : {a['raison']}")
+    for a in ameliorations:
+        print(f"AMÉLIORATION {a['id']} : {a['prix']} {a['devise']}/{a['periode']}, {a['mesure']} +{a['gain_annonce']} {a['unite']}")
+    if not essai and ameliorations:
+        with open(analyste.AMELIORATIONS, "a", encoding="utf-8", newline="\n") as f:
+            for a in ameliorations:
+                f.write(json.dumps({"date": registre.maintenant(), **a}, ensure_ascii=False) + "\n")
     for e in ecartes:
         print(f"ÉCARTÉ {e['nom']} ({e['lien']}) : {e['raison']}")
     for g in gardes:
@@ -193,7 +279,8 @@ def passage(essai):
                 f.write(json.dumps({"date": registre.maintenant(), "par": "chercheur-outils", "etat": "propose",
                                     "modele": modele, **g}, ensure_ascii=False) + "\n")
     sources = f"{len(autorises)} liens collectés" + (f", sources en panne : {' ; '.join(erreurs)}" if erreurs else "")
-    return f"{len(gardes)} candidat(s), {len(ecartes)} écarté(s), {sources}"
+    return (f"{len(gardes)} candidat(s), {len(ecartes)} écarté(s), {len(ameliorations)} amélioration(s) payante(s), "
+            f"{sources}")
 
 
 def main():

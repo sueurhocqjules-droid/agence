@@ -13,7 +13,7 @@ from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from agence import lancer, questions, registre, telegram, youtube
-from agents import guetteur, surete
+from agents import analyste, guetteur, surete
 
 DEPOT = "sueurhocqjules-droid/agence"
 PARIS = ZoneInfo("Europe/Paris")
@@ -72,6 +72,7 @@ def page(maintenant):
                + ("" if avant else " Aucun relevé avant la période : les vues gagnées comptent tout depuis la sortie."), ""]
 
     lignes += argent(debut, fin)
+    lignes += investissements()
 
     stock = registre.lire("stock")
     dans = lambda l: debut <= quand(l["maj"]) < fin
@@ -152,6 +153,33 @@ def argent(debut, fin, seuils=None, occasions=None):
     if autres:
         lignes.append("- Autres commentaires relevés : " + ", ".join(f"{n} {t}" for t, n in sorted(autres.items())))
     lignes += ["- Revenus : 0 € (aucune chaîne monétisée)", ""]
+    return lignes
+
+
+def investissements(cas=None, ecarts=None):
+    """Section de l'Analyste : référence « ne rien acheter », proposition par poche (€ de Jules, $ de sa limite Claude,
+    jamais additionnées) et montant qui suffit, le cas à éviter, l'écart prévu / réalisé des achats en cours."""
+    cas = analyste.derniers_cas() if cas is None else cas
+    ecarts = analyste.ecarts()[1] if ecarts is None else ecarts
+    lignes = ["## Investissements", ""]
+    if not cas:
+        return lignes + ["- Pas encore de simulation de l'Analyste", f"- Prévu / réalisé : {ecarts}", ""]
+    r = cas["reference"]
+    if r:
+        lignes.append(f"- Ne rien acheter (référence) : {nombre(round(r['vues_6_mois'][1]))} vues sur 6 mois en médiane "
+                      f"(de {nombre(round(r['vues_6_mois'][0]))} à {nombre(round(r['vues_6_mois'][2]))}), "
+                      f"revenu {r['revenu_eur_6_mois'][1]:.2f} €".replace(".", ","))
+    for p in cas["propositions"]:
+        devise = analyste.POCHES[p["poche"]]
+        lignes.append(f"- Proposition en {'€ de ta poche' if devise == 'EUR' else '$ de ta limite Claude'} : "
+                      f"{' + '.join(p['recommande']) or 'rien'} ({p['pourquoi']}). Montant qui suffit : "
+                      f"{p['montant_qui_suffit']} {devise} par mois")
+    if not cas["ids"]:
+        lignes.append("- Aucune amélioration payante proposée par le Chercheur d'outils cette semaine")
+    for a in cas["a_eviter"]:
+        lignes.append(f"- À éviter : {' + '.join(a)} (ROI médian sous 1 à 6 mois)")
+    lignes += [f"- Prévu / réalisé : {ecarts}", "- Tu décides de chaque achat, dans Jarvis (règle : 0 € tant que l'agence "
+               "ne gagne rien)", f"- Tableau complet : https://github.com/{DEPOT}/blob/main/registre/tableau-investissements.csv", ""]
     return lignes
 
 
