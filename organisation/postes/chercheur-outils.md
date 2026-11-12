@@ -3,9 +3,11 @@ id = "chercheur-outils"
 titre = "Chercheur d'outils et d'IA"
 superieur = "chef-recherche"
 objectifs = [2, 4]
-statut = "a_construire"
+statut = "en_service"
+module = "agents.chercheur_outils"
+env = ["GEMINI_API_KEY", "OPENROUTER_API_KEY", "GH_TOKEN"]
 etape = 8
-moteur = "modèle gratuit avec recherche web"
+moteur = "modèle gratuit, sur des données collectées par script (OpenRouter, GitHub, Hacker News, boîte à outils)"
 reveil = "une fois par semaine"
 regle_de_deux = "[A] : lit le web. Aucun secret, n'installe rien (la Maintenance fait les essais)"
 secrets = ["clé du modèle gratuit attribué"]
@@ -22,7 +24,7 @@ Trouver les outils et modèles gratuits qui remplaceraient du Claude ou du trava
 Nouveautés du mois, catalogue (`ressources/catalogue.md`), coûts du registre (où part l'argent), et la boîte à outils de Jarvis (`ressources/boite-a-outils-jarvis.md`, copie automatique de celle de Jules, décidé par Jules le 11/11). Il est le seul poste à la lire.
 
 ## Sorties
-Une fiche par outil candidat (ce qu'il remplace, coût, licence, risque, et pour un skill Claude : ce qui tourne sans modèle, scripts ou commandes, et ce qui n'est que consignes), transmise à la Maintenance pour essai et au Chef de la Recherche.
+Une fiche par outil candidat (ce qu'il remplace, coût, licence, risque, et pour un skill Claude : ce qui tourne sans modèle, scripts ou commandes, et ce qui n'est que consignes), transmise à la Maintenance pour essai et au Chef de la Recherche. Concrètement : `registre/candidats.jsonl`, état `propose`, 5 au plus par semaine, chaque lien tiré des données collectées. La Direction les voit dans son dossier et pose la question à Jules quand un compte est à créer.
 
 ## Outils
 Recherche web, lecture du catalogue, du registre et de la boîte à outils de Jarvis.

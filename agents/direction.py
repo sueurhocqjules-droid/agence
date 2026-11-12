@@ -78,6 +78,15 @@ def bloquants(depuis):
     return resultat[-20:]
 
 
+def candidats(depuis):
+    """Outils candidats du Chercheur d'outils proposés depuis cette date (registre/candidats.jsonl)."""
+    chemin = registre.DOSSIER / "candidats.jsonl"
+    if not chemin.exists():
+        return []
+    tous = [json.loads(l) for l in chemin.read_text(encoding="utf-8").splitlines() if l.strip()]
+    return [c for c in tous if mesures.quand(c["date"]) >= depuis]
+
+
 def dossier(maintenant):
     """Tout ce que la Direction lit, en données structurées tirées du registre."""
     depuis = maintenant - timedelta(days=7)
@@ -118,6 +127,7 @@ def dossier(maintenant):
         "section_du_critique": critique.read_text(encoding="utf-8") if critique.exists() else "pas encore écrite",
         "plan_du_chef_de_contenu": tomllib.loads(plan.read_text(encoding="utf-8")) if plan.exists() else None,
         "heures_de_sortie": donnees["heures"],
+        "propositions_de_la_recherche": candidats(depuis),
         "decisions_7j": [{k: d.get(k) for k in ("auteur", "decision", "pourquoi", "prediction", "echeance")}
                          for d in toutes if mesures.quand(d["date"]) >= depuis][-40:],
         "predictions_ouvertes": [{k: d.get(k) for k in ("id", "auteur", "decision", "mesure", "avant", "attendu", "echeance")}
