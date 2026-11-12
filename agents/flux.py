@@ -56,7 +56,9 @@ def dernier_artefact(nom):
 
 def telecharger(artefact, dossier):
     archive = zipfile.ZipFile(io.BytesIO(gh("api", artefact["archive_download_url"], binaire=True)))
-    nom = next(n for n in archive.namelist() if n.endswith("-yt.mp4"))
+    nom = next((n for n in archive.namelist() if n.endswith("-yt.mp4")), None)
+    if not nom:  # rendu sans sa version YouTube (compression ratée) : on le refait
+        return None
     archive.extract(nom, dossier)
     return Path(dossier) / nom
 
@@ -157,6 +159,10 @@ def passage(essai):
             if langue in bloquees or envois[langue] >= ENVOIS_MAX or deja_rejete(nom, artefact["id"]):
                 continue
             fichier = telecharger(artefact, dossier)
+            if not fichier:
+                print(f"INCOMPLET {nom} : artefact {artefact['id']} sans -yt.mp4, à rendre de nouveau")
+                a_rendre.append(nom)
+                continue
             defauts, mesures = controle.controler(fichier)
             if defauts:
                 print(f"REJET {nom} : {', '.join(defauts)}")
