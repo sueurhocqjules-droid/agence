@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: meta
-        uses: dependabot/fetch-metadata@v2
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+        uses: dependabot/fetch-metadata@v3
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with: { python-version: "3.13" }
       - run: pip install -r requirements.txt
       - run: python -m unittest discover tests

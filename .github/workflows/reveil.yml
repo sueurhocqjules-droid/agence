@@ -22,18 +22,18 @@ jobs:
     timeout-minutes: 30
     steps:
       # Cloisonnement : le jeton du dépôt n'est pas laissé dans .git/config, seule l'étape de commit le reçoit
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       # Moteur public : sujets à lire, et file de rendu à pousser avec la clé de déploiement (écriture sur ce seul dépôt)
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           repository: sueurhocqjules-droid/studio-rendu
           path: rendu
           ssh-key: ${{ secrets.RENDU_DEPLOY_KEY }}
       # Coûts des séances de l'atelier (dépôt privé chaines-studio) : clé de déploiement en lecture seule,
       # un seul fichier récupéré, clé retirée du disque après le checkout
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           repository: sueurhocqjules-droid/chaines-studio
           path: atelier-src
@@ -41,7 +41,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: atelier/couts.csv
           sparse-checkout-cone-mode: false
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
           cache: pip
