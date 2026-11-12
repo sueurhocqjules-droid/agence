@@ -23,6 +23,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from agence import mesures, modeles, organisation, postes, registre
+from agence.modeles import propre
 from agents import surete
 
 RACINE = Path(__file__).resolve().parent.parent
@@ -127,11 +128,6 @@ def deja_proposes():
     if not CANDIDATS.exists():
         return set()
     return {normaliser(json.loads(l)["lien"]) for l in CANDIDATS.read_text(encoding="utf-8").splitlines() if l.strip()}
-
-
-def propre(valeur):
-    """Les modèles mettent des tirets longs malgré la consigne : virgule à la place (règle de Jules)."""
-    return valeur.replace(" — ", ", ").replace("—", ", ") if isinstance(valeur, str) else valeur
 
 
 def valider(reponse, autorises, postes_connus, deja):

@@ -61,6 +61,11 @@ def appeler(fournisseur, modele, consigne, max_tokens=12000):
     return texte, usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0), duree
 
 
+def propre(valeur):
+    """Les modèles mettent des tirets longs malgré la consigne : virgule à la place (règle de Jules)."""
+    return valeur.replace(" — ", ", ").replace("—", ", ") if isinstance(valeur, str) else valeur
+
+
 def extraire_json(texte):
     """Premier objet ou tableau JSON du texte (les modèles l'entourent souvent de ```json)."""
     for ouvrant, fermant in (("{", "}"), ("[", "]")):

@@ -78,13 +78,13 @@ def bloquants(depuis):
     return resultat[-20:]
 
 
-def candidats(depuis):
-    """Outils candidats du Chercheur d'outils proposés depuis cette date (registre/candidats.jsonl)."""
-    chemin = registre.DOSSIER / "candidats.jsonl"
-    if not chemin.exists():
-        return []
-    tous = [json.loads(l) for l in chemin.read_text(encoding="utf-8").splitlines() if l.strip()]
-    return [c for c in tous if mesures.quand(c["date"]) >= depuis]
+def recherche(depuis):
+    """Propositions du Chef de la Recherche depuis cette date. S'il n'a rien transmis, les rapports bruts de son équipe."""
+    propositions = registre.lire_jsonl("propositions", depuis)
+    if propositions:
+        return propositions
+    return {"note": "le Chef de la Recherche n'a rien transmis : rapports bruts de son équipe",
+            "outils": registre.lire_jsonl("candidats", depuis), "concepts": registre.lire_jsonl("concepts", depuis)}
 
 
 def dossier(maintenant):
@@ -127,7 +127,8 @@ def dossier(maintenant):
         "section_du_critique": critique.read_text(encoding="utf-8") if critique.exists() else "pas encore écrite",
         "plan_du_chef_de_contenu": tomllib.loads(plan.read_text(encoding="utf-8")) if plan.exists() else None,
         "heures_de_sortie": donnees["heures"],
-        "propositions_de_la_recherche": candidats(depuis),
+        "propositions_de_la_recherche": recherche(depuis),
+        "rapport_des_operations": (registre.lire_jsonl("operations", depuis) or [None])[-1],
         "decisions_7j": [{k: d.get(k) for k in ("auteur", "decision", "pourquoi", "prediction", "echeance")}
                          for d in toutes if mesures.quand(d["date"]) >= depuis][-40:],
         "predictions_ouvertes": [{k: d.get(k) for k in ("id", "auteur", "decision", "mesure", "avant", "attendu", "echeance")}
@@ -159,6 +160,9 @@ def consigne_systeme():
 
 Ta séance : tu reçois le dossier de la semaine en JSON. Tu n'as aucun outil : tout ce que tu sais est dans le dossier.
 Un blocage avec une date leve_le a été levé ensuite par un passage réussi : ce n'est plus une panne en cours.
+Chaque proposition de la recherche porte sa preuve et sa prédiction : si tu la retiens, reprends-la en décision avec
+sa mesure et sa valeur attendue (ou la tienne), et dis dans le pourquoi qu'elle vient de la recherche.
+Le rapport des opérations dit si l'agence tourne : ses réparations relèvent de Jules quand il faut écrire du code.
 Tu rends ta réponse au format imposé, appliquée telle quelle par un script :
 - decisions : ce que tu décides, chacune avec sa raison. Quand elle a un effet mesurable, nomme la mesure (liste fermée)
   et la valeur attendue à l'échéance ; le critique la jugera sur les vrais chiffres. Une décision sans mesure reste notée.
