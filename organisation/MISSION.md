@@ -8,7 +8,7 @@ Créer une entreprise de contenu sur tous les réseaux sociaux, en exploitant le
 
 ## Les 4 objectifs, seul critère de réussite
 
-Toute tâche se rattache à l'un d'eux (champ `objectifs` de chaque fiche). Peu importe le comment, seule leur atteinte compte.
+Toute tâche se rattache à l'un d'eux (champ `objectifs` de chaque fiche). Peu importe le comment, seule leur atteinte compte : le plus vite et le plus efficacement possible, avec toutes les ressources accessibles (budget de la semaine, outils et modèles gratuits, machines, comptes que Jules peut créer).
 
 1. **Revenu :** premier palier de 50 €/mois, sans délai imposé. Toute voie légale (pub, affiliation, produit), en évitant ce qui crée du service client ou des pertes
 2. **Économie :** moins de 20 % de la limite hebdomadaire de l'abonnement Claude de Jules, et 0 € de dépense tant que l'agence ne gagne rien. L'enveloppe Claude de la semaine est le `claude_usd_semaine` de la fiche de l'Auteur : Jules l'ajuste selon ce qui lui reste de sa propre consommation, vers le haut comme vers le bas, et l'agence s'y adapte d'elle-même (cadence, nombre de sujets, modèles gratuits à la place de Claude). Une réserve ponctuelle accordée par Jules (colonne `reserve_usd` de l'atelier) ne compte pas dans les plafonds de la Sûreté. Dès le premier revenu, tout l'argent gagné est réinvesti, réparti par l'équipe Argent (budget Claude, outils payants, nouveaux réseaux)

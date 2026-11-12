@@ -23,7 +23,8 @@ PARIS = ZoneInfo("Europe/Paris")
 FICHIER = "organisation/creneaux.toml"
 ESSAI_JOURS = 14
 VIDEOS_MIN = 12     # par chaîne, avec leurs vues à 48 h, avant de proposer un essai
-CADENCE_MAX = 3     # sorties par jour et par chaîne (quota d'envoi YouTube partagé par les trois chaînes)
+CADENCE_MAX = 5     # sorties par jour et par chaîne. L'API YouTube accepte 100 envois par jour et par projet
+                    # (doc vérifiée le 12/11/2026) ; Studio bloquait vers 3 ou 4 par chaîne sans téléphone vérifié
 STOCK_ALERTE = 3    # jours : en dessous, si le budget ne paie pas la cadence, elle baisse sans attendre
 
 
@@ -129,7 +130,9 @@ def passage(essai):
     fiche = consignes.chemin_fiche("programmateur").read_text(encoding="utf-8")
     consigne = f"""Tu es le programmateur d'une agence de vidéos courtes (YouTube Shorts, trois chaînes : en, es, pt).
 Tu décides de la cadence (sorties par jour, de 1 à {CADENCE_MAX}) et des heures de sortie de chaque chaîne, en t'appuyant
-sur ce que tu sais des pratiques qui marchent sur chaque réseau et sur les chiffres ci-dessous.
+sur ce que tu sais des pratiques qui marchent sur chaque réseau et sur les chiffres ci-dessous. Au-delà de 3 sorties
+par jour, YouTube peut refuser des envois d'une chaîne dont le téléphone n'est pas vérifié : le flux note ces refus
+(uploadLimitExceeded) dans son journal.
 Heures de sortie actuelles, à Paris : {heures}
 Vues gagnées sur les 7 derniers jours par chaîne : {avants}
 Vues à 48 h selon l'heure de sortie :
