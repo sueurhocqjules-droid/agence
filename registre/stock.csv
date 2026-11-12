@@ -41,3 +41,12 @@ volt-pt,pt,volt,en_rendu,,,2026-11-12T09:02:20+00:00,
 snowball-en,en,snowball,en_rendu,,,2026-11-12T09:02:20+00:00,
 snowball-es,es,snowball,en_rendu,,,2026-11-12T09:02:20+00:00,
 snowball-pt,pt,snowball,en_rendu,,,2026-11-12T09:02:20+00:00,
+volt-en,en,volt,programme,2026-11-18T00:00:00+00:00,FGlVTuHW5ag,2026-11-12T13:54:20+00:00,"artefact 13928998458, {'duree_s': 72.81, 'son_moyen_db': -18.0, 'noir_s': 0}"
+volt-es,es,volt,programme,2026-11-18T01:00:00+00:00,UIB2kCW9a80,2026-11-12T13:54:28+00:00,"artefact 13929272553, {'duree_s': 72.81, 'son_moyen_db': -18.0, 'noir_s': 0}"
+volt-pt,pt,volt,programme,2026-11-17T22:00:00+00:00,9NhsaIbTaxE,2026-11-12T13:54:37+00:00,"artefact 13929512711, {'duree_s': 72.81, 'son_moyen_db': -18.0, 'noir_s': 0}"
+snowball-en,en,snowball,programme,2026-11-18T17:00:00+00:00,Y7_Afs0ynSc,2026-11-12T13:54:46+00:00,"artefact 13929611837, {'duree_s': 64.81, 'son_moyen_db': -18.0, 'noir_s': 0}"
+snowball-es,es,snowball,programme,2026-11-18T18:00:00+00:00,dSYVWxpUsu0,2026-11-12T13:54:56+00:00,"artefact 13929851566, {'duree_s': 64.81, 'son_moyen_db': -18.0, 'noir_s': 0}"
+snowball-pt,pt,snowball,programme,2026-11-18T15:00:00+00:00,swTKZ2-oYVQ,2026-11-12T13:55:06+00:00,"artefact 13929836666, {'duree_s': 64.81, 'son_moyen_db': -18.0, 'noir_s': 0}"
+thick-en,en,thick,en_rendu,,,2026-11-12T13:55:11+00:00,
+thick-es,es,thick,en_rendu,,,2026-11-12T13:55:11+00:00,
+thick-pt,pt,thick,en_rendu,,,2026-11-12T13:55:11+00:00,
