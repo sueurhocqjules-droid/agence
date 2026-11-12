@@ -3,7 +3,8 @@
 Lancement : python -m agence.lancer chef-contenu   (ou python -m agents.chef_contenu --essai : montre, n'écrit rien)
 
 1. Script : jours de stock par chaîne, sujets écrits pas encore programmés, et le minimum de sujets pour tenir
-   la consigne (7 jours de stock d'avance au dimanche suivant), entre 1 et 14 (plafond de l'atelier).
+   la consigne (7 jours de stock d'avance au dimanche suivant), entre 1 et le plafond : 14 (atelier) ou moins
+   si le budget de la semaine (fiche de l'Auteur, ajusté par Jules) paie moins de sujets.
 2. Modèle gratuit : choisit le nombre dans ces bornes, écrit les retours de son équipe et répond aux demandes
    de Jules (issues equipe:contenu). Le script vérifie tout (choix fermés) avant de l'appliquer.
 3. Écrit organisation/plan.toml, que l'atelier (chaines-studio) lit le lundi, et note sa prédiction.
@@ -74,7 +75,9 @@ def passage(essai):
     titres = {s: {l: flux.lire_sujet(s)[0][l]["titre"] for l in youtube.CHAINES} for s in sujets}
     attente = sujets_en_attente(sujets, titres, donnees["stats"], donnees["stock"])
     minimum, detail = besoin(donnees["stock"], donnees["stats"], donnees["heures"], attente, maintenant)
-    plancher = min(max(1, minimum), SUJETS_MAX)
+    capacite, cout, budget = mesures.capacite(donnees["atelier"])
+    plafond = max(1, min(SUJETS_MAX, capacite)) if capacite is not None else SUJETS_MAX
+    plancher = min(max(1, minimum), plafond)
     reperes = videos_reperes(donnees["stats"], maintenant)
     try:
         issues = demandes.demandes("contenu")
@@ -94,8 +97,9 @@ Situation au {maintenant:%d/%m} :
 - vues gagnées sur les 7 derniers jours par chaîne : {vues}
 - jours de sorties programmées d'avance par chaîne : {jours}
 - par chaîne : {json.dumps(detail, ensure_ascii=False)}
-- l'atelier écrit lundi entre {plancher} (minimum pour tenir {STOCK_VISE} jours de stock dimanche prochain) et {SUJETS_MAX} sujets,
-  chacun publié sur les trois chaînes. Au-delà du minimum, les sujets font du stock d'avance (coût ~2 $ par sujet).
+- l'atelier écrit lundi entre {plancher} (minimum pour tenir {STOCK_VISE} jours de stock dimanche prochain) et {plafond} sujets
+  (ce que paie le budget de la semaine, {budget:.0f} $ à {cout if cout else "~2"} $ par sujet), chacun publié sur les trois
+  chaînes. Au-delà du minimum, les sujets font du stock d'avance.
 - vidéos de plus de 2 jours, par chaîne (comparer les sujets entre eux sur une même chaîne ; les écarts entre chaînes
   tiennent à l'âge des chaînes, pas aux sujets) : {json.dumps(reperes, ensure_ascii=False) if reperes else "pas encore assez de recul"}
 - derniers retours à l'Auteur : {consignes.lire_section(fiches["auteur"], "Retours") or "aucun"}
@@ -105,14 +109,14 @@ Situation au {maintenant:%d/%m} :
 
 N'écris aucun chiffre qui ne figure pas ci-dessus. Pas de demande de Jules : "reponses": [].
 Réponds seulement en JSON, en français, sans tiret long :
-{{"nombre": <entier entre {plancher} et {SUJETS_MAX}>, "pourquoi": "<une phrase>",
+{{"nombre": <entier entre {plancher} et {plafond}>, "pourquoi": "<une phrase>",
 "retour_auteur": "<1 à 3 lignes : quels sujets marchent, quoi refaire ou éviter, chiffres à l'appui>",
 "retour_programmateur": "<1 à 3 lignes sur les heures de sortie, ou vide si rien à dire>",
 "reponses": [{{"numero": <numéro de l'issue>, "texte": "<réponse à Jules et ce que tu décides>"}}]}}"""
     texte, modele, *_ = postes.demander("chef-contenu", consigne)
     reponse = modeles.extraire_json(texte) or {}
     nombre = reponse.get("nombre")
-    if not isinstance(nombre, int) or not plancher <= nombre <= SUJETS_MAX:
+    if not isinstance(nombre, int) or not plancher <= nombre <= plafond:
         print(f"Nombre proposé hors bornes ({nombre!r}) : minimum retenu")
         nombre = plancher
     pourquoi = str(reponse.get("pourquoi") or f"minimum pour {STOCK_VISE} jours de stock")[:300]
@@ -136,10 +140,11 @@ Réponds seulement en JSON, en français, sans tiret long :
         if isinstance(r, dict) and r.get("numero") in numeros and str(r.get("texte") or "").strip():
             demandes.repondre(r["numero"], f"{str(r['texte']).strip()[:2000]}\n\n_Le Chef de contenu de l'agence._")
             registre.decider("chef-contenu", f"réponse à la demande #{r['numero']}", str(r["texte"])[:300])
-    if minimum > SUJETS_MAX:  # remonte à la Direction, qui lit les blocages des journaux
+    if minimum > plafond:  # remonte à la Direction, qui lit les blocages des journaux
         lancer.noter_journal("chef-contenu", {"date": registre.maintenant(), "quoi": "plan", "resultat": "ok",
                                               "bloquant": f"il faudrait {minimum} sujets pour tenir {STOCK_VISE} jours "
-                                                          f"de stock, l'atelier en fait {SUJETS_MAX} au plus"})
+                                                          f"de stock, le budget et l'atelier en permettent {plafond}. "
+                                                          f"Le Programmateur baisse la cadence si le stock passe sous 3 jours"})
     return resultat, 1
 
 

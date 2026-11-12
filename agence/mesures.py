@@ -74,6 +74,22 @@ def jours_de_stock(stock, stats, heures, a, chaine=None):
     return round(jours[chaine] if chaine else min(jours.values()), 1)
 
 
+def cout_sujet(atelier, seances=4):
+    """Coût moyen d'un sujet (dollars équivalent Claude) sur les dernières séances de l'atelier qui notent leur
+    nombre de sujets, ou None tant qu'aucune ne le fait."""
+    lignes = [l for l in atelier if str(l.get("sujets") or "").strip() not in ("", "0")][-seances:]
+    sujets = sum(int(float(l["sujets"])) for l in lignes)
+    return round(sum(float(l["dollars_equiv"] or 0) for l in lignes) / sujets, 2) if sujets else None
+
+
+def capacite(atelier):
+    """(sujets par semaine que paie le budget de l'Auteur, coût d'un sujet, budget), capacité None sans mesure du coût.
+    Le budget est le claude_usd_semaine de la fiche de l'Auteur, que Jules ajuste selon sa propre consommation."""
+    budget = float(organisation.fiches()["auteur"]["budget"]["claude_usd_semaine"])
+    cout = cout_sujet(atelier)
+    return (int(budget // cout) if cout else None), cout, budget
+
+
 def valeur(mesure, a, donnees):
     """Valeur de la mesure à la date `a`, ou None si le registre ne permet pas de la calculer."""
     if mesure not in MESURES:

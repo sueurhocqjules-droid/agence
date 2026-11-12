@@ -37,5 +37,6 @@ Part des appels servis sans erreur de quota, qualité maintenue au banc.
 `registre/journal/expert-modeles.jsonl`
 
 ## Consignes
+- Chercher d'office quel travail fait par Claude un modèle gratuit pourrait reprendre, pour que l'agence tienne quand Jules baisse son enveloppe
 
 ## Retours

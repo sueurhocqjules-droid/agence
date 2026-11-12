@@ -18,7 +18,7 @@ equipe = []
 # Programmateur (rythme par réseau)
 
 ## Mission
-Trouver, réseau par réseau, la cadence et les heures qui apportent le plus de flux, en équilibrant qualité et volume, dans le budget. Instagram n'a pas le rythme de YouTube. En attendant ses résultats : 2 vidéos par jour et par chaîne.
+Décider, réseau par réseau, de la cadence et des heures qui apportent le plus de flux, en équilibrant qualité et volume, dans le budget. C'est le spécialiste du rythme de l'agence : il connaît les pratiques de chaque réseau (Instagram n'a pas le rythme de YouTube) et personne d'autre ne décide de la cadence, Jules non plus. Le budget de la semaine bouge (fiche de l'Auteur) : une hausse de cadence doit tenir dedans, et si le budget ne paie plus la cadence et que le stock passe sous 3 jours, elle baisse d'office. Point de départ : 2 vidéos par jour et par chaîne.
 
 ## Entrées
 Stats par vidéo, heure et réseau. Limites de rythme de chaque plateforme (tenues par la Sûreté).
