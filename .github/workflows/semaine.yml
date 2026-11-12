@@ -58,6 +58,12 @@ jobs:
           git config --global user.name "agence-robot"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
       # Chaque étape tourne même si la précédente a échoué : la Direction lit les blocages dans les journaux
+      - name: Expert en modèles
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: python -m agence.lancer expert-modeles
       - name: Critique
         if: ${{ !cancelled() }}
         env:
