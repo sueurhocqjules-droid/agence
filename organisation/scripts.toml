@@ -30,6 +30,12 @@ description = "la surveillance des coûts et des sanctions"
 secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
 hors_pause = true
 
+[prevu_realise]
+proprietaire = "analyste"
+module = "agents.prevu_realise"
+description = "l'écart prévu / réalisé des achats accordés par Jules, à 4 et 8 semaines"
+secrets = []
+
 [bilan]
 proprietaire = "direction"
 module = "agents.bilan"

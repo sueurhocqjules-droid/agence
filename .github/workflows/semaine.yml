@@ -93,6 +93,12 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           GH_TOKEN: ${{ github.token }}
         run: python -m agence.lancer chercheur-outils
+      # Sans modèle ni secret : simule les achats possibles (fiches du Chercheur) pour le dossier de la Direction
+      - name: Analyste des investissements
+        if: ${{ !cancelled() }}
+        run: |
+          python -m agence.lancer analyste
+          python -m agence.lancer prevu_realise
       # Relevés faits ici, avec le jeton du workflow : le Veilleur et les deux chefs n'ont aucun jeton GitHub
       - name: Relevés pour la recherche et les opérations
         if: ${{ !cancelled() }}

@@ -3,13 +3,15 @@ id = "analyste"
 titre = "Analyste des investissements (contrôle de gestion)"
 superieur = "direction"
 objectifs = [1, 2]
-statut = "a_construire"
+statut = "en_service"
+module = "agents.analyste"
+env = []
 etape = 11
-moteur = "script de simulation (Monte-Carlo, sans modèle), modèle gratuit pour poser les fourchettes de gain à partir des fiches"
+moteur = "script de simulation (Monte-Carlo, sans modèle) ; le gain d'un vendeur est l'hypothèse optimiste, la moitié la médiane, zéro le pessimiste"
 reveil = "une fois par semaine, après le Chercheur d'outils et avant la Direction"
 regle_de_deux = "aucune : lit le registre et des fiches en champs fermés, aucun texte de vendeur, aucun jeton, n'agit pas dehors"
-secrets = ["clé du modèle gratuit attribué"]
-budget = { claude_usd_semaine = 0, appels_gratuits_jour = 10 }
+secrets = []
+budget = { claude_usd_semaine = 0, appels_gratuits_jour = 0 }
 scripts = ["simulation", "prevu_realise"]
 equipe = []
 +++
@@ -36,6 +38,8 @@ Registre (stock, stats des vidéos par cohorte, coûts, part de la limite Claude
 
 ## Outils
 Scripts `simulation` (business cases et tableau) et `prevu_realise` (écart entre la prévision d'un achat et ce qui est mesuré 4 et 8 semaines après). Lecture du registre.
+
+`agents/analyste.py` (`python -m agence.lancer analyste`, essai sans rien écrire : `--essai`) : état actuel lu au registre (vues de la première semaine des vidéos, sujets par semaine = le moins élevé du budget de l'Auteur divisé par le coût d'un sujet et des créneaux, abonnés, jours de stock), 1 000 tirages communs à tous les cas, 26 semaines, palier partenaire du Guetteur. Hypothèses écrites en tête du fichier tant qu'aucune mesure ne les remplace : RPM des Shorts 0,02 à 0,10 € pour 1 000 vues, part des vues reprise chaque semaine 10 à 50 %, change 0,86 € pour 1 $. `agents/prevu_realise.py` : achats lus dans `registre/investissements.jsonl` (id, date, mesure de `agence/mesures.py`, prevu = [p10, p50, p90]), une ligne par Jules à chaque achat accordé.
 
 ## Secrets et permissions
 Aucun jeton. N'achète rien, n'écrit que ses propres fichiers du registre.
