@@ -4,7 +4,7 @@ Lancement : python -m agence.lancer bilan   (ou python -m agents.bilan --essai :
 
 Un lundi, la page couvre la semaine passée (lundi 0h à lundi 0h UTC). Un autre jour, la semaine en cours.
 Envoi : une issue du dépôt agence qui mentionne Jules (la mention déclenche le mail de GitHub, le dépôt n'étant pas suivi), un résumé sur Telegram avec le lien,
-et une copie dans registre/bilans/. L'analyse (pourquoi, prédictions jugées) viendra avec la Direction, étape 7.
+et une copie dans registre/bilans/. En tête, les sections écrites le dimanche par la Direction et le critique.
 """
 import subprocess
 import sys
@@ -54,6 +54,11 @@ def page(maintenant):
     par_chaine, releve, avant = chaines(registre.lire("stats"), debut, fin)
     jour = lambda d: d.astimezone(PARIS).strftime("%d/%m")
     lignes = [f"# Bilan de la semaine du {jour(debut)} au {jour(fin - timedelta(seconds=1))}", ""]
+    # Sections écrites le dimanche par la Direction et par le critique (que la Direction ne retouche pas)
+    for titre, fichier in (("Le mot de la Direction", "direction"), ("Le critique : les prédictions jugées", "critique")):
+        chemin = registre.DOSSIER / "bilans" / f"{fichier}-{fin:%Y-%m-%d}.md"
+        if chemin.exists():
+            lignes += [f"## {titre}", "", chemin.read_text(encoding="utf-8").strip(), ""]
 
     lignes += ["## Chaînes", "", "| Chaîne | Vidéos sorties | Vues gagnées | Vues au total | Meilleure de la semaine |",
                "|---|---|---|---|---|"]
@@ -95,7 +100,7 @@ def page(maintenant):
     lignes += ["## Questions pour toi", ""]
     lignes += [f"- {q['texte']} (Oui : {questions.en_clair(q['si_oui'])}), à trancher par les boutons Telegram" for q in ouvertes] \
         or ["- Aucune. Tu n'as rien à faire cette semaine."]
-    lignes += ["", "_Bilan écrit par script, sans modèle. L'analyse (pourquoi, prédictions jugées) arrivera avec la Direction._"]
+    lignes += ["", "_Chiffres écrits par script, sans modèle. Le mot de la Direction et le critique sont écrits le dimanche soir._"]
     resume = (f"Bilan de la semaine : +{total} vues, {prog} vidéos programmées, {c['dollars']:.2f} $ Claude"
               f"{', ' + str(len(ouvertes)) + ' question(s) pour toi' if ouvertes else ', rien à faire'}.")
     return "\n".join(lignes) + "\n", resume, debut

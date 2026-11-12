@@ -26,6 +26,13 @@ def demandes(equipe):
             if i["user"]["login"] == JULES and "pull_request" not in i]
 
 
+def repondre(numero, texte):
+    """Répond dans l'issue puis la ferme : la demande est traitée, Jules la rouvre s'il veut aller plus loin."""
+    subprocess.run(["gh", "issue", "comment", str(numero), "-R", DEPOT, "--body-file", "-"],
+                   input=texte, text=True, encoding="utf-8", check=True, capture_output=True)
+    subprocess.run(["gh", "issue", "close", str(numero), "-R", DEPOT], check=True, capture_output=True)
+
+
 if __name__ == "__main__":
     import sys
     sys.stdout.reconfigure(encoding="utf-8")

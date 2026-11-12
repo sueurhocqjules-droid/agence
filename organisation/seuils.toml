@@ -6,7 +6,7 @@
 alerte_usd_semaine = 38
 # Au-delà : pause des agents qui appellent Claude, et question à Jules pour reprendre
 pause_usd_semaine = 45
-pause_cibles = ["auteur"]
+pause_cibles = ["auteur", "direction"]
 # Étalon : combien de dollars équivalent API font 1 % de la limite hebdomadaire de Jules.
 # 0 = inconnu, le compteur ne donne alors que des dollars. À mesurer (barre d'état, ~/.claude/limites.jsonl).
 dollars_par_pourcent = 0

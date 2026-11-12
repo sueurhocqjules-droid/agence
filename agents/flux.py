@@ -22,12 +22,11 @@ from datetime import datetime, time, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from agence import controle, lancer, registre, youtube
+from agence import controle, lancer, mesures, registre, youtube
 
 DEPOT_RENDU = "sueurhocqjules-droid/studio-rendu"
 RENDU = Path(os.environ.get("RENDU_DIR") or Path(__file__).resolve().parents[2] / "studio-rendu")
 PARIS = ZoneInfo("Europe/Paris")
-CRENEAUX = {"en": (1, 18), "es": (2, 19), "pt": (16, 23)}  # heures de Paris, deux vidéos par jour et par chaîne
 DELAI_MIN = timedelta(hours=2)    # jamais de sortie plus tôt : une date passée publierait aussitôt
 ENVOIS_MAX = 4                    # par chaîne et par passage (Studio bloquait au-delà de 3 ou 4 par jour)
 RENDUS_MAX = 6                    # par passage, une machine par vidéo
@@ -84,11 +83,11 @@ def pousser_file(noms):
     subprocess.run(["git", "push", "-q"], cwd=RENDU, check=True)
 
 
-def creneaux(langue, pris, debut):
-    """Créneaux libres de la chaîne à partir de debut, dans l'ordre."""
+def creneaux(heures, pris, debut):
+    """Créneaux libres d'une chaîne (ses heures de sortie, à Paris) à partir de debut, dans l'ordre."""
     jour = debut.astimezone(PARIS).date()
     while True:
-        for heure in CRENEAUX[langue]:
+        for heure in sorted(heures):
             quand = datetime.combine(jour, time(heure), PARIS)
             if quand >= debut and quand not in pris:
                 yield quand
@@ -139,6 +138,7 @@ def passage(essai):
     from googleapiclient.errors import HttpError
 
     sujets = ordre_sujets()
+    heures = mesures.heures_de_sortie()  # réglées par le Programmateur (organisation/creneaux.toml)
     maintenant = datetime.now(timezone.utc)
     clients = {l: youtube.client(l) for l in youtube.CHAINES}
     etats = {l: etat_chaine(c) for l, c in clients.items()}
@@ -175,7 +175,7 @@ def passage(essai):
                 continue
             titres, sorties = etats[langue]
             debut = max([maintenant + DELAI_MIN] + [s + timedelta(minutes=1) for s in sorties])
-            quand = next(creneaux(langue, sorties, debut))
+            quand = next(creneaux(heures[langue], sorties, debut))
             if essai:
                 print(f"ESSAI {nom} -> {quand:%d/%m %H:%M} Paris, {mesures}")
                 continue
