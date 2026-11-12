@@ -1,0 +1,26 @@
+# Maintenance : une mise à jour de Dependabot est fusionnée seule si elle est mineure ou corrective et que
+# le contrôle passe. Une version majeure reste ouverte pour la Direction. Méthode de la doc GitHub
+# (« Automating Dependabot with GitHub Actions »), fusion directe faute de protection de branche en dépôt privé gratuit.
+name: Mises à jour
+on: pull_request
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  controle-et-fusion:
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - id: meta
+        uses: dependabot/fetch-metadata@v2
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: { python-version: "3.13" }
+      - run: pip install -r requirements.txt
+      - run: python -m unittest discover tests
+      - name: Fusionner (mineure ou corrective seulement)
+        if: steps.meta.outputs.update-type != 'version-update:semver-major'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.html_url }}
+        run: gh pr merge "$PR" --squash --delete-branch

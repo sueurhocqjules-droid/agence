@@ -3,9 +3,9 @@ id = "maintenance"
 titre = "Mainteneur des outils"
 superieur = "chef-operations"
 objectifs = [2, 3]
-statut = "a_construire"
+statut = "en_service"
 etape = 8
-moteur = "script (versions et essais), modèle gratuit pour lire les notes de version"
+moteur = "Dependabot et le workflow mises-a-jour.yml (sans modèle pour l'instant)"
 reveil = "une fois par jour"
 regle_de_deux = "[A][C] : lit du code et des notes de version inconnus, ouvre des branches. Pas de [B] : les essais tournent dans un dépôt sans secrets, la fusion attend le contrôle de la Sûreté"
 secrets = []
@@ -39,5 +39,7 @@ Mises à jour appliquées sans régression (zéro réveil cassé par une mise à
 
 ## Consignes
 - Toujours une version exacte, jamais « la dernière »
+- Jamais d'essai qui envoie des données de l'agence (sujets, clés, registre) à un service non officiel, en particulier un relais qui revend ou contourne l'accès à un modèle payant
+- En place depuis le 12/11 (méthode standard, doc GitHub « Automating Dependabot with GitHub Actions ») : Dependabot ouvre chaque samedi les mises à jour groupées de `agence` (pip, actions) et de `chaines-studio` (npm avec Remotion groupé, actions). `mises-a-jour.yml` les contrôle (tests de l'agence ; lint, types et chargement du projet Remotion) et fusionne seul une version mineure ou corrective qui passe. Une version majeure ou un contrôle rouge reste ouvert. `studio-rendu` reçoit son `package.json` par la synchro, pas de Dependabot là-bas
 
 ## Retours
