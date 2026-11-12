@@ -180,11 +180,15 @@ class ChoixFermes(unittest.TestCase):
 
     def test_cout_d_un_sujet_et_capacite(self):
         seance = lambda dollars, sujets: {"dollars_equiv": str(dollars), "sujets": str(sujets)}
-        atelier = [seance(9, ""), seance(14.2, 7), seance(3.6, 1), seance(1, 0)]   # anciennes lignes sans sujets ignorées
-        self.assertEqual(mesures.cout_sujet(atelier), 2.23)
+        # anciennes lignes sans sujets ignorées, séance ratée (0 sujet) comptée : elle a coûté sans livrer
+        atelier = [seance(9, ""), seance(14.2, 7), seance(3.6, 1), seance(1, 0)]
+        self.assertEqual(mesures.cout_sujet(atelier), 2.35)
         self.assertIsNone(mesures.cout_sujet([seance(9, "")]))
+        self.assertIsNone(mesures.cout_sujet([seance(8, 0)]))
+        # fenêtre : depuis la 2e dernière séance qui a livré, la séance ratée d'avant sort du calcul
+        self.assertEqual(mesures.cout_sujet([seance(50, 0), seance(4, 2), seance(2, 0), seance(4, 2)], seances=2), 2.5)
         capacite, cout, budget = mesures.capacite(atelier)
-        self.assertEqual(capacite, int(budget // 2.23))
+        self.assertEqual(capacite, int(budget // 2.35))
 
     def test_la_reserve_de_jules_sort_du_plafond(self):
         lundi = datetime(2026, 11, 9, tzinfo=timezone.utc)
