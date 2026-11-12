@@ -6,17 +6,18 @@ Un lundi, la page couvre la semaine passée (lundi 0h à lundi 0h UTC). Un autre
 Envoi : une issue du dépôt agence qui mentionne Jules (la mention déclenche le mail de GitHub, le dépôt n'étant pas suivi), un résumé sur Telegram avec le lien,
 et une copie dans registre/bilans/. En tête, les sections écrites le dimanche par la Direction et le critique.
 """
+import json
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 from agence import lancer, questions, registre, telegram, youtube
-from agents import surete
+from agents import guetteur, surete
 
 DEPOT = "sueurhocqjules-droid/agence"
 PARIS = ZoneInfo("Europe/Paris")
-NOMS = {"en": "Every Second (anglais)", "es": "Cada Segundo (espagnol)", "pt": "Cada Segundo (portugais)"}
+NOMS = {"en": "Every Second (anglais)", "es": "Cada Segundo (espagnol)", "pt": "A Cada Segundo (portugais)"}
 
 
 def periode(maintenant):
@@ -70,6 +71,8 @@ def page(maintenant):
     lignes += ["", f"Au total : +{total} vues. Dernier relevé : {releve[:16].replace('T', ' ') + ' UTC' if releve else 'aucun'}."
                + ("" if avant else " Aucun relevé avant la période : les vues gagnées comptent tout depuis la sortie."), ""]
 
+    lignes += argent(debut, fin)
+
     stock = registre.lire("stock")
     dans = lambda l: debut <= quand(l["maj"]) < fin
     prog = sum(1 for l in stock if l["etat"] == "programme" and dans(l))
@@ -104,6 +107,52 @@ def page(maintenant):
     resume = (f"Bilan de la semaine : +{total} vues, {prog} vidéos programmées, {c['dollars']:.2f} $ Claude"
               f"{', ' + str(len(ouvertes)) + ' question(s) pour toi' if ouvertes else ', rien à faire'}.")
     return "\n".join(lignes) + "\n", resume, debut
+
+
+def nombre(n):
+    return "?" if n is None else f"{n:,}".replace(",", " ")
+
+
+def pourcent(x):
+    return f"{x * 100:.1f} %".replace(".", ",")
+
+
+def argent(debut, fin, seuils=None, occasions=None):
+    """Bloc Argent : le seuil de monétisation le plus proche avec ce qui manque (photo du Guetteur), la progression
+    de chaque chaîne vers son palier le plus avancé, et les occasions de la période (commentaires et mails)."""
+    if seuils is None:
+        seuils = json.loads(guetteur.SEUILS.read_text(encoding="utf-8")) if guetteur.SEUILS.exists() else {}
+    if occasions is None:
+        occasions = registre.lire_jsonl(guetteur.OCCASIONS.stem)
+    lignes = ["## Argent", ""]
+    p = seuils.get("plus_proche")
+    if p:
+        manque = (p["cible"] - (p["valeur"] or 0)) if p["valeur"] is not None else None
+        lignes.append(f"- Seuil le plus proche : {p['texte']} ({pourcent(p['progression'])}"
+                      + (f", il manque {nombre(manque)})" if manque and manque > 0 else ")")
+                      + f". Photo du Guetteur du {quand(seuils['date']).astimezone(PARIS):%d/%m %Hh%M}")
+        meilleurs = {}
+        for l in seuils.get("paliers", []):
+            if l["progression"] > meilleurs.get(l["chaine"], {"progression": -1})["progression"]:
+                meilleurs[l["chaine"]] = l
+        for langue, l in meilleurs.items():
+            detail = ", ".join(f"{nombre(c['valeur'])}/{nombre(c['cible'])} {guetteur.NOMS_CRITERES[c['critere']]}"
+                               for c in l["criteres"])
+            lignes.append(f"  - {NOMS.get(langue, langue)} : {pourcent(l['progression'])} du palier « {l['nom']} » ({detail})")
+    else:
+        lignes.append("- Seuils : pas encore de photo du Guetteur")
+    periode_ = [o for o in occasions if quand(o.get("date")) and debut <= quand(o["date"]) < fin]
+    vraies = [o for o in periode_ if o.get("occasion")]
+    lignes += [f"- Occasion : {o['type']} ({o.get('source', 'commentaire')}, {NOMS.get(o.get('chaine'), 'aucune chaîne')}) "
+               f"{o['lien']}" for o in vraies] or ["- Aucune vraie occasion (collaboration, achat) cette semaine"]
+    autres = {}
+    for o in periode_:
+        if not o.get("occasion"):
+            autres[o["type"]] = autres.get(o["type"], 0) + 1
+    if autres:
+        lignes.append("- Autres commentaires relevés : " + ", ".join(f"{n} {t}" for t, n in sorted(autres.items())))
+    lignes += ["- Revenus : 0 € (aucune chaîne monétisée)", ""]
+    return lignes
 
 
 def surete_etat(pauses):
