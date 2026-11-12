@@ -166,7 +166,7 @@ def passage(essai):
                 print(f"INCOMPLET {nom} : artefact {artefact['id']} sans -yt.mp4, à rendre de nouveau")
                 a_rendre.append(nom)
                 continue
-            defauts, mesures = controle.controler(fichier)
+            defauts, releve = controle.controler(fichier)
             if defauts:
                 print(f"REJET {nom} : {', '.join(defauts)}")
                 rejetees.append(nom)
@@ -177,7 +177,7 @@ def passage(essai):
             debut = max([maintenant + DELAI_MIN] + [s + timedelta(minutes=1) for s in sorties])
             quand = next(creneaux(heures[langue], sorties, debut))
             if essai:
-                print(f"ESSAI {nom} -> {quand:%d/%m %H:%M} Paris, {mesures}")
+                print(f"ESSAI {nom} -> {quand:%d/%m %H:%M} Paris, {releve}")
                 continue
             sujet_json, calcul_json = lire_sujet(sujet)
             try:
@@ -194,7 +194,7 @@ def passage(essai):
             envois[langue] += 1
             programmees.append(nom)
             stock(nom, langue, sujet, "programme", quand.astimezone(timezone.utc).isoformat(), video_id,
-                  f"artefact {artefact['id']}, {mesures}")
+                  f"artefact {artefact['id']}, {releve}")
             print(f"OK {nom} : {video_id}, sortie {quand:%d/%m %H:%M} Paris")
 
     a_rendre = a_rendre[:RENDUS_MAX]
