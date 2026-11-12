@@ -1,0 +1,13 @@
+# Maintenance (étape 8) : Dependabot ouvre les mises à jour, mises-a-jour.yml les fusionne si les tests passent.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule: { interval: weekly, day: saturday }
+    groups:
+      python: { patterns: ["*"] }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly, day: saturday }
+    groups:
+      actions: { patterns: ["*"] }
