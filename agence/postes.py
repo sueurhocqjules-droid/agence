@@ -2,7 +2,12 @@
 
 Les offres gratuites saturent par moments (Gemini en 503, Groq au quota par minute) : on passe au suivant.
 """
+import json
+from pathlib import Path
+
 from agence.modeles import appeler
+
+PANNES = Path(__file__).resolve().parent.parent / "registre" / "modeles_en_panne.json"  # écrit par l'Expert en modèles
 
 POSTES = {
     # Le plus proche des traductions validées par Jules ; qwen garde la structure, un peu moins naturel.
@@ -26,7 +31,8 @@ POSTES = {
 def demander(poste, consigne):
     """Renvoie (texte, modele, jetons_entree, jetons_sortie, duree_s) du premier modèle qui répond."""
     erreurs = []
-    for fournisseur, modele, plafond in POSTES[poste]:
+    pannes = json.loads(PANNES.read_text(encoding="utf-8")) if PANNES.exists() else {}
+    for fournisseur, modele, plafond in sorted(POSTES[poste], key=lambda m: m[1] in pannes):  # tri stable : en panne à la fin
         try:
             texte, entree, sortie, duree = appeler(fournisseur, modele, consigne, plafond)
             return texte, modele, entree, sortie, duree

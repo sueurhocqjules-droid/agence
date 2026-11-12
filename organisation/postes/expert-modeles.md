@@ -3,10 +3,12 @@ id = "expert-modeles"
 titre = "Expert en modèles (réassignation)"
 superieur = "chef-operations"
 objectifs = [2]
-statut = "a_construire"
+statut = "en_service"
+module = "agents.expert_modeles"
+env = ["GROQ_API_KEY", "GEMINI_API_KEY", "OPENROUTER_API_KEY"]
 etape = 8
 moteur = "script de choix, modèle gratuit seulement pour les cas serrés, jamais Claude"
-reveil = "sur événement : un agent arrive au bout de son modèle gratuit"
+reveil = "le dimanche, avant les autres agents (et sur événement plus tard)"
 regle_de_deux = "[B] : connaît la bibliothèque de clés. Ni [A] ni [C] : écrit seulement l'attribution"
 secrets = ["bibliothèque des clés des modèles gratuits"]
 budget = { claude_usd_semaine = 0, appels_gratuits_jour = 10 }
@@ -38,5 +40,7 @@ Part des appels servis sans erreur de quota, qualité maintenue au banc.
 
 ## Consignes
 - Chercher d'office quel travail fait par Claude un modèle gratuit pourrait reprendre, pour que l'agence tienne quand Jules baisse son enveloppe
+
+- En place depuis le 12/11 : chaque dimanche, un petit appel à chaque modèle attribué. Ceux qui ne répondent pas vont dans `registre/modeles_en_panne.json` et passent en dernier pour tous les postes. Chaque passage repart de zéro : un modèle revenu reprend sa place. Reste à faire : attribuer un modèle candidat du Chercheur d'outils après un passage au banc
 
 ## Retours
