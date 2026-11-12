@@ -3,12 +3,14 @@ id = "guetteur"
 titre = "Guetteur (Argent)"
 superieur = "direction"
 objectifs = [1]
-statut = "a_construire"
+statut = "en_service"
+module = "agents.guetteur"
+env = ["YOUTUBE_API_KEY", "GROQ_API_KEY", "GEMINI_API_KEY", "OPENROUTER_API_KEY", "TELEGRAM_BOT_TOKEN"]
 etape = 9
 moteur = "script de seuils, modèle gratuit pour classer"
 reveil = "à chaque réveil de l'agence"
-regle_de_deux = "[A][B] : lit commentaires et messages avec un jeton en lecture. Pas de [C] : ne répond jamais, rend des champs structurés"
-secrets = ["jetons YouTube en lecture seule", "clé du modèle gratuit attribué"]
+regle_de_deux = "[A][B] : lit les commentaires publics avec une clé de lecture. Pas de [C] : ne répond jamais, rend des champs structurés, ne prévient que Jules"
+secrets = ["clé YouTube Data publique (lecture seule, aucun jeton de chaîne)", "clé du modèle gratuit attribué", "bot Telegram (messages à Jules seulement)"]
 budget = { claude_usd_semaine = 0, appels_gratuits_jour = 50 }
 scripts = ["seuils"]
 equipe = []
@@ -25,10 +27,12 @@ Stats du registre, commentaires et messages des chaînes, demandes de collaborat
 Alertes en champs fermés (type, chaîne, lien, montant estimé, urgence) au registre. Jamais de réponse à une personne : tout contact passe par Jules.
 
 ## Outils
-Script `seuils`, lecture des commentaires par l'API.
+`agents/guetteur.py` : script `seuils` (paliers de `PALIERS`, chiffres officiels relus le 13/11/2026, vues et vidéos sur 90 jours lues dans `registre/stats.csv`, abonnés par l'API publique), puis lecture des nouveaux commentaires de nos vidéos et classement par un modèle gratuit (type, urgence : listes fermées). Photo des seuils dans `registre/seuils.json` (palier le plus proche et sa distance), occasions dans `registre/occasions.jsonl`. Essai sans rien écrire : `python -m agents.guetteur --essai`, sur données d'exemple : `--exemple`.
+
+Autres réseaux : pas encore de stats au registre (TikTok, Instagram, Facebook ne sont pas branchés). Leurs paliers s'ajoutent à `PALIERS` quand le flux y publie.
 
 ## Secrets et permissions
-Jetons en lecture seule (portée youtube.readonly), distincts de ceux qui publient.
+Clé YouTube Data publique (`YOUTUBE_API_KEY`) : lecture seule, aucun jeton de chaîne (ceux-là publient). Bot Telegram pour prévenir Jules, une fois par occasion ou palier (`registre/alertes.csv`).
 
 ## Mesure de réussite
 Occasions réelles remontées (retenues par la Direction), peu de fausses alertes.

@@ -32,6 +32,9 @@ POSTES = {
                        ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 5000)],
     # Chef des opérations : des chiffres à lire justes, peu de données
     "chef-operations": [("groq", "openai/gpt-oss-120b", 3000), ("gemini", "gemini-flash-latest", 3000)],
+    # Guetteur (étape 9) : classement court de commentaires en champs fermés, à chaque réveil
+    "guetteur": [("groq", "openai/gpt-oss-120b", 3000), ("gemini", "gemini-flash-lite-latest", 3000),
+                 ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 3000)],
 }
 
 
