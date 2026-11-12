@@ -88,6 +88,19 @@ jobs:
           ATELIER_COUTS: atelier-src/atelier/couts.csv
           PYTHONUTF8: "1"
         run: python -m agence.lancer garde_fous
+      # Avant le flux : un mail de sanction met la chaîne en pause dès ce réveil. Lecture seule, ne répond jamais
+      - name: Courrier (tri de prod.hack05)
+        if: ${{ !cancelled() }}
+        timeout-minutes: 8
+        env:
+          GMAIL_TOKEN: ${{ secrets.GMAIL_TOKEN }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PYTHONUTF8: "1"
+        run: python -m agence.lancer courrier
       - name: Flux (rendu, contrôle, programmation)
         if: ${{ !cancelled() }}
         env:

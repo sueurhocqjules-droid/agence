@@ -3,14 +3,16 @@ id = "courrier"
 titre = "Courrier (tri de prod.hack05)"
 superieur = "chef-operations"
 objectifs = [3]
-statut = "plus_tard"
+statut = "en_service"
+module = "agents.courrier"
+env = ["GMAIL_TOKEN", "GROQ_API_KEY", "GEMINI_API_KEY", "OPENROUTER_API_KEY", "TELEGRAM_BOT_TOKEN"]
 etape = 9
 moteur = "filtres Gmail par chaîne d'abord, modèle gratuit pour le reste"
 reveil = "à chaque réveil de l'agence"
-regle_de_deux = "[A][B] : lit la boîte. Pas de [C] : rend une catégorie fermée, un script pose l'étiquette et transmet"
-secrets = ["accès Gmail prod.hack05 en lecture"]
+regle_de_deux = "[A][B] : lit la boîte (en-têtes et extrait). Pas de [C] : rend une catégorie fermée, le script transmet, ne répond jamais"
+secrets = ["jeton Gmail prod.hack05 (lecture et filtres, rien d'autre)", "clé du modèle gratuit attribué", "bot Telegram (messages à Jules seulement)"]
 budget = { claude_usd_semaine = 0, appels_gratuits_jour = 50 }
-scripts = ["etiqueter", "transmettre"]
+scripts = ["transmettre"]
 equipe = []
 +++
 # Courrier (tri de prod.hack05)
@@ -19,16 +21,16 @@ equipe = []
 Que rien d'important n'échappe dans la boîte prod.hack05. Filtres Gmail par chaîne d'abord, l'agent classe le reste.
 
 ## Entrées
-Mails de prod.hack05 non classés par les filtres.
+Mails de prod.hack05 arrivés depuis le passage précédent (curseur dans `registre/courrier.json`, 7 jours au premier passage, 40 au plus par réveil) : expéditeur, destinataire, objet, extrait. Jamais le corps entier.
 
 ## Sorties
-Une catégorie fermée par mail (avertissement, collaboration, plateforme, facture, inutile). Le script transmet les avertissements à la Sûreté et les collaborations au Guetteur, en champs structurés. Ne répond jamais.
+Une catégorie fermée par mail (collaboration, plateforme, sanction, autre) et la chaîne (en, es, pt, aucune ; l'adresse en « + » ou le nom de la chaîne, lus par le script, l'emportent). Classement dans `registre/courrier.jsonl`. Le script transmet les collaborations au Guetteur (`registre/occasions.jsonl`, Jules prévenu une fois) et les sanctions à la Sûreté : venue d'une adresse de plateforme et pour une chaîne précise, la chaîne est mise en pause (`registre.pause`, question Telegram pour reprendre) ; sinon Jules est prévenu, rien n'est mis en pause (possible hameçonnage). Ne répond jamais.
 
 ## Outils
-Lecture de la boîte, scripts `etiqueter` et `transmettre`.
+`agents/courrier.py` (lecture, consigne, validation, `transmettre`). Les filtres Gmail par chaîne sont posés par `agence/tri_mail.py` (une fois, sans doublon) dès que Jules a créé les étiquettes : le Courrier n'en dépend pas.
 
 ## Secrets et permissions
-Accès Gmail en lecture seule (gmail.readonly). Les étiquettes sont posées par le script, qui a seul le droit de modifier.
+Jeton Gmail `GMAIL_TOKEN` : lecture et filtres (gmail.readonly, gmail.settings.basic), rien d'autre. Ni envoi, ni étiquette posée sur un mail, ni suppression.
 
 ## Mesure de réussite
 Zéro avertissement manqué, part des mails bien classés (contrôle par échantillon).
