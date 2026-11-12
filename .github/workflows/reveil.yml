@@ -98,6 +98,19 @@ jobs:
           RENDU_DIR: rendu
           PYTHONUTF8: "1"
         run: python -m agence.lancer flux
+      # Après les stats (vues sur 90 jours) : seuils de monétisation et commentaires, clé publique en lecture seule
+      - name: Guetteur (seuils, commentaires)
+        if: ${{ !cancelled() }}
+        timeout-minutes: 8
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PYTHONUTF8: "1"
+        run: python -m agence.lancer guetteur
       - name: Commiter le registre
         if: always()
         env:
