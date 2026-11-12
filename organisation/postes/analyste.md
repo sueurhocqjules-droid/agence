@@ -16,17 +16,17 @@ equipe = []
 # Analyste des investissements (contrôle de gestion)
 
 ## Mission
-Dire ce que rapporterait chaque dépense possible, avant qu'elle soit faite, et vérifier après coup si elle a rapporté ce qui était prévu. Il part de l'état actuel de l'agence (le cas « ne rien acheter », toujours présent comme référence), simule chaque amélioration payante, puis les paliers (10, 20, 50, 100, 500) et leurs combinaisons, et repère celles qui ne valent pas leur prix. Il ne décide rien : la Direction recommande, Jules tranche. L'optimisation gratuite reste au Chercheur d'outils, à la Maintenance et à l'Expert en modèles.
+Dire ce que rapporterait chaque dépense possible, avant qu'elle soit faite, et vérifier après coup si elle a rapporté ce qui était prévu. Il part de l'état actuel de l'agence (le cas « ne rien acheter », toujours présent comme référence), simule chaque amélioration payante, puis les paliers (10, 20, 50, 100, 500) et leurs combinaisons, et repère celles qui ne valent pas leur prix. Tout le revenu est réinvesti pour l'instant : il vérifie chaque mois s'il est vraiment nécessaire d'investir autant, en comparant le gain du dernier palier à son coût, et dit quel montant suffit. Il ne décide rien : la Direction recommande, Jules tranche. L'optimisation gratuite reste au Chercheur d'outils, à la Maintenance et à l'Expert en modèles.
 
 ## Entrées
-Registre (stock, stats des vidéos par cohorte, coûts, part de la limite Claude), fiches d'amélioration payantes du Chercheur d'outils (`registre/candidats.jsonl`, champs fermés), achats déjà faits et leur prévision (`registre/investissements.jsonl`).
+Registre (stock, stats des vidéos par cohorte, coûts, part de la limite Claude), fiches d'amélioration payantes du Chercheur d'outils (`registre/ameliorations.jsonl`, champs fermés), achats déjà faits et leur prévision (`registre/investissements.jsonl`).
 
 ## Sorties
 - `registre/business-cases.jsonl` : une ligne par cas (amélioration ou combinaison, poche, palier, coût, gain pessimiste / médian / optimiste, ROI à 6 mois, délai de retour, gain marginal sur le palier d'en dessous)
 - Toujours **deux propositions séparées** : une en € de la poche de Jules, une en $ de sa limite Claude. Jamais mélangées dans un même total
 - Avant le premier revenu, le gain se mesure en unités d'objectif : coût par sujet, sujets par semaine, jours de stock, % de la limite hebdo, semaines gagnées pour atteindre 50 €/mois. Le revenu en € s'y ajoute dès qu'il existe
 - `registre/tableau-investissements.csv`, produit par le script `simulation` (sans jetons), joint au bilan du lundi
-- Chaque lundi, une section du bilan : les cas classés, le cas à éviter de la semaine s'il y en a un, l'écart prévu / réalisé des achats en cours
+- Chaque lundi, une section du bilan : les cas classés, le cas à éviter de la semaine s'il y en a un, le montant qui suffit à réinvestir, l'écart prévu / réalisé des achats en cours
 
 ## Méthode
 - **Simulation, pas d'addition.** Deux améliorations ensemble ne valent pas la somme des deux : la combinaison se simule (une amélioration peut ne valoir qu'avec une autre)

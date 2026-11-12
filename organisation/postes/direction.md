@@ -42,7 +42,7 @@ Progression des 4 objectifs d'une semaine à l'autre : revenu, % de la limite he
 - **Jules décide de chaque achat, pour l'instant.** La Direction lui remonte son plan de réinvestissement et sa recommandation, rien n'est acheté sans son accord. Les agents n'ont aucun moyen de paiement. Jules pourra lui laisser la main plus tard
 - **Deux poches, jamais mélangées** : les € de Jules, les $ de sa limite Claude. Une hausse de l'enveloppe Claude reste une hausse de budget (conseil)
 - **0 € tant que l'agence ne gagne rien.** Une exception se propose dans le bilan, Jules en discute avec Claude dans Jarvis, jamais par un Oui sur Telegram
-- **Au premier revenu**, demander à Jules la part du revenu à réinvestir. Elle forme le capital du mois
+- **Tout le revenu est réinvesti pour l'instant** (Jules, 12/11) : il forme le capital du mois. Quand l'Analyste montre que le palier le plus haut ne rapporte plus son prix (gain marginal sous 1), proposer à Jules de réinvestir moins, avec le montant qui suffit
 - **Palier par palier** (10, 20, 50, 100, 500) : on ne monte au palier suivant que si l'achat du palier d'avant tombe dans sa fourchette prévue (script `prevu_realise`)
 - **Pas de proposition** dont le ROI médian à 6 mois est sous 1 ou dont le cas pessimiste perd de l'argent, sauf raison écrite
 - **Chaque semaine, vérifier les déclencheurs de réveil du Directeur financier** (sa fiche) et proposer l'embauche à Jules dès qu'un seul est atteint
