@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from agence import consignes, mesures, organisation, registre
-from agents import chef_contenu, critique, direction, flux, programmateur
+from agents import chef_contenu, critique, direction, flux, programmateur, surete
 
 T = datetime(2026, 11, 15, 18, tzinfo=timezone.utc)
 FICHE = """+++
@@ -148,7 +148,7 @@ class ChoixFermes(unittest.TestCase):
 
     def test_proposition_de_creneau_valide(self):
         p = {"chaine": "en", "ancienne": 18, "nouvelle": 20, "attendu": 600}
-        self.assertEqual(programmateur.valider(p, self.heures, {"en": 500}), ("en", [1, 20], 600))
+        self.assertEqual(programmateur.valider(p, self.heures, {"en": 500}, 14), ("en", [1, 20], 600))
 
     def test_propositions_de_creneau_refusees(self):
         for p in ({"chaine": "fr", "ancienne": 18, "nouvelle": 20, "attendu": 600},
@@ -158,7 +158,41 @@ class ChoixFermes(unittest.TestCase):
                   {"chaine": "en", "ancienne": 18, "nouvelle": 20, "attendu": 400},
                   {"chaine": "en", "ancienne": 18, "nouvelle": 20, "attendu": 9000}):
             with self.assertRaises(ValueError, msg=p):
-                programmateur.valider(p, self.heures, {"en": 500})
+                programmateur.valider(p, self.heures, {"en": 500}, 14)
+
+    def test_cadence_dans_le_budget(self):
+        plus = {"chaine": "en", "ancienne": None, "nouvelle": 12, "attendu": 600}
+        self.assertEqual(programmateur.valider(plus, self.heures, {"en": 500}, 21)[1], [1, 12, 18])
+        for capacite in (20, None):   # 3 sorties par jour = 21 sujets par semaine, ou coût d'un sujet inconnu
+            with self.assertRaises(ValueError):
+                programmateur.valider(plus, self.heures, {"en": 500}, capacite)
+        moins = {"chaine": "es", "ancienne": 2, "nouvelle": None, "attendu": 600}
+        self.assertEqual(programmateur.valider(moins, self.heures, {"es": 500}, None)[1], [19])
+        with self.assertRaises(ValueError):   # jamais sous une sortie par jour
+            programmateur.valider(moins, {**self.heures, "es": [2]}, {"es": 500}, None)
+
+    def test_reduction_forcee(self):
+        groupes = {("en", 1): [50, 70], ("en", 18): [200]}
+        heures = {"en": [1, 18], "es": [2, 19], "pt": [16]}
+        self.assertEqual(programmateur.reduction_forcee(heures, groupes), {"en": [18], "es": [2], "pt": [16]})
+        un = {"en": [18], "es": [2], "pt": [16]}
+        self.assertEqual(programmateur.reduction_forcee(un, groupes), un)
+
+    def test_cout_d_un_sujet_et_capacite(self):
+        seance = lambda dollars, sujets: {"dollars_equiv": str(dollars), "sujets": str(sujets)}
+        atelier = [seance(9, ""), seance(14.2, 7), seance(3.6, 1), seance(1, 0)]   # anciennes lignes sans sujets ignorées
+        self.assertEqual(mesures.cout_sujet(atelier), 2.23)
+        self.assertIsNone(mesures.cout_sujet([seance(9, "")]))
+        capacite, cout, budget = mesures.capacite(atelier)
+        self.assertEqual(capacite, int(budget // 2.23))
+
+    def test_la_reserve_de_jules_sort_du_plafond(self):
+        lundi = datetime(2026, 11, 9, tzinfo=timezone.utc)
+        atelier = [{"debut": "2026-11-11T12:43:12Z", "agent": "auteur", "dollars_equiv": "14", "appels_gratuits": "0"},
+                   {"debut": "2026-11-12T12:00:00Z", "agent": "auteur", "dollars_equiv": "28", "appels_gratuits": "0",
+                    "reserve_usd": "20"}]
+        c = surete.compteur(lundi + timedelta(days=4), [], atelier, {"claude": {"dollars_par_pourcent": 0}})
+        self.assertEqual((c["dollars"], c["reserve"], c["hors_reserve"]), (42, 20, 22))
 
     def test_creneaux_du_flux_suivent_les_heures(self):
         paris = flux.PARIS

@@ -49,15 +49,16 @@ def couts_atelier():
     if not chemin.exists():
         return None
     with open(chemin, newline="", encoding="utf-8") as f:
-        return [{"debut": l["date"], "agent": "auteur", "dollars_equiv": l["cout_usd_equivalent"], "appels_gratuits": "0"}
-                for l in csv.DictReader(f)]
+        return [{"debut": l["date"], "agent": "auteur", "dollars_equiv": l["cout_usd_equivalent"], "appels_gratuits": "0",
+                 "sujets": l.get("sujets") or "", "reserve_usd": l.get("reserve_usd") or "0"} for l in csv.DictReader(f)]
 
 
 def compteur(maintenant, couts, atelier, reglages, fin=None):
     """Dépenses de la semaine de `maintenant` (jusqu'à `fin` si donnée) : total, par agent, et % de la limite
-    hebdomadaire si l'étalon est connu."""
+    hebdomadaire si l'étalon est connu. `reserve` : la part des séances payée par une réserve accordée par Jules
+    (colonne reserve_usd de l'atelier), comptée dans le total mais pas dans les plafonds."""
     debut = lancer.debut_semaine(maintenant)
-    par_agent = {}
+    par_agent, reserve = {}, 0.0
     for ligne in couts + (atelier or []):
         quand = datetime.fromisoformat(ligne["debut"])
         if quand < debut or (fin and quand >= fin):
@@ -65,9 +66,11 @@ def compteur(maintenant, couts, atelier, reglages, fin=None):
         a = par_agent.setdefault(ligne["agent"], {"dollars": 0.0, "appels": 0})
         a["dollars"] += float(ligne["dollars_equiv"] or 0)
         a["appels"] += int(float(ligne["appels_gratuits"] or 0))
+        reserve += min(float(ligne.get("reserve_usd") or 0), float(ligne["dollars_equiv"] or 0))
     total = sum(a["dollars"] for a in par_agent.values())
     etalon = reglages["claude"]["dollars_par_pourcent"]
-    return {"semaine": debut.date().isoformat(), "par_agent": par_agent, "dollars": total,
+    return {"semaine": debut.date().isoformat(), "par_agent": par_agent, "dollars": total, "reserve": reserve,
+            "hors_reserve": total - reserve,
             "appels": sum(a["appels"] for a in par_agent.values()),
             "pourcent": total / etalon if etalon else None, "atelier_lu": atelier is not None}
 
@@ -175,7 +178,8 @@ def passage(essai):
     part = f", {c['pourcent']:.1f} % de ta limite" if c["pourcent"] is not None else ""
     detail = ", ".join(f"{a} {v['dollars']:.2f} $" for a, v in sorted(c["par_agent"].items()) if v["dollars"])
     print(f"Semaine du {c['semaine']} : {c['dollars']:.2f} $ équivalent Claude{part} ({detail or 'aucun'}), "
-          f"{c['appels']} appels gratuits" + ("" if c["atelier_lu"] else ", atelier de chaines-studio non lu"))
+          f"{c['appels']} appels gratuits" + (f", dont {c['reserve']:.2f} $ de réserve accordée par Jules" if c["reserve"] else "")
+          + ("" if c["atelier_lu"] else ", atelier de chaines-studio non lu"))
 
     cl = reglages["claude"]
     marque = f"budget semaine {c['semaine']}"
@@ -184,7 +188,7 @@ def passage(essai):
         if not essai:
             registre.pause(cible, "surete", f"nouvelle semaine ({c['semaine']}) : le compteur repart à zéro", action="reprise")
             questions.clore(f"reprise:{cible}", f"nouvelle semaine, {questions.decrire(cible)} a repris tout seul.")
-    if c["dollars"] >= cl["pause_usd_semaine"]:
+    if c["hors_reserve"] >= cl["pause_usd_semaine"]:
         for cible in cl["pause_cibles"]:
             s.mettre_en_pause(
                 cible, f"{marque} : {c['dollars']:.2f} $ Claude, plafond {cl['pause_usd_semaine']} $",
@@ -195,7 +199,7 @@ def passage(essai):
                 f"Les vidéos déjà rendues continuent de sortir.",
                 "Oui si tu acceptes de dépasser cette semaine (par exemple si tu n'as pas besoin de Claude pour autre chose). "
                 "Non si tu préfères garder ta marge : la pause se lève toute seule lundi, quand le compteur repart à zéro.")
-    if c["dollars"] >= cl["alerte_usd_semaine"]:
+    if c["hors_reserve"] >= cl["alerte_usd_semaine"]:
         s.alerter(f"claude:{c['semaine']}", "budget", f"{c['dollars']:.2f} $ équivalent Claude depuis lundi{part} "
                   f"({detail}). Je te préviens à {cl['alerte_usd_semaine']} $, j'arrête l'atelier à {cl['pause_usd_semaine']} $. "
                   f"Rien à faire pour l'instant.")

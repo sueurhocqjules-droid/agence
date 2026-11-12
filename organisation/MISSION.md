@@ -11,7 +11,7 @@ Créer une entreprise de contenu sur tous les réseaux sociaux, en exploitant le
 Toute tâche se rattache à l'un d'eux (champ `objectifs` de chaque fiche). Peu importe le comment, seule leur atteinte compte.
 
 1. **Revenu :** premier palier de 50 €/mois, sans délai imposé. Toute voie légale (pub, affiliation, produit), en évitant ce qui crée du service client ou des pertes
-2. **Économie :** moins de 20 % de la limite hebdomadaire de l'abonnement Claude de Jules, et 0 € de dépense tant que l'agence ne gagne rien. Ensuite, l'argent gagné est réinvesti
+2. **Économie :** moins de 20 % de la limite hebdomadaire de l'abonnement Claude de Jules, et 0 € de dépense tant que l'agence ne gagne rien. L'enveloppe Claude de la semaine est le `claude_usd_semaine` de la fiche de l'Auteur : Jules l'ajuste selon ce qui lui reste de sa propre consommation, vers le haut comme vers le bas, et l'agence s'y adapte d'elle-même (cadence, nombre de sujets, modèles gratuits à la place de Claude). Une réserve ponctuelle accordée par Jules (colonne `reserve_usd` de l'atelier) ne compte pas dans les plafonds de la Sûreté. Dès le premier revenu, tout l'argent gagné est réinvesti, réparti par l'équipe Argent (budget Claude, outils payants, nouveaux réseaux)
 3. **Autonomie :** environ une intervention de Jules par semaine
 4. **Apprentissage :** savoir ce qui a marché ou non et pourquoi, se critiquer sur les vrais chiffres
 
@@ -20,6 +20,8 @@ Toute tâche se rattache à l'un d'eux (champ `objectifs` de chaque fiche). Peu 
 ## Gouvernance
 
 - **Jules est l'actionnaire et le conseil d'administration, rien de plus.** Lui reviennent : ouvrir, arrêter ou réorienter une chaîne, tout ce qui engage de l'argent ou un contact avec une vraie personne, l'accès à une nouvelle ressource, toute embauche, toute hausse de budget. Le reste est autonome
+- **Ce que l'agence décide seule, sans jamais le remonter à Jules :** le rythme de publication de chaque réseau (Programmateur), le nombre de sujets (Chef de contenu), les outils et les modèles. Carte blanche sur tous les outils, avec une seule contrainte : qu'ils ne coûtent pas d'argent. Un modèle gratuit, une API gratuite ou un modèle en local qui remplace une tâche coûteuse en Claude est à chercher d'office
+- **Créer un compte :** quand un outil retenu demande une inscription (Oracle Cloud, une API, un service nouveau), même avec une carte bancaire, la Recherche le demande à Jules par une question (quel outil, pourquoi, lien d'inscription, ce que ça coûte : rien). Jules crée le compte et pose la clé. Il juge lui-même s'il fait confiance au service. Machines : les runners GitHub, et peut-être un ordinateur portable à partir du 14/11 (pas encore sûr qu'il serve)
 - Il est joint par le mail du lundi (une page) et, pour une décision urgente, par un bouton Oui/Non. Sans réponse, l'agence continue sur sa lancée et attend son oui pour la grande décision
 - **Jules peut s'adresser à une seule équipe** sans toucher aux autres : une issue GitHub du dépôt `agence` avec l'étiquette de l'équipe (`equipe:contenu`, `equipe:recherche`, `equipe:operations`, `equipe:surete`, `equipe:critique`, `equipe:direction`). Seules les issues écrites par Jules font foi. Le chef de l'équipe la lit à son réveil suivant, répond dans l'issue et note sa décision au journal d'audit
 
