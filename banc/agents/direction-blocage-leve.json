@@ -1,0 +1,23 @@
+{
+ "id": "direction-blocage-leve",
+ "poste": "direction",
+ "panne": "Semaine du 9/11/2026 : la Direction comptait comme ouverts des échecs déjà réparés, parce que son dossier listait les blocages sans dire lesquels avaient été levés par un passage réussi. Réparé par la date leve_le (direction.bloquants) et une phrase de sa consigne.",
+ "adaptateur": "direction",
+ "entree": {
+  "depuis": "2026-11-08T00:00:00+00:00",
+  "journaux": {
+   "chef-contenu": [
+    {"date": "2026-11-10T11:30:00+00:00", "quoi": "flux", "resultat": "echec", "code": 1, "bloquant": "flux a échoué (code 1), voir la sortie"},
+    {"date": "2026-11-10T17:21:00+00:00", "quoi": "flux", "resultat": "ok", "code": 0}
+   ],
+   "surete": [
+    {"date": "2026-11-12T05:20:00+00:00", "quoi": "garde_fous", "resultat": "echec", "code": 1, "bloquant": "garde_fous a échoué (code 1), voir la sortie"}
+   ]
+  }
+ },
+ "criteres": [
+  {"id": "blocage-repare-date", "type": "code", "verif": "egal", "sur": "bloquants.0.leve_le", "valeur": "2026-11-10T17:21"},
+  {"id": "blocage-en-cours-sans-date", "type": "code", "verif": "egal", "sur": "bloquants.1.leve_le", "valeur": null},
+  {"id": "consigne-explique-leve-le", "type": "code", "verif": "avec", "sur": "seance", "motifs": ["leve_le"]}
+ ]
+}

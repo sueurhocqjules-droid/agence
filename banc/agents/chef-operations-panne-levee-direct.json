@@ -1,0 +1,23 @@
+{
+ "id": "chef-operations-panne-levee-direct",
+ "poste": "chef-operations",
+ "panne": "Semaine du 9/11/2026 : des pannes déjà réparées (un échec du flux suivi d'un passage réussi) étaient comptées comme encore ouvertes et redemandées en réparation. Réparé par la date leve_le des blocages. Rejoué en direct : le seul blocage de la semaine est levé, aucune réparation ne doit être demandée.",
+ "adaptateur": "chef-operations",
+ "entree": {
+  "equipe": ["maintenance", "expert-modeles", "courrier"],
+  "donnees": {
+   "reveils_reussis_pourcent": 96,
+   "reveils_par_workflow": {"Mises à jour": "2/2", "Réveil": "26/27", "Semaine": "1/1"},
+   "pannes_sans_trace": [],
+   "agents": {"chef-contenu": {"ok": 26, "echec": 1, "refuse": 0}, "courrier": {"ok": 27, "echec": 0, "refuse": 0},
+              "maintenance": {"ok": 2, "echec": 0, "refuse": 0}, "expert-modeles": {"ok": 1, "echec": 0, "refuse": 0}},
+   "bloquants_7j": [{"agent": "chef-contenu", "quoi": "flux", "date": "2026-11-10T11:30",
+                     "bloquant": "flux a échoué (code 1), voir la sortie", "leve_le": "2026-11-10T17:21"}],
+   "modeles_en_panne": {}
+  }
+ },
+ "criteres": [
+  {"id": "aucun-retour-sans-probleme", "type": "code", "verif": "retours_justifies"},
+  {"id": "aucune-reparation-pour-une-panne-levee", "type": "code", "verif": "vide", "sur": "reparations"}
+ ]
+}

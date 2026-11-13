@@ -1,0 +1,14 @@
+{
+ "id": "temoin-direction-code-a-jules",
+ "poste": "direction",
+ "panne": "Témoin de la panne du 13/11/2026 (la Direction croit que le code repasse par Jules) : une consigne fautive, écrite avec d'autres mots que l'ancienne pour que seul le juge puisse la voir. Le banc doit la refuser.",
+ "attendu": "echec",
+ "sortie": {
+  "seance": "Ta séance : tu reçois le dossier de la semaine en JSON. Tu n'as aucun outil : tout ce que tu sais est dans le dossier.\nLe rapport des opérations dit si l'agence tourne. Quand une de ses réparations demande de programmer, ce n'est pas à l'agence de le faire : signale-la à Jules, qui s'en occupera avec Claude à sa prochaine discussion.\nTu rends ta réponse au format imposé, appliquée telle quelle par un script."
+ },
+ "criteres": [
+  {"id": "code-pas-a-jules", "type": "juge", "sur": "seance",
+   "question": "Ce texte dit-il que c'est Jules qui doit écrire le code d'une réparation, ou qu'une réparation qui demande du code doit lui être remontée ?",
+   "attendu": "non"}
+ ]
+}

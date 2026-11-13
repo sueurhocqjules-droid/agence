@@ -196,15 +196,18 @@ def deja_proposes():
     return {normaliser(json.loads(l)["lien"]) for l in CANDIDATS.read_text(encoding="utf-8").splitlines() if l.strip()}
 
 
-def valider(reponse, autorises, postes_connus, deja):
+def valider(reponse, autorises, postes_connus, deja, refuses=()):
     """Garde les candidats conformes aux choix fermés. Renvoie (gardés, écartés avec leur raison)."""
     gardes, ecartes = [], []
+    refuses = {normaliser(l) for l in refuses}
     for c in (reponse.get("candidats") or [])[:MAX_CANDIDATS]:
         if not isinstance(c, dict):
             continue
         lien = normaliser(c.get("lien"))
         if lien not in autorises:
             raison = "lien absent des données collectées"
+        elif lien in refuses:
+            raison = "déjà refusé (registre/refus.jsonl)"
         elif lien in deja:
             raison = "déjà proposé une semaine précédente"
         elif c.get("remplace") not in postes_connus:
@@ -258,7 +261,7 @@ def passage(essai):
     postes_connus = set(organisation.fiches()) | AUTRES_POSTES
     texte, modele, *_ = postes.demander("chercheur-outils", consigne(donnees, postes_connus))
     reponse = modeles.extraire_json(texte) or {}
-    gardes, ecartes = valider(reponse, autorises, postes_connus, deja_proposes())
+    gardes, ecartes = valider(reponse, autorises, postes_connus, deja_proposes(), registre.refuses())
     deja = {(a.get("id"), normaliser(a.get("lien"))) for a in registre.lire_jsonl(analyste.AMELIORATIONS.stem)}
     ameliorations, refusees = valider_ameliorations(reponse, prix, autorises, set(organisation.fiches()), deja)
     for a in refusees:

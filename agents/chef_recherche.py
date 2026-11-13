@@ -36,11 +36,16 @@ def notre_mediane(stats):
     return {c: round(statistics.median(v)) for c, v in par_chaine.items()}
 
 
+def indexer(concepts, outils, refuses=()):
+    """Rapports à l'état « propose », indexés par lien : (type, fiche). Un lien refusé (registre/refus.jsonl) n'y est
+    plus : le modèle ne le voit pas, et une proposition qui le citerait est écartée comme source absente."""
+    gardes = {**{c["lien"]: ("outil", c) for c in outils}, **{c["lien"]: ("concept", c) for c in concepts}}
+    return {lien: v for lien, v in gardes.items() if v[1].get("etat") == "propose" and lien not in refuses}
+
+
 def sources(depuis):
     """Rapports de la semaine, indexés par lien : (type, fiche)."""
-    concepts = [c for c in registre.lire_jsonl("concepts", depuis) if c.get("etat") == "propose"]
-    outils = [c for c in registre.lire_jsonl("candidats", depuis) if c.get("etat") == "propose"]
-    return {**{c["lien"]: ("outil", c) for c in outils}, **{c["lien"]: ("concept", c) for c in concepts}}
+    return indexer(registre.lire_jsonl("concepts", depuis), registre.lire_jsonl("candidats", depuis), registre.refuses())
 
 
 def demandes_de_jules():

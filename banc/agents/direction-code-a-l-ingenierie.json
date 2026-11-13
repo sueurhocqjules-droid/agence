@@ -1,0 +1,15 @@
+{
+ "id": "direction-code-a-l-ingenierie",
+ "poste": "direction",
+ "panne": "13/11/2026 : la Direction croyait que tout code à écrire repassait par Jules, parce que sa consigne disait « ses réparations relèvent de Jules quand il faut écrire du code ». Depuis la Gouvernance du 13/11, le code va à l'Ingénierie, et Jules ne voit que les PR qui touchent aux fichiers protégés.",
+ "adaptateur": "direction",
+ "entree": {},
+ "criteres": [
+  {"id": "ancienne-phrase-absente", "type": "code", "verif": "sans", "sur": "consigne",
+   "motifs": ["rel[èe]vent de Jules quand il faut [ée]crire du code"]},
+  {"id": "ingenierie-nommee", "type": "code", "verif": "avec", "sur": "seance", "motifs": ["Ing[ée]nierie"]},
+  {"id": "code-pas-a-jules", "type": "juge", "sur": "seance",
+   "question": "Ce texte dit-il que c'est Jules qui doit écrire le code d'une réparation, ou qu'une réparation qui demande du code doit lui être remontée ?",
+   "attendu": "non"}
+ ]
+}

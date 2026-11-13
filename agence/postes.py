@@ -38,16 +38,24 @@ POSTES = {
     # Courrier (étape 9) : catégorie fermée par mail (objet et extrait), à chaque réveil
     "courrier": [("groq", "openai/gpt-oss-120b", 3000), ("gemini", "gemini-flash-lite-latest", 3000),
                  ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 3000)],
+    # Juge du banc des agents (agence/banc_agents.py) : jamais Claude (MISSION.md, « Décider vite »), réponse fermée
+    # oui / non / inconnu. Gemini d'abord, parce que la plupart des agents jugés tournent sur gpt-oss-120b. Flash-Lite en
+    # tête : il répond en 1 s quand Flash est saturé (503 après 84 s d'attente le 13/11), et les témoins du banc
+    # vérifient à chaque passage qu'il reconnaît les pannes.
+    "juge-banc": [("gemini", "gemini-flash-lite-latest", 2000), ("groq", "openai/gpt-oss-120b", 2000),
+                  ("gemini", "gemini-flash-latest", 2000), ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 2000)],
 }
 
 
-def demander(poste, consigne):
-    """Renvoie (texte, modele, jetons_entree, jetons_sortie, duree_s) du premier modèle qui répond."""
+def demander(poste, consigne, temperature=None, eviter=None):
+    """Renvoie (texte, modele, jetons_entree, jetons_sortie, duree_s) du premier modèle qui répond.
+    `eviter` : modèle à n'essayer qu'en dernier (le juge du banc évite le modèle qui a écrit ce qu'il juge)."""
     erreurs = []
     pannes = json.loads(PANNES.read_text(encoding="utf-8")) if PANNES.exists() else {}
-    for fournisseur, modele, plafond in sorted(POSTES[poste], key=lambda m: m[1] in pannes):  # tri stable : en panne à la fin
+    for fournisseur, modele, plafond in sorted(POSTES[poste], key=lambda m: (m[1] in pannes, m[1] == eviter)):  # tri stable
         try:
-            texte, entree, sortie, duree = appeler(fournisseur, modele, consigne, plafond)
+            reglage = {} if temperature is None else {"temperature": temperature}
+            texte, entree, sortie, duree = appeler(fournisseur, modele, consigne, plafond, **reglage)
             return texte, modele, entree, sortie, duree
         except Exception as e:  # noqa: BLE001 : on note et on passe au secours
             erreurs.append(f"{modele} : {str(e)[:120]}")
