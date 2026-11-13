@@ -28,6 +28,9 @@ def demandes(equipe):
 
 def repondre(numero, texte):
     """Répond dans l'issue puis la ferme : la demande est traitée, Jules la rouvre s'il veut aller plus loin."""
+    if os.environ.get("AGENCE_ESSAI") == "1":
+        print(f"ESSAI : réponse à l'issue #{numero} non envoyée :", texte)
+        return
     subprocess.run(["gh", "issue", "comment", str(numero), "-R", DEPOT, "--body-file", "-"],
                    input=texte, text=True, encoding="utf-8", check=True, capture_output=True)
     subprocess.run(["gh", "issue", "close", str(numero), "-R", DEPOT], check=True, capture_output=True)

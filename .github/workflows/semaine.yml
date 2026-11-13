@@ -8,6 +8,11 @@ on:
   schedule:
     - cron: "37 17 * * 0"   # dimanche 18h37 à Paris (19h37 en été)
   workflow_dispatch:
+    inputs:
+      essai:
+        description: "Essai à blanc : sans Direction, sans réponse aux issues, sans commit (sorties en artefact)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -23,7 +28,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      AGENCE_COMMIT: "1"    # chaque changement de consignes ou de créneaux a son commit
+      AGENCE_COMMIT: ${{ inputs.essai && '0' || '1' }}    # chaque changement de consignes ou de créneaux a son commit
+      AGENCE_ESSAI: ${{ inputs.essai && '1' || '0' }}     # essai : aucune action visible hors du runner
       ATELIER_COUTS: atelier-src/atelier/couts.csv
       PYTHONUTF8: "1"
     steps:
@@ -134,15 +140,24 @@ jobs:
           REVEILS_JSON: ${{ runner.temp }}/reveils.json
         run: python -m agence.lancer chef-operations
       - name: Direction
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.essai }}
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           GH_TOKEN: ${{ github.token }}
         run: python -m agence.lancer direction
+      - name: Sorties de l'essai
+        if: ${{ always() && inputs.essai }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: essai-semaine
+          path: |
+            registre
+            organisation
+          retention-days: 7
       - name: Commiter le registre et l'organisation
-        if: always()
+        if: ${{ always() && !inputs.essai }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
