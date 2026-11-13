@@ -1,14 +1,14 @@
 {
- "date": "2026-11-13T13:06:50+00:00",
+ "date": "2026-11-13T22:35:58+00:00",
  "plus_proche": {
   "chaine": "en",
   "palier": "yt_fans",
   "nom": "YouTube, palier fans (dons, Shopping)",
-  "progression": 0.0038,
+  "progression": 0.0043,
   "critere": "vues_shorts_90j",
-  "valeur": 11464,
+  "valeur": 12874,
   "cible": 3000000,
-  "texte": "Every Second (en) : 11 464 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
+  "texte": "Every Second (en) : 12 874 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
  },
  "paliers": [
   {
@@ -18,21 +18,21 @@
    "criteres": [
     {
      "critere": "abonnes",
-     "valeur": 10,
+     "valeur": 11,
      "cible": 500
     },
     {
      "critere": "videos_90j",
-     "valeur": 12,
+     "valeur": 13,
      "cible": 3
     },
     {
      "critere": "vues_shorts_90j",
-     "valeur": 11464,
+     "valeur": 12874,
      "cible": 3000000
     }
    ],
-   "progression": 0.0038,
+   "progression": 0.0043,
    "atteint": false,
    "inconnu": []
   },
@@ -43,13 +43,83 @@
    "criteres": [
     {
      "critere": "abonnes",
-     "valeur": 10,
+     "valeur": 11,
      "cible": 1000
     },
     {
      "critere": "vues_shorts_90j",
-     "valeur": 11464,
+     "valeur": 12874,
      "cible": 10000000
+    }
+   ],
+   "progression": 0.0013,
+   "atteint": false,
+   "inconnu": []
+  },
+  {
+   "chaine": "es",
+   "palier": "yt_fans",
+   "nom": "YouTube, palier fans (dons, Shopping)",
+   "criteres": [
+    {
+     "critere": "abonnes",
+     "valeur": 0,
+     "cible": 500
+    },
+    {
+     "critere": "videos_90j",
+     "valeur": 13,
+     "cible": 3
+    },
+    {
+     "critere": "vues_shorts_90j",
+     "valeur": 5,
+     "cible": 3000000
+    }
+   ],
+   "progression": 0.0,
+   "atteint": false,
+   "inconnu": []
+  },
+  {
+   "chaine": "es",
+   "palier": "yt_partenaire",
+   "nom": "YouTube, partage des revenus pub",
+   "criteres": [
+    {
+     "critere": "abonnes",
+     "valeur": 0,
+     "cible": 1000
+    },
+    {
+     "critere": "vues_shorts_90j",
+     "valeur": 5,
+     "cible": 10000000
+    }
+   ],
+   "progression": 0.0,
+   "atteint": false,
+   "inconnu": []
+  },
+  {
+   "chaine": "pt",
+   "palier": "yt_fans",
+   "nom": "YouTube, palier fans (dons, Shopping)",
+   "criteres": [
+    {
+     "critere": "abonnes",
+     "valeur": 6,
+     "cible": 500
+    },
+    {
+     "critere": "videos_90j",
+     "valeur": 14,
+     "cible": 3
+    },
+    {
+     "critere": "vues_shorts_90j",
+     "valeur": 3151,
+     "cible": 3000000
     }
    ],
    "progression": 0.0011,
@@ -57,95 +127,25 @@
    "inconnu": []
   },
   {
-   "chaine": "es",
-   "palier": "yt_fans",
-   "nom": "YouTube, palier fans (dons, Shopping)",
-   "criteres": [
-    {
-     "critere": "abonnes",
-     "valeur": 0,
-     "cible": 500
-    },
-    {
-     "critere": "videos_90j",
-     "valeur": 12,
-     "cible": 3
-    },
-    {
-     "critere": "vues_shorts_90j",
-     "valeur": 3,
-     "cible": 3000000
-    }
-   ],
-   "progression": 0.0,
-   "atteint": false,
-   "inconnu": []
-  },
-  {
-   "chaine": "es",
-   "palier": "yt_partenaire",
-   "nom": "YouTube, partage des revenus pub",
-   "criteres": [
-    {
-     "critere": "abonnes",
-     "valeur": 0,
-     "cible": 1000
-    },
-    {
-     "critere": "vues_shorts_90j",
-     "valeur": 3,
-     "cible": 10000000
-    }
-   ],
-   "progression": 0.0,
-   "atteint": false,
-   "inconnu": []
-  },
-  {
-   "chaine": "pt",
-   "palier": "yt_fans",
-   "nom": "YouTube, palier fans (dons, Shopping)",
-   "criteres": [
-    {
-     "critere": "abonnes",
-     "valeur": 4,
-     "cible": 500
-    },
-    {
-     "critere": "videos_90j",
-     "valeur": 12,
-     "cible": 3
-    },
-    {
-     "critere": "vues_shorts_90j",
-     "valeur": 1890,
-     "cible": 3000000
-    }
-   ],
-   "progression": 0.0006,
-   "atteint": false,
-   "inconnu": []
-  },
-  {
    "chaine": "pt",
    "palier": "yt_partenaire",
    "nom": "YouTube, partage des revenus pub",
    "criteres": [
     {
      "critere": "abonnes",
-     "valeur": 4,
+     "valeur": 6,
      "cible": 1000
     },
     {
      "critere": "vues_shorts_90j",
-     "valeur": 1890,
+     "valeur": 3151,
      "cible": 10000000
     }
    ],
-   "progression": 0.0002,
+   "progression": 0.0003,
    "atteint": false,
    "inconnu": []
   }
  ],
- "curseur_commentaires": "2026-11-13T01:15:10Z"
+ "curseur_commentaires": "2026-11-13T14:02:26Z"
 }
