@@ -21,6 +21,7 @@ Entreprise de contenu menée par des agents : scripts pour le routinier, modèle
 - **Le registre ne se réécrit pas** : on ajoute des lignes. Une décision note sa prédiction et la mesure qui la jugera, le verdict revient au critique
 - **Secrets** : jamais dans le dépôt. Sur GitHub, en secrets d'Actions (`YT_TOKEN_EN`, `YT_TOKEN_ES`, `YT_TOKEN_PT`, `GROQ_API_KEY`, `GEMINI_API_KEY`, `OPENROUTER_API_KEY`, `RENDU_DEPLOY_KEY` : clé SSH en écriture sur `studio-rendu` seulement). En local, `agence/youtube.py` lit les jetons de `chaines-studio/.secrets/`
 - **0 € tant que l'agence ne gagne rien**
+- (essai du contrôle des fichiers protégés : PR saine, à fermer sans fusion)
 
 ## Lancer en local
 
