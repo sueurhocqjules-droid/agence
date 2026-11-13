@@ -29,14 +29,14 @@ def cle(fournisseur):
     return None
 
 
-def appeler(fournisseur, modele, consigne, max_tokens=12000):
+def appeler(fournisseur, modele, consigne, max_tokens=12000, temperature=0.7):
     """Renvoie (texte, jetons_entree, jetons_sortie, duree_s). Lève RuntimeError avec le message de l'API."""
     base, _ = FOURNISSEURS[fournisseur]
     corps = json.dumps({
         "model": modele,
         "messages": [{"role": "user", "content": consigne}],
         "max_tokens": max_tokens,
-        "temperature": 0.7,
+        "temperature": temperature,
     }).encode()
     requete = urllib.request.Request(f"{base}/chat/completions", data=corps, headers={
         "Authorization": f"Bearer {cle(fournisseur)}",

@@ -1,0 +1,15 @@
+{
+ "id": "temoin-chef-operations-retour-invente",
+ "poste": "chef-operations",
+ "panne": "Témoin de la panne de la semaine du 9/11/2026 (retours inventés du Chef des opérations) : la sortie fautive, telle qu'elle partait avant la réparation. Le banc doit la refuser.",
+ "attendu": "echec",
+ "sortie": {
+  "ligne": "100 % des réveils réussis cette semaine, aucune panne sans trace.",
+  "retours": [{"poste": "courrier", "texte": "Le tri du courrier a pris du retard en milieu de semaine : viser moins de 10 mails en attente."}],
+  "reparations": [],
+  "problemes_par_membre": {"maintenance": 0, "expert-modeles": 0, "courrier": 0}
+ },
+ "criteres": [
+  {"id": "aucun-retour-sans-probleme", "type": "code", "verif": "retours_justifies"}
+ ]
+}

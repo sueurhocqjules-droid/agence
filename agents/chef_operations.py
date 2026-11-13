@@ -104,6 +104,12 @@ def equipe_en_service(fiches):
     return [p for p in fiches["chef-operations"]["equipe"] if fiches.get(p, {}).get("statut") == "en_service"]
 
 
+def fiches_equipe(equipe):
+    """Ce que le modèle lit de chaque fiche de l'équipe."""
+    return {p: {s: consignes.lire_section(consignes.chemin_fiche(p).read_text(encoding="utf-8"), s)
+                for s in ("Mission", "Mesure de réussite", "Retours")} for p in equipe}
+
+
 def consigne(donnees, equipe):
     return (
         "Tu es le chef des opérations d'une petite agence de Shorts YouTube qui tourne seule dans GitHub Actions, "
@@ -138,8 +144,7 @@ def passage(essai):
                "duree_totale_min_par_agent": {a: round(sum(int(l["duree_s"] or 0) for l in couts if l["agent"] == a) / 60)
                                               for a in sorted({l["agent"] for l in couts})},
                "problemes_par_membre": a_signaler,
-               "equipe": {p: {s: consignes.lire_section(consignes.chemin_fiche(p).read_text(encoding="utf-8"), s)
-                              for s in ("Mission", "Mesure de réussite", "Retours")} for p in equipe}}
+               "equipe": fiches_equipe(equipe)}
     texte, modele, *_ = postes.demander("chef-operations", consigne(donnees, equipe))
     ligne, retours, reparations, ecartes = valider(modeles.extraire_json(texte) or {}, equipe, a_signaler)
     ligne = ligne or f"réveils réussis : {calcul['reveils_reussis_pourcent']} %, {len(calcul['pannes_sans_trace'])} panne(s) sans trace"

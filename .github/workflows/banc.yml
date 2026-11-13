@@ -1,0 +1,57 @@
+# Banc des agents (MISSION.md, règle 8) : aucun changement d'un agent, de sa fiche, de la mission ou du banc ne part
+# sans rejouer les cas tirés des vraies pannes (banc/agents/). Vert quand chaque cas rend le verdict attendu :
+# les cas sains passent, les témoins échouent. Le juge est un modèle gratuit qui n'est pas Claude.
+name: Banc des agents
+
+on:
+  pull_request:
+    paths:
+      - "agents/**"
+      - "agence/**"
+      - "organisation/postes/**"
+      - "organisation/MISSION.md"
+      - "banc/agents/**"
+      - "registre/refus.jsonl"
+      - ".github/workflows/banc.yml"
+  push:
+    branches: [main]
+    paths:
+      - "agents/**"
+      - "agence/**"
+      - "organisation/postes/**"
+      - "organisation/MISSION.md"
+      - "banc/agents/**"
+      - "registre/refus.jsonl"
+      - ".github/workflows/banc.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: banc-${{ github.ref }}     # les quotas par minute des modèles gratuits : un seul banc à la fois par branche
+  cancel-in-progress: true
+
+jobs:
+  banc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Tests
+        run: python -m unittest discover tests
+      - name: Banc des agents
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: python -m agence.banc_agents

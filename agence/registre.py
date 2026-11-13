@@ -55,6 +55,11 @@ def lire_jsonl(nom, depuis=None):
     return [l for l in lignes if not depuis or datetime.fromisoformat(l["date"]) >= depuis]
 
 
+def refuses():
+    """Liens des outils, services ou concepts refusés (registre/refus.jsonl) : la Recherche ne les repropose pas."""
+    return {l["lien"] for l in lire_jsonl("refus")}
+
+
 def decider(auteur, decision, pourquoi, prediction=None, mesure=None, echeance=None, avant=None, attendu=None,
             changement=None):
     """Note une décision au journal d'audit, avec sa raison, et renvoie son identifiant.

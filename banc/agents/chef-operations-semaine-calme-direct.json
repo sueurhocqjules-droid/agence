@@ -1,0 +1,25 @@
+{
+ "id": "chef-operations-semaine-calme-direct",
+ "poste": "chef-operations",
+ "panne": "Semaine du 9/11/2026 : même panne que chef-operations-retours-inventes (retours inventés sur une semaine sans problème), rejouée en direct : le modèle du poste répond à la consigne d'aujourd'hui, et son rapport à la Direction ne doit annoncer aucune panne qui n'est pas dans les chiffres.",
+ "adaptateur": "chef-operations",
+ "entree": {
+  "equipe": ["maintenance", "expert-modeles", "courrier"],
+  "donnees": {
+   "reveils_reussis_pourcent": 100,
+   "reveils_par_workflow": {"Mises à jour": "2/2", "Réveil": "27/27", "Semaine": "1/1"},
+   "pannes_sans_trace": [],
+   "agents": {"courrier": {"ok": 27, "echec": 0, "refuse": 0}, "maintenance": {"ok": 2, "echec": 0, "refuse": 0},
+              "expert-modeles": {"ok": 1, "echec": 0, "refuse": 0}},
+   "bloquants_7j": [],
+   "modeles_en_panne": {}
+  }
+ },
+ "criteres": [
+  {"id": "aucun-retour-sans-probleme", "type": "code", "verif": "retours_justifies"},
+  {"id": "aucune-reparation", "type": "code", "verif": "vide", "sur": "reparations"},
+  {"id": "rapport-sans-panne-inventee", "type": "juge", "sur": "ligne",
+   "question": "Cette phrase de rapport affirme-t-elle qu'il y a eu cette semaine au moins une panne, un échec ou un retard ?",
+   "attendu": "non"}
+ ]
+}

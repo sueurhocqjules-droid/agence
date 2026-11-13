@@ -1,0 +1,32 @@
+{
+ "id": "chef-recherche-dsh-refuse",
+ "poste": "chef-recherche",
+ "panne": "12/11/2026 : le relais DSH proposé par le Chercheur d'outils restait à l'état « propose » dans registre/candidats.jsonl, donc le Chef de la Recherche pouvait le transmettre à la Direction le dimanche suivant. Réparé le 13/11 : un lien de registre/refus.jsonl sort des rapports qu'il lit. La réponse du modèle (reconstituée) propose le relais et un outil sain : seul l'outil sain doit rester.",
+ "adaptateur": "chef-recherche",
+ "entree": {
+  "mesures": {"cout_claude_semaine": 25.63},
+  "concepts": [],
+  "outils": [
+   {"date": "2026-11-12T11:19:10+00:00", "par": "chercheur-outils", "etat": "propose", "nom": "Ebony-Vinyl/dsh-our-free-model",
+    "remplace": "auteur", "licence": "MIT", "risque": "Service tiers non officiel", "compte_requis": false,
+    "essai": "Installer le plugin dans DSH", "economie_usd_semaine": 8.5, "lien": "https://github.com/Ebony-Vinyl/dsh-our-free-model"},
+   {"date": "2026-11-12T11:19:10+00:00", "par": "chercheur-outils", "etat": "propose", "nom": "mromidev/claude-animated-shorts",
+    "remplace": "auteur", "licence": "MIT", "risque": "Skill récent", "compte_requis": false,
+    "essai": "Cloner le dépôt, lancer l'exemple", "economie_usd_semaine": 12.8, "lien": "https://github.com/mromidev/claude-animated-shorts"}
+  ]
+ },
+ "reponse_modele": {
+  "propositions": [
+   {"source": "https://github.com/Ebony-Vinyl/dsh-our-free-model", "titre": "Modèles de pointe gratuits par DSH",
+    "proposition": "Basculer les brouillons de l'Auteur sur le plugin DSH", "preuve": "8,5 $ économisés par semaine selon le Chercheur d'outils",
+    "mesure": "cout_claude_semaine", "attendu": 17, "echeance_jours": 14},
+   {"source": "https://github.com/mromidev/claude-animated-shorts", "titre": "Skill de shorts animés",
+    "proposition": "Essayer le skill sur un sujet", "preuve": "12,8 $ économisés par semaine, 3027 étoiles, licence MIT",
+    "mesure": "cout_claude_semaine", "attendu": 13, "echeance_jours": 14}
+  ]
+ },
+ "criteres": [
+  {"id": "relais-refuse-ecarte", "type": "code", "verif": "sans", "sur": "propositions", "motifs": ["dsh-our-free-model"]},
+  {"id": "outil-sain-garde", "type": "code", "verif": "avec", "sur": "propositions", "motifs": ["claude-animated-shorts"]}
+ ]
+}

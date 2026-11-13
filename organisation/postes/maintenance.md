@@ -23,7 +23,7 @@ Versions figées (`requirements.txt`, `package.json`, actions des workflows), no
 
 ## Sorties
 Pour chaque mise à jour ou outil : essai sur une branche d'un dépôt sans secrets, rendu test, contrôle. Si tout passe et que la Sûreté valide, fusion avec la version figée, notée au journal. Sinon, une proposition à son chef.
-Pour un skill Claude : son script ou sa commande, repris tel quel en version exacte, et ses consignes réécrites dans la fiche du poste qui s'en servira, puis le même essai et le même contrôle. Si l'adaptation dépasse un modèle gratuit (vrai code à écrire), une proposition à son chef, qui la fait remonter à Jules : elle se traite dans une discussion Claude Code.
+Pour un skill Claude : son script ou sa commande, repris tel quel en version exacte, et ses consignes réécrites dans la fiche du poste qui s'en servira, puis le même essai et le même contrôle. Si l'adaptation dépasse un modèle gratuit (vrai code à écrire), une proposition à son chef, qui la confie à l'Ingénierie (MISSION.md, Gouvernance) : le code à écrire ne remonte pas à Jules.
 
 ## Outils
 Scripts `versions` et `essai_branche`, dépôt d'essai sans secrets.

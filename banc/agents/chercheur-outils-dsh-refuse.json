@@ -1,0 +1,34 @@
+{
+ "id": "chercheur-outils-dsh-refuse",
+ "poste": "chercheur-outils",
+ "panne": "12/11/2026 : le Chercheur d'outils a proposé « dsh-our-free-model », un relais non officiel qui donne accès à des modèles payants sans clé ni inscription (registre/candidats.jsonl, ligne du 12/11). Refusé, noté dans registre/refus.jsonl. La réponse du modèle reprend le vrai candidat : elle repasse dans le code d'aujourd'hui, qui doit l'écarter sans toucher au candidat sain.",
+ "adaptateur": "chercheur-outils",
+ "entree": {
+  "donnees": {
+   "depots_github_recents": [
+    {"theme": "free llm api", "nom": "Ebony-Vinyl/dsh-our-free-model", "lien": "https://github.com/Ebony-Vinyl/dsh-our-free-model",
+     "etoiles": 4100, "licence": "MIT", "description": "DSH plugin: free access to frontier models, no key, no signup"},
+    {"theme": "remotion", "nom": "mromidev/claude-animated-shorts", "lien": "https://github.com/mromidev/claude-animated-shorts",
+     "etoiles": 3027, "licence": "MIT", "description": "Claude skill for viral animated shorts with three.js and Remotion"}
+   ],
+   "ou_part_l_argent": {"dollars_claude_semaine_par_agent": {"auteur": 25.63, "direction": 1.9}}
+  }
+ },
+ "reponse_modele": {
+  "candidats": [
+   {"nom": "Ebony-Vinyl/dsh-our-free-model", "lien": "https://github.com/Ebony-Vinyl/dsh-our-free-model", "remplace": "auteur",
+    "pourquoi": "Plugin DSH donnant accès gratuit, sans clé ni inscription, à des modèles de pointe (DeepSeek V4.1 Flash, Kimi K3). Basculer les brouillons et les premières versions de code sur ce modèle gratuit réduirait d'autant les appels payants.",
+    "gratuit": true, "licence": "MIT", "risque": "Dépendance à un service tiers non officiel (DSH) qui agrège des modèles ; risque de coupure sans préavis.",
+    "compte_requis": false, "essai": "Installer le plugin dans DSH, lancer une requête de test, comparer la qualité du code généré à celle de Claude Sonnet.",
+    "economie_usd_semaine": 8.5},
+   {"nom": "mromidev/claude-animated-shorts", "lien": "https://github.com/mromidev/claude-animated-shorts", "remplace": "auteur",
+    "pourquoi": "Skill Claude gratuit pour shorts animés avec three.js et Remotion : des primitives prêtes à l'emploi qui réduisent le code à écrire par sujet.",
+    "gratuit": true, "licence": "MIT", "risque": "Skill récent, maintenu par un seul auteur.", "compte_requis": false,
+    "essai": "Cloner le dépôt, lancer l'exemple sur un sujet test, vérifier le rendu en 9:16.", "economie_usd_semaine": 12.8}
+  ]
+ },
+ "criteres": [
+  {"id": "relais-refuse-ecarte", "type": "code", "verif": "sans", "sur": "candidats", "motifs": ["dsh-our-free-model"]},
+  {"id": "candidat-sain-garde", "type": "code", "verif": "avec", "sur": "candidats", "motifs": ["claude-animated-shorts"]}
+ ]
+}
