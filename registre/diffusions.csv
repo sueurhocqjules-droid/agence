@@ -1,0 +1,10 @@
+date,reseau,chaine,nom,etat,media_id,note
+2026-11-13T11:41:53+00:00,instagram,en,paper-en,erreur,,POST envoi du fichier : Bad Request
+2026-11-13T11:42:02+00:00,facebook,en,paper-en,publie,1558300416314755,
+2026-11-13T11:42:16+00:00,facebook,en,dollar-en,publie,4079358392371613,
+2026-11-13T11:42:57+00:00,instagram,es,paper-es,erreur,,POST envoi du fichier : Bad Request
+2026-11-13T11:43:05+00:00,facebook,es,paper-es,publie,1126696046858475,
+2026-11-13T11:43:17+00:00,facebook,es,dollar-es,publie,1677331643835477,
+2026-11-13T11:43:56+00:00,instagram,pt,paper-pt,erreur,,POST envoi du fichier : Bad Request
+2026-11-13T11:44:04+00:00,facebook,pt,paper-pt,publie,2592784274552163,
+2026-11-13T11:44:16+00:00,facebook,pt,dollar-pt,publie,1760897001640342,
