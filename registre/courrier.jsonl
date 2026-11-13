@@ -22,3 +22,4 @@
 {"date": "2026-11-12T23:27:00+00:00", "id": "1a1d0eec7ce284c7", "fil": "1a1d0eec7ce284c7", "recu": "2026-11-12T18:04:30+00:00", "categorie": "plateforme", "chaine": null, "expediteur": "accounts.google.com", "plateforme": true}
 {"date": "2026-11-12T23:27:00+00:00", "id": "1a1d110b574ea698", "fil": "1a1d110b574ea698", "recu": "2026-11-12T18:41:34+00:00", "categorie": "plateforme", "chaine": null, "expediteur": "google.com", "plateforme": true}
 {"date": "2026-11-12T23:27:00+00:00", "id": "1a1d19435c1e32b4", "fil": "1a1d19435c1e32b4", "recu": "2026-11-12T21:05:12+00:00", "categorie": "plateforme", "chaine": null, "expediteur": "cerebras.net", "plateforme": false}
+{"date": "2026-11-13T11:36:25+00:00", "id": "1a1d4850b95118ce", "fil": "1a1d4850b95118ce", "recu": "2026-11-13T10:47:25+00:00", "categorie": "plateforme", "chaine": null, "expediteur": "email.meta.com", "plateforme": true}
