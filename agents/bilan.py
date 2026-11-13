@@ -12,7 +12,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from agence import lancer, questions, registre, telegram, youtube
+from agence import lancer, mesures, questions, registre, telegram, youtube
 from agents import analyste, guetteur, surete
 
 DEPOT = "sueurhocqjules-droid/agence"
@@ -60,6 +60,13 @@ def page(maintenant):
         chemin = registre.DOSSIER / "bilans" / f"{fichier}-{fin:%Y-%m-%d}.md"
         if chemin.exists():
             lignes += [f"## {titre}", "", chemin.read_text(encoding="utf-8").strip(), ""]
+    # Écrit par script : un problème de diffusion figure au bilan même si la Direction n'en a rien dit
+    signaux = mesures.signaux_portee(registre.lire("stats"), fin)
+    if signaux:
+        lignes += ["## Diffusion : à surveiller", ""] + [
+            f"- {p['texte'][0].upper() + p['texte'][1:]}."
+            + (" Solutions de la Direction : voir son mot plus haut." if p["semaines"] >= mesures.SEMAINES_AVANT_JULES
+               else "") for p in signaux] + [""]
 
     lignes += ["## Chaînes", "", "| Chaîne | Vidéos sorties | Vues gagnées | Vues au total | Meilleure de la semaine |",
                "|---|---|---|---|---|"]

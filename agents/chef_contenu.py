@@ -100,8 +100,9 @@ Situation au {maintenant:%d/%m} :
 - l'atelier écrit lundi entre {plancher} (minimum pour tenir {STOCK_VISE} jours de stock dimanche prochain) et {plafond} sujets
   (ce que paie le budget de la semaine, {budget:.0f} $ à {cout if cout else "~2"} $ par sujet), chacun publié sur les trois
   chaînes. Au-delà du minimum, les sujets font du stock d'avance.
-- vidéos de plus de 2 jours, par chaîne (comparer les sujets entre eux sur une même chaîne ; les écarts entre chaînes
-  tiennent à l'âge des chaînes, pas aux sujets) : {json.dumps(reperes, ensure_ascii=False) if reperes else "pas encore assez de recul"}
+- vidéos de plus de 2 jours, par chaîne (comparer les sujets entre eux sur une même chaîne : les mêmes sujets sortent
+  partout, un écart entre chaînes parle de la chaîne, pas des sujets) : {json.dumps(reperes, ensure_ascii=False) if reperes else "pas encore assez de recul"}
+- chaînes que YouTube diffuse mal (la Direction s'en occupe ; n'en tire rien sur les sujets) : {"; ".join(p["texte"] for p in mesures.signaux_portee(donnees["stats"], maintenant)) or "aucune"}
 - derniers retours à l'Auteur : {consignes.lire_section(fiches["auteur"], "Retours") or "aucun"}
 - le Programmateur ne règle que les heures de sortie de chaque chaîne (actuelles, à Paris : {donnees["heures"]}) ;
   derniers retours qu'il a reçus : {consignes.lire_section(fiches["programmateur"], "Retours") or "aucun"}
