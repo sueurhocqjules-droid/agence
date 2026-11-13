@@ -135,3 +135,12 @@ jobs:
           git diff --cached --quiet || git commit -q -m "Registre : réveil du $(date -u +%Y-%m-%dT%H:%MZ)"
           git -c http.https://github.com/.extraheader="$auth" pull -q --rebase
           git -c http.https://github.com/.extraheader="$auth" push -q
+      # Alarme hors de GitHub (Worker Cloudflare, alarme/worker.js) : sans signe de vie pendant 24 h, Jules est prévenu
+      # sur Telegram. Ne casse jamais le réveil ; ne fait rien tant que ALARME_SECRET n'est pas posé
+      - name: Signe de vie (alarme hors de GitHub)
+        if: always()
+        timeout-minutes: 2
+        env:
+          ALARME_SECRET: ${{ secrets.ALARME_SECRET }}
+          PYTHONUTF8: "1"
+        run: python -m agence.alarme signe
