@@ -60,3 +60,9 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-12T23:26:52+00:00,courrier,8,0,0,1,"ok : 24 mail(s) : 0 collaboration, 24 plateforme, 0 sanction, 0 autre ; 0 transmis"
 2026-11-12T23:27:00+00:00,flux,2,0,0,0,"ok : 0 programmées, 0 rejetées, 0 en rendu"
 2026-11-12T23:27:03+00:00,guetteur,1,0,0,0,"ok : 0 commentaire(s) nouveau(x), 0 occasion(s) ; seuil le plus proche : Every Second (en) : 8 576 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
+2026-11-13T03:24:41+00:00,reponses,0,0,0,0,ok : 0 réponse(s) de Jules
+2026-11-13T03:24:42+00:00,stats,4,0,0,0,"ok : 72 vidéos, 12768 vues"
+2026-11-13T03:24:46+00:00,garde_fous,4,0,0,0,"ok : 33.67 $ cette semaine, 0 alerte(s) envoyée(s)"
+2026-11-13T03:24:49+00:00,courrier,1,0,0,0,ok : 0 mail nouveau
+2026-11-13T03:24:50+00:00,flux,2,0,0,0,"ok : 0 programmées, 0 rejetées, 0 en rendu"
+2026-11-13T03:24:52+00:00,guetteur,3,0,0,1,"ok : 1 commentaire(s) nouveau(x), 0 occasion(s) ; seuil le plus proche : Every Second (en) : 10 883 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
