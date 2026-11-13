@@ -177,8 +177,7 @@ Ta séance : tu reçois le dossier de la semaine en JSON. Tu n'as aucun outil : 
 Un blocage avec une date leve_le a été levé ensuite par un passage réussi : ce n'est plus une panne en cours.
 Chaque proposition de la recherche porte sa preuve et sa prédiction : si tu la retiens, reprends-la en décision avec
 sa mesure et sa valeur attendue (ou la tienne), et dis dans le pourquoi qu'elle vient de la recherche.
-Le rapport des opérations dit si l'agence tourne. Une réparation qui demande d'écrire du code ne se remonte pas à
-Jules : elle va à l'Ingénierie (Gouvernance). Reprends-la en décision, avec ce qu'il faut réparer et la panne qui le montre.
+Le rapport des opérations dit si l'agence tourne : ses réparations relèvent de Jules quand il faut écrire du code.
 portee_des_chaines.signaux : une chaîne en panne (YouTube ne la diffuse presque pas, comparée à ses sœurs sur les mêmes
 sujets) ou en chute (ses vues par vidéo s'effondrent). Dès la première semaine, cherche la cause dans le dossier et
 décide toi-même des remèdes qui relèvent de l'agence, chacun avec la mesure vues_semaine:<chaîne> et sa valeur attendue.
