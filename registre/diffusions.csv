@@ -8,3 +8,9 @@ date,reseau,chaine,nom,etat,media_id,note
 2026-11-13T11:43:56+00:00,instagram,pt,paper-pt,erreur,,POST envoi du fichier : Bad Request
 2026-11-13T11:44:04+00:00,facebook,pt,paper-pt,publie,2592784274552163,
 2026-11-13T11:44:16+00:00,facebook,pt,dollar-pt,publie,1760897001640342,
+2026-11-13T12:02:56+00:00,instagram,en,paper-en,publie,17912982402572174,
+2026-11-13T12:03:39+00:00,instagram,en,dollar-en,erreur,,Instagram : Meta n'a pas pu traiter la vidéo (ERROR)
+2026-11-13T12:05:03+00:00,instagram,es,paper-es,publie,18110344436211157,
+2026-11-13T12:07:25+00:00,instagram,es,dollar-es,publie,18000688835826189,
+2026-11-13T12:08:45+00:00,instagram,pt,paper-pt,publie,18119127770113475,
+2026-11-13T12:10:06+00:00,instagram,pt,dollar-pt,publie,17993726279859620,
