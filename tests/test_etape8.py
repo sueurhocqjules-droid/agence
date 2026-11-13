@@ -102,6 +102,16 @@ class ChefOperations(unittest.TestCase):
         ligne, retours, reparations, ecartes = chef_operations.valider(reponse, ["maintenance", "expert-modeles"])
         self.assertEqual((ligne, len(retours), len(reparations), len(ecartes)), ("tout va, bien", 1, 3, 2))
 
+    def test_retour_seulement_sur_un_probleme(self):
+        calcul = {"agents": {"courrier": {"ok": 6, "echec": 0, "refuse": 0}, "maintenance": {"ok": 1, "echec": 0, "refuse": 0}},
+                  "reveils_par_workflow": {"Mises à jour": "1/2", "Reveil": "3/4"}}
+        a_signaler = chef_operations.problemes(["courrier", "maintenance", "expert-modeles"], calcul, {"gemini": "503"})
+        self.assertEqual(a_signaler, {"courrier": 0, "maintenance": 1, "expert-modeles": 1})
+        reponse = {"retours": [{"poste": p, "texte": "constat"} for p in ("courrier", "maintenance", "expert-modeles")]}
+        _, retours, _, ecartes = chef_operations.valider(reponse, list(a_signaler), a_signaler)
+        self.assertEqual([r["poste"] for r in retours], ["maintenance", "expert-modeles"])
+        self.assertIn("courrier", ecartes[0])
+
 
 if __name__ == "__main__":
     unittest.main()

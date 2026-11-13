@@ -64,13 +64,33 @@ def chiffres(runs, entrees):
             "pannes_sans_trace": sans_trace, "agents": agents}
 
 
-def valider(reponse, equipe):
-    """(ligne, retours gardés, réparations gardées, écartés) selon les choix fermés."""
+WORKFLOWS_MAINTENANCE = ("Mises à jour", "Dependabot Updates")
+
+
+def problemes(equipe, calcul, en_panne):
+    """Nombre de problèmes de la semaine par membre, tirés des chiffres : un retour sans problème serait inventé."""
+    agents = calcul.get("agents") or {}
+    compte = {p: agents.get(p, {}).get("echec", 0) + agents.get(p, {}).get("refuse", 0) for p in equipe}
+    if "maintenance" in compte:
+        compte["maintenance"] += sum(int(v.split("/")[1]) - int(v.split("/")[0])
+                                     for w, v in (calcul.get("reveils_par_workflow") or {}).items()
+                                     if w in WORKFLOWS_MAINTENANCE)
+    if "expert-modeles" in compte:
+        compte["expert-modeles"] += len(en_panne or {})
+    return compte
+
+
+def valider(reponse, equipe, a_signaler=None):
+    """(ligne, retours gardés, réparations gardées, écartés) selon les choix fermés. Un retour ne va qu'à un membre
+    qui a au moins un problème dans les chiffres (a_signaler), sinon le modèle meuble avec des constats inventés."""
     ligne = modeles.propre(str(reponse.get("ligne") or "").strip())
     retours, reparations, ecartes, vus = [], [], [], set()
     for r in reponse.get("retours") or []:
         if not isinstance(r, dict) or r.get("poste") not in equipe or r["poste"] in vus or not str(r.get("texte", "")).strip():
             ecartes.append(f"retour refusé : {str(r)[:80]}")
+            continue
+        if a_signaler is not None and not a_signaler.get(r["poste"]):
+            ecartes.append(f"retour à {r['poste']} refusé : aucun problème dans les chiffres de la semaine")
             continue
         vus.add(r["poste"])
         retours.append({"poste": r["poste"], "texte": modeles.propre(str(r["texte"]))})
@@ -94,7 +114,7 @@ def consigne(donnees, equipe):
         '{"ligne": "ton rapport à la Direction en une phrase, avec les chiffres", '
         f'"retours": [{{"poste": "un de {equipe}", "texte": "une à trois lignes sur sa mesure de réussite"}}], '
         '"reparations": [{"quoi": "ce qui doit être réparé", "pourquoi": "la panne ou le blocage qui le montre"}]}\n'
-        f"Un retour par membre au plus, seulement s'il y a quelque chose à dire. {MAX_REPARATIONS} réparations au plus, "
+        f"Un retour par membre au plus, seulement à un membre dont problemes_par_membre n'est pas nul. {MAX_REPARATIONS} réparations au plus, "
         "seulement pour une panne ou un blocage encore en cours (leve_le vide). En français, sans tiret long, "
         "sans inventer aucun chiffre."
     )
@@ -112,14 +132,16 @@ def passage(essai):
     equipe = equipe_en_service(fiches)
     pannes = registre.DOSSIER / "modeles_en_panne.json"
     couts = [l for l in registre.lire("couts") if mesures.quand(l["debut"]) >= depuis]
-    donnees = {**calcul, "bloquants_7j": bloquants(depuis),
-               "modeles_en_panne": json.loads(pannes.read_text(encoding="utf-8")) if pannes.exists() else {},
+    en_panne = json.loads(pannes.read_text(encoding="utf-8")) if pannes.exists() else {}
+    a_signaler = problemes(equipe, calcul, en_panne)
+    donnees = {**calcul, "bloquants_7j": bloquants(depuis), "modeles_en_panne": en_panne,
                "duree_totale_min_par_agent": {a: round(sum(int(l["duree_s"] or 0) for l in couts if l["agent"] == a) / 60)
                                               for a in sorted({l["agent"] for l in couts})},
+               "problemes_par_membre": a_signaler,
                "equipe": {p: {s: consignes.lire_section(consignes.chemin_fiche(p).read_text(encoding="utf-8"), s)
                               for s in ("Mission", "Mesure de réussite", "Retours")} for p in equipe}}
     texte, modele, *_ = postes.demander("chef-operations", consigne(donnees, equipe))
-    ligne, retours, reparations, ecartes = valider(modeles.extraire_json(texte) or {}, equipe)
+    ligne, retours, reparations, ecartes = valider(modeles.extraire_json(texte) or {}, equipe, a_signaler)
     ligne = ligne or f"réveils réussis : {calcul['reveils_reussis_pourcent']} %, {len(calcul['pannes_sans_trace'])} panne(s) sans trace"
     print(f"RAPPORT {ligne}")
     for r in retours:
