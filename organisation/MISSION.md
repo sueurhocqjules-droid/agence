@@ -34,8 +34,25 @@ Toute tâche se rattache à l'un d'eux (champ `objectifs` de chaque fiche). Peu 
 - **Canaux :** Telegram pour tout (récapitulatif quotidien, messages urgents, boutons Oui/Non). Le mail du lundi tient en une page, dans cet ordre : à valider, contacts en attente, demandes ouvertes, ce qui a été fait (organisation comprise), décisions jugées par le Critique, les 4 objectifs en chiffres. Sans réponse, l'agence continue sur sa lancée
 - **Ce que l'Ingénierie fusionne seule :** une PR de code aux tests verts, relue par la Sûreté. Une PR qui touche aux workflows, aux secrets, aux autorisations de clés ou à cette section passe par Jules
 - **Dérogation des premières semaines :** les comptes se créent avec Jules. Au bilan de fin décembre (ou plus tôt si Jules l'avance), l'agence propose elle-même ce qu'elle pourrait traiter seule
-- **En construction les 13 et 14/11 :** guichet, contacts, Ingénierie, Responsable de l'organisation, registre des essais. Tant qu'un de ces circuits n'existe pas, la demande passe par une question Oui/Non, comme avant
+- **En construction les 13 et 14/11 :** guichet, contacts, Ingénierie, Responsable de l'organisation, registre des essais, Responsable du revenu, décision rapide, mémoire, banc des agents, fichiers protégés, alarme extérieure. Tant qu'un de ces circuits n'existe pas, la demande passe par une question Oui/Non, comme avant
+- **Concepts et lignes des chaînes :** à l'agence seule (le Veilleur propose, la Direction tranche). Peu importe le nombre de concepts ou de chaînes par concept, tant que ça sert les objectifs. Une chaîne qui marche n'est pas réorientée brutalement. Les règles de monétisation de chaque plateforme sont lues par l'agence, qui s'y adapte d'elle-même
 - **Jules peut s'adresser à une seule équipe** sans toucher aux autres : une issue GitHub du dépôt `agence` avec l'étiquette de l'équipe (`equipe:contenu`, `equipe:recherche`, `equipe:operations`, `equipe:surete`, `equipe:critique`, `equipe:direction`). Seules les issues écrites par Jules font foi. Le chef de l'équipe la lit à son réveil suivant, répond dans l'issue et note sa décision au journal d'audit
+
+## Décider vite
+
+> Ajouté le 13/11 à la demande de Jules : une boucle besoin → Recherche → Direction du dimanche → Ingénierie prend 2 à 3 semaines, alors qu'une tendance dure quelques jours. Pensé contre les pièges décrits par ceux qui font tourner des entreprises d'agents : allers-retours de propositions et de votes plus lents qu'une équipe humaine, boucles d'analyse, documents qui s'écartent du réel, agents du même modèle qui se confortent entre eux.
+
+- **Trois classes de décisions, un seul décideur par classe :**
+  - **Classe 1, réversible :** annulable par un `git revert`, 0 €, dans le budget de l'équipe, sans nouveau secret ni compte, sans toucher aux fichiers protégés. L'agent qui en a besoin (ou son chef, si ça touche un collègue) décide et l'applique au réveil suivant, sans attendre le dimanche. S'il faut du code, il écrit directement la demande à l'Ingénierie. Une ligne au journal d'audit avec sa prédiction ; le Critique juge après coup
+  - **Classe 2, engageante dans l'agence :** budget d'une autre équipe, création, suppression ou fusion d'un poste, nouvelle chaîne, changement de ligne d'une chaîne. Tranchée par la Direction (par le Responsable de l'organisation pour les postes), convoquée à la demande et pas seulement le dimanche, réponse en 24 h au plus. Sans réponse dans ce délai, la proposition part si elle reste annulable (consentement par défaut), et le Critique la juge comme les autres
+  - **Classe 3, Jules :** seulement ce que la Gouvernance lui réserve
+- **Dans le doute, la classe la plus basse qui reste annulable.** Un essai annulé coûte moins qu'une semaine d'attente
+- **Pas de boucle d'analyse :** un besoin a un délai (48 h par défaut) et au plus 3 options. Au bout du délai, l'option gratuite la plus simple qui tient part en essai. Une analyse ne se refait que sur un fait nouveau
+- **Pas de comité :** personne ne vote. Les autres postes donnent un avis dans le délai ou se taisent
+- **L'Ingénierie démarre à l'événement** (demande étiquetée), jamais à date fixe : une décision de classe 1 ou 2 devient une PR dans la journée
+- **Le délai se mesure :** le Chef des opérations suit le temps entre un besoin écrit et sa mise en service (cible 72 h en classe 1, une semaine en classe 2) et le remonte au bilan quand il dérape
+- **Le document suit le réel :** un changement de code, de poste ou de consigne met à jour la fiche et la mémoire dans le même commit. Un test vérifie que chaque fiche pointe vers un module qui existe et que chaque script a un propriétaire
+- **Points de contrôle d'une autre famille de modèle :** le Critique, la relecture des PR et le juge du banc ne tournent pas sur Claude, pour que la Direction, l'Auteur et l'Ingénierie ne soient pas jugés par leurs propres angles morts (Anthropic, Project Vend 2)
 
 ## Règles de travail
 
@@ -45,6 +62,9 @@ Toute tâche se rattache à l'un d'eux (champ `objectifs` de chaque fiche). Peu 
 4. **Budget par agent** (champ `budget` de la fiche), en plus du compteur global tenu par la Sûreté. Un agent au bout de son budget s'arrête et le fait remonter. Dépasser un budget demande le oui de Jules
 5. **Tout passe par le lanceur** (`python -m agence.lancer <nom>`) : il refuse un agent en pause (lui, un supérieur ou toute l'agence, `registre/pauses.csv`) ou au bout de son budget, ne lui passe que ses secrets et note chaque passage dans `registre/journal/<agent>.jsonl`. Les demandes de Jules à une équipe se lisent avec `agence.demandes`
 6. **Journal d'audit :** chaque décision d'agent est notée dans `registre/decisions.jsonl`, au moins en une ligne, avec sa raison, et sa prédiction quand elle en a une. On ajoute, on ne réécrit jamais
+7. **Mémoire de l'entreprise** (`organisation/MEMOIRE.md`) : les leçons apprises, une par ligne (le fait, sa preuve par lien vers le registre, un commit ou un run, la date, ce qu'il change, la date où la revoir). N'importe quel agent en propose, le Critique la tient. La Direction, le Responsable de l'organisation, l'Ingénierie, le Chef de contenu et le Responsable du revenu la relisent avant toute décision de classe 2. Chaque fiche de poste garde « Pourquoi ce poste existe » : on ne supprime pas un poste sans l'avoir lu. Elle reste courte : une leçon qui ne change plus aucune décision en sort
+8. **Banc avant mise en service** (`banc/agents/`) : aucun nouveau poste, aucun changement de consignes, de modèle ou de code d'agent ne part sans passer son banc. 20 à 50 cas tirés des vraies pannes, rejoués à chaque changement, un juge par critère avec la réponse « inconnu », vérification par code d'abord, par modèle ensuite. Chaque panne réelle devient un cas (Anthropic, « Demystifying evals for AI agents », janvier 2026)
+9. **Fichiers protégés** : tests et cas de banc existants, workflows, secrets et autorisations de clés, mission, objectifs et Gouvernance ne changent que par une PR fusionnée par Jules (avec Claude dans Jarvis). L'Ingénierie peut ajouter des tests, jamais en retirer ni en assouplir
 
 ## Sécurité : la règle de deux
 
