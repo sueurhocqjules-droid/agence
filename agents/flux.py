@@ -6,8 +6,11 @@ Lancement : python -m agents.flux [--essai]
 À chaque passage :
 1. Compare les sujets du moteur (studio-rendu) aux vidéos déjà sur les chaînes (titre exact) : ce qui manque.
 2. Ce qui manque et a un rendu sur studio-rendu : téléchargé, contrôlé (agence/controle.py), programmé au prochain créneau.
-3. Ce qui manque sans rendu : poussé dans la file de studio-rendu (file/attente.txt), dont le rendu part tout seul.
-   Le passage suivant (12 h plus tard) le programme.
+3. Diffusion : chaque vidéo déjà publique sur YouTube part en Reel sur le compte Instagram et la Page Facebook de sa
+   langue (agence/meta.py), la plus ancienne d'abord, au rythme fixé par le Programmateur (organisation/diffusion.toml).
+   Facebook n'accepte pas plus de 90 s : une vidéo plus longue y est notée « hors_format » et sautée.
+4. Ce qui manque sans rendu (ou dont le rendu a expiré avant sa diffusion) : poussé dans la file de studio-rendu
+   (file/attente.txt), dont le rendu part tout seul. Le passage suivant le programme ou le diffuse.
 Coût : 0 jeton. Quota YouTube : ~1 600 unités par envoi. Minutes de rendu : dépôt public, gratuites.
 """
 import io
@@ -17,12 +20,13 @@ import re
 import subprocess
 import sys
 import tempfile
+import tomllib
 import zipfile
 from datetime import datetime, time, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from agence import controle, lancer, mesures, registre, youtube
+from agence import controle, lancer, meta, mesures, registre, youtube
 
 DEPOT_RENDU = "sueurhocqjules-droid/studio-rendu"
 RENDU = Path(os.environ.get("RENDU_DIR") or Path(__file__).resolve().parents[2] / "studio-rendu")
@@ -30,6 +34,8 @@ PARIS = ZoneInfo("Europe/Paris")
 DELAI_MIN = timedelta(hours=2)    # jamais de sortie plus tôt : une date passée publierait aussitôt
 ENVOIS_MAX = 4                    # par chaîne et par passage (Studio bloquait au-delà de 3 ou 4 par jour)
 RENDUS_MAX = 6                    # par passage, une machine par vidéo
+DIFFUSION = Path(__file__).resolve().parents[1] / "organisation" / "diffusion.toml"
+REELS_FACEBOOK_MAX_S = 90         # Reels des Pages : 3 à 90 s
 
 
 def gh(*args, binaire=False):
@@ -95,13 +101,15 @@ def creneaux(heures, pris, debut):
 
 
 def etat_chaine(client):
-    """Titres présents et dates de sortie à venir d'une chaîne."""
-    titres, sorties = set(), set()
+    """Titres présents, dates de sortie à venir et titres déjà publics d'une chaîne."""
+    titres, sorties, publics = set(), set(), set()
     for v in youtube.videos(client, "snippet,status"):
         titres.add(v["snippet"]["title"])
         if v["status"].get("publishAt"):
             sorties.add(datetime.fromisoformat(v["status"]["publishAt"].replace("Z", "+00:00")))
-    return titres, sorties
+        if v["status"].get("privacyStatus") == "public":
+            publics.add(v["snippet"]["title"])
+    return titres, sorties, publics
 
 
 def envoyer(client, fichier, sujet_json, calcul_json, langue, quand):
@@ -132,6 +140,106 @@ def deja_rejete(nom, artefact_id):
 def stock(nom, langue, sujet, etat, sortie="", video_id="", note=""):
     registre.ajouter("stock", [{"nom": nom, "chaine": langue, "sujet": sujet, "etat": etat, "sortie_prevue": sortie,
                                 "video_id": video_id, "maj": registre.maintenant(), "note": note}])
+
+
+def cadence_diffusion():
+    """{reseau: sorties par jour}, réglé par le Programmateur."""
+    with open(DIFFUSION, "rb") as f:
+        return {reseau: r["par_jour"] for reseau, r in tomllib.load(f).items()}
+
+
+def diffusion(reseau, langue, nom, etat, media_id="", note=""):
+    registre.ajouter("diffusions", [{"date": registre.maintenant(), "reseau": reseau, "chaine": langue, "nom": nom,
+                                     "etat": etat, "media_id": media_id, "note": note}])
+
+
+def publies_aujourdhui(lignes, reseau, langue, maintenant):
+    jour = maintenant.astimezone(PARIS).date()
+    return sum(1 for l in lignes if l["reseau"] == reseau and l["chaine"] == langue and l["etat"] == "publie"
+               and datetime.fromisoformat(l["date"]).astimezone(PARIS).date() == jour)
+
+
+def a_diffuser(sujets, titres_publics, deja, sautes, langue):
+    """Sujets publics sur YouTube, pas encore sur le réseau ni sautés, du plus ancien au plus récent."""
+    return [s for s in sujets if (t := lire_sujet(s)[0][langue]["titre"]) in titres_publics
+            and t not in deja and f"{s}-{langue}" not in sautes]
+
+
+def diffuser(essai, sujets, etats, pauses, dossier, maintenant):
+    """Reels Instagram et Facebook des vidéos déjà publiques sur YouTube. Renvoie (publiées, erreurs, à rendre)."""
+    if not meta.jeton():
+        print("Diffusion Meta : pas de jeton (META_TOKEN), rien envoyé")
+        return [], [], []
+    cadence = cadence_diffusion()
+    lignes = registre.lire("diffusions")
+    comptes_ig = meta.comptes_instagram()
+    publiees, erreurs, a_rendre, fichiers = [], [], [], {}
+    for langue in youtube.CHAINES:
+        for reseau in ("instagram", "facebook"):
+            ligne = lancer.pause_active([f"chaine:{langue}", f"{reseau}:{langue}", f"reseau:{reseau}"], pauses)
+            if ligne:
+                print(f"PAUSE {reseau} {langue} ({ligne['par']} : {ligne['raison']}) : aucune diffusion")
+                continue
+            restant = cadence.get(reseau, 0) - publies_aujourdhui(lignes, reseau, langue, maintenant)
+            if restant <= 0:
+                continue
+            if reseau == "instagram":
+                if langue not in comptes_ig:
+                    print(f"Instagram {langue} : compte {meta.INSTAGRAM[langue]} non assigné à l'utilisateur système")
+                    continue
+                cle_page, deja = None, meta.titres_instagram(comptes_ig[langue])
+            else:
+                cle_page = meta.jeton_page(meta.PAGES[langue])
+                deja = meta.titres_facebook(meta.PAGES[langue], cle_page)
+            sautes = {l["nom"] for l in lignes if l["reseau"] == reseau and l["etat"] == "hors_format"}
+            for sujet in a_diffuser(sujets, etats[langue][2], deja, sautes, langue):
+                if restant <= 0:
+                    break
+                nom = f"{sujet}-{langue}"
+                if nom not in fichiers:
+                    fichiers[nom] = fichier_controle(nom, dossier)
+                if not fichiers[nom]:
+                    if nom not in a_rendre:
+                        a_rendre.append(nom)  # rendu expiré ou incomplet : refait, diffusé au passage suivant
+                    restant -= 1  # pas plus de rendus que de places du jour
+                    continue
+                fichier, duree = fichiers[nom]
+                if reseau == "facebook" and duree > REELS_FACEBOOK_MAX_S:
+                    print(f"HORS FORMAT facebook {nom} : {duree:.0f} s, plus de {REELS_FACEBOOK_MAX_S} s")
+                    if not essai:
+                        diffusion(reseau, langue, nom, "hors_format", note=f"{duree:.0f} s")
+                    continue
+                if essai:
+                    print(f"ESSAI diffusion {reseau} {nom}")
+                    restant -= 1
+                    continue
+                sujet_json, calcul_json = lire_sujet(sujet)
+                titre, description = sujet_json[langue]["titre"], calcul_json["descriptions"][langue]
+                try:
+                    if reseau == "instagram":
+                        media_id = meta.publier_instagram(comptes_ig[langue], fichier, titre, description)
+                    else:
+                        media_id = meta.publier_facebook(meta.PAGES[langue], cle_page, fichier, titre, description)
+                except meta.ErreurMeta as e:
+                    print(f"ERREUR {reseau} {nom} : {e}")
+                    diffusion(reseau, langue, nom, "erreur", note=str(e)[:300])
+                    erreurs.append(f"{reseau}:{nom}")
+                    break  # limite atteinte ou accès coupé : plus rien sur ce compte pour ce passage
+                diffusion(reseau, langue, nom, "publie", media_id)
+                publiees.append(f"{reseau}:{nom}")
+                restant -= 1
+                print(f"OK {reseau} {nom} : {media_id}")
+    return publiees, erreurs, a_rendre
+
+
+def fichier_controle(nom, dossier):
+    """(fichier, durée en s) du dernier rendu encore disponible et sans défaut, sinon None."""
+    artefact = dernier_artefact(nom)
+    fichier = artefact and telecharger(artefact, dossier)
+    if not fichier:
+        return None
+    defauts, releve = controle.controler(fichier)
+    return None if defauts else (fichier, releve["duree_s"])
 
 
 def passage(essai):
@@ -173,7 +281,7 @@ def passage(essai):
                 if not essai:
                     stock(nom, langue, sujet, "rejete", note=f"artefact {artefact['id']} : {', '.join(defauts)}")
                 continue
-            titres, sorties = etats[langue]
+            titres, sorties, _ = etats[langue]
             debut = max([maintenant + DELAI_MIN] + [s + timedelta(minutes=1) for s in sorties])
             quand = next(creneaux(heures[langue], sorties, debut))
             if essai:
@@ -197,6 +305,9 @@ def passage(essai):
                   f"artefact {artefact['id']}, {releve}")
             print(f"OK {nom} : {video_id}, sortie {quand:%d/%m %H:%M} Paris")
 
+        diffusees, erreurs, pour_diffuser = diffuser(essai, sujets, etats, pauses, dossier, maintenant)
+        a_rendre += [n for n in pour_diffuser if n not in a_rendre]  # YouTube d'abord, puis la diffusion
+
     a_rendre = a_rendre[:RENDUS_MAX]
     if a_rendre and rendu_en_cours():
         print("Rendu déjà en cours sur studio-rendu : file inchangée")
@@ -207,7 +318,7 @@ def passage(essai):
             sujet, langue = nom.split("-")
             stock(nom, langue, sujet, "en_rendu")
     print(f"À rendre : {' '.join(a_rendre) or 'rien'}")
-    return programmees, rejetees, a_rendre
+    return programmees, rejetees, a_rendre, diffusees, erreurs
 
 
 def main():
@@ -216,10 +327,11 @@ def main():
         passage(essai=True)  # rien n'est écrit, pas même le coût
         return
     with registre.seance("flux") as info:
-        programmees, rejetees, a_rendre = passage(essai=False)
-        info["resultat"] = f"ok : {len(programmees)} programmées, {len(rejetees)} rejetées, {len(a_rendre)} en rendu"
+        programmees, rejetees, a_rendre, diffusees, erreurs = passage(essai=False)
+        info["resultat"] = (f"ok : {len(programmees)} programmées, {len(rejetees)} rejetées, {len(a_rendre)} en rendu, "
+                            f"{len(diffusees)} diffusées, {len(erreurs)} erreurs de diffusion")
         print(info["resultat"])
-    if rejetees:
+    if rejetees or erreurs:
         sys.exit(1)  # le réveil passe au rouge : un défaut demande un regard
 
 

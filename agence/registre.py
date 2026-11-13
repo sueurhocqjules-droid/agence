@@ -18,6 +18,7 @@ COLONNES = {
     "pauses": ["date", "cible", "action", "par", "raison"],
     "questions": ["date", "id", "par", "texte", "si_oui", "si_non", "etat", "reponse", "message_id"],
     "alertes": ["date", "cle", "niveau", "message"],
+    "diffusions": ["date", "reseau", "chaine", "nom", "etat", "media_id", "note"],
 }
 
 

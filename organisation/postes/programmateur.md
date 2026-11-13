@@ -24,7 +24,7 @@ Décider, réseau par réseau, de la cadence et des heures qui apportent le plus
 Stats par vidéo, heure et réseau. Limites de rythme de chaque plateforme (tenues par la Sûreté).
 
 ## Sorties
-Un essai de cadence à la fois par réseau, noté au journal avec sa prédiction. Le calendrier des créneaux appliqué par `flux`.
+Un essai de cadence à la fois par réseau, noté au journal avec sa prédiction. Le calendrier des créneaux appliqué par `flux` : `organisation/creneaux.toml` pour YouTube, `organisation/diffusion.toml` pour les Reels par jour sur Instagram et Facebook (vidéos déjà publiques sur YouTube, la plus ancienne d'abord).
 
 ## Outils
 Script `creneaux`, lecture du registre.
