@@ -1,5 +1,6 @@
 """Tests de l'agent flux : un artefact incomplet repart en rendu au lieu de bloquer le passage.  python -m unittest discover tests"""
 import io
+# Essai du contrôle des fichiers protégés : cette ligne modifie un test existant, la PR doit être refusée
 import tempfile
 import unittest
 import zipfile
