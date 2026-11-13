@@ -31,6 +31,7 @@ class Diffuser(unittest.TestCase):
                 mock.patch.object(flux.registre, "lire", return_value=list(lignes)), \
                 mock.patch.object(flux, "diffusion", side_effect=lambda *a, **k: notes.append(a)), \
                 mock.patch.object(flux, "fichier_controle", side_effect=lambda nom, d: fichiers.get(nom.split("-")[0])), \
+                mock.patch.object(flux, "heberger", side_effect=lambda f: f"https://raw/{f}"), \
                 mock.patch.object(meta, "jeton", return_value="x"), \
                 mock.patch.object(meta, "comptes_instagram", return_value={"en": "ig1"}), \
                 mock.patch.object(meta, "jeton_page", return_value="page"), \

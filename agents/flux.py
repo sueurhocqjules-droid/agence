@@ -217,7 +217,7 @@ def diffuser(essai, sujets, etats, pauses, dossier, maintenant):
                 titre, description = sujet_json[langue]["titre"], calcul_json["descriptions"][langue]
                 try:
                     if reseau == "instagram":
-                        media_id = meta.publier_instagram(comptes_ig[langue], fichier, titre, description)
+                        media_id = meta.publier_instagram(comptes_ig[langue], heberger(fichier), titre, description)
                     else:
                         media_id = meta.publier_facebook(meta.PAGES[langue], cle_page, fichier, titre, description)
                 except meta.ErreurMeta as e:
@@ -230,6 +230,20 @@ def diffuser(essai, sujets, etats, pauses, dossier, maintenant):
                 restant -= 1
                 print(f"OK {reseau} {nom} : {media_id}")
     return publiees, erreurs, a_rendre
+
+
+def heberger(fichier):
+    """Met la vidéo seule sur la branche « diffusion » du dépôt public studio-rendu (clé de déploiement déjà utilisée pour
+    la file) et renvoie son adresse publique, que Meta lit pour Instagram. Chaque envoi remplace le précédent : la branche
+    ne garde qu'une vidéo et ne déclenche aucun rendu (seul main le fait)."""
+    def git(*args, entree=None):
+        return subprocess.run(["git", *args], cwd=RENDU, check=True, capture_output=True, text=True,
+                              input=entree).stdout.strip()
+    blob = git("hash-object", "-w", str(fichier))
+    arbre = git("mktree", "-z", entree=f"100644 blob {blob}\t{Path(fichier).name}\0")  # -z : pas de \r sous Windows
+    commit = git("commit-tree", arbre, "-m", f"Diffusion : {Path(fichier).name}")
+    git("push", "-q", "-f", "origin", f"{commit}:refs/heads/diffusion")
+    return f"https://raw.githubusercontent.com/{DEPOT_RENDU}/{commit}/{Path(fichier).name}"
 
 
 def fichier_controle(nom, dossier):

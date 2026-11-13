@@ -3,8 +3,10 @@
 Un seul jeton : l'utilisateur système `every-second-publisher` du portefeuille « Every Second Lab », sans expiration,
 avec les 3 comptes Instagram et les 3 Pages assignés. Variable META_TOKEN (secret GitHub), sinon INSTAGRAM_ACCESS_TOKEN
 du .env de Jarvis (même jeton, posé par `instagram.py login`).
-Les vidéos partent depuis le fichier (hôte rupload.facebook.com), sans lien public.
-Docs : developers.facebook.com/docs/instagram-platform/content-publishing (Reels, envoi « resumable »)
+Facebook : la vidéo part depuis le fichier (rupload.facebook.com). Instagram : Meta va la chercher à une adresse publique
+(flux.heberger). Testé le 13/11 : l'envoi direct Instagram (rupload, « ProcessingFailedError ») et le lien du Reel Facebook
+(erreur 2207076) échouent, une adresse raw.githubusercontent.com passe.
+Docs : developers.facebook.com/docs/instagram-platform/content-publishing (Reels)
 et developers.facebook.com/docs/video-api/guides/reels-publishing (Reels des Pages).
 """
 import json
@@ -17,7 +19,6 @@ from pathlib import Path
 
 VERSION = "v27.0"
 GRAPH = f"https://graph.facebook.com/{VERSION}/"
-RUPLOAD = "https://rupload.facebook.com/"
 INSTAGRAM = {"en": "everysecondlab", "es": "cadasegundolab", "pt": "acadasegundolab"}
 PAGES = {"en": "1537802816072828", "es": "1517937254731092", "pt": "1522397427617458"}
 JARVIS_ENV = Path(__file__).resolve().parents[2] / "jarvis-starter-kit" / ".env"
@@ -117,13 +118,10 @@ def attendre(lire_etat, fini, erreurs, quoi, essais=16, pause=30):
     raise ErreurMeta(f"{quoi} : vidéo toujours en traitement après {essais * pause // 60} min")
 
 
-def publier_instagram(ig_id, fichier, titre, description):
-    """Publie un Reel depuis le fichier. Renvoie l'id du média."""
-    conteneur = appel("POST", f"{ig_id}/media", {"media_type": "REELS", "upload_type": "resumable",
+def publier_instagram(ig_id, adresse, titre, description):
+    """Publie un Reel à partir de l'adresse publique de la vidéo. Renvoie l'id du média."""
+    conteneur = appel("POST", f"{ig_id}/media", {"media_type": "REELS", "video_url": adresse,
                                                   "caption": legende(titre, description), "share_to_feed": "true"})["id"]
-    contenu = Path(fichier).read_bytes()
-    appel("POST", f"{RUPLOAD}ig-api-upload/{VERSION}/{conteneur}", corps=contenu,
-          entetes={"offset": "0", "file_size": str(len(contenu))})
     attendre(lambda: appel("GET", conteneur, {"fields": "status_code"}).get("status_code"),
              {"FINISHED"}, {"ERROR", "EXPIRED"}, "Instagram")
     return appel("POST", f"{ig_id}/media_publish", {"creation_id": conteneur})["id"]
