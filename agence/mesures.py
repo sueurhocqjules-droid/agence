@@ -4,12 +4,20 @@ Chaque mesure se calcule à une date donnée, sur les 7 jours qui la précèdent
 Une prédiction (décision, changement de consignes, essai de créneaux) nomme l'une d'elles, sa valeur avant
 et la valeur attendue : le critique la recalcule à l'échéance et rend son verdict.
 """
+import statistics
 import tomllib
 from datetime import datetime, timedelta
 
 from agence import organisation, registre, youtube
 
 SEMAINE = timedelta(days=7)
+RECUL = timedelta(days=2)     # une vidéo plus jeune n'a pas encore reçu sa diffusion
+PART_MIN_SOEURS = 0.02        # panne : sous 2 % des vues de la meilleure chaîne sœur, sur les mêmes sorties
+                              # (13/11 : es non diffusée à 0,04 %, pt diffusée normalement à 7,8 % de en)
+SOEUR_MIN = 200               # ... si cette sœur en a au moins autant (sinon tout le monde est bas, rien à comparer)
+CHUTE_MAX = 0.2               # chute : médiane sous 20 % de celle de la semaine d'avant
+CHUTE_BASE_MIN = 20           # ... si la semaine d'avant valait au moins 20 vues par vidéo
+SEMAINES_AVANT_JULES = 2      # à partir de là, la Direction propose ses solutions à Jules
 MESURES = {
     "vues_semaine": "vues gagnées sur les 7 derniers jours, toutes chaînes",
     **{f"vues_semaine:{l}": f"vues gagnées sur les 7 derniers jours, chaîne {l}" for l in youtube.CHAINES},
@@ -47,6 +55,66 @@ def vues_gagnees(stats, a, chaine=None):
     if not fin:
         return None
     return sum(v - debut.get(k, 0) for k, v in fin.items() if chaine in (None, k[0]))
+
+
+def portee(stats, a):
+    """Par chaîne, la diffusion des vidéos sorties dans les 7 jours qui s'arrêtent 2 jours avant `a`, au dernier relevé
+    avant `a`. Chaque sujet sort sur toutes les chaînes : les totaux se comparent entre chaînes sœurs.
+    panne : moins de 2 % des vues de la meilleure sœur (qui en a au moins 200), sur au moins 3 vidéos.
+    chute : médiane sous 20 % de celle de la semaine d'avant. La médiane ignore une vidéo virale isolée."""
+    releve = max((l["releve"] for l in stats if quand(l["releve"]) < a), default=None)
+    if not releve:
+        return {}
+    fin = a - RECUL
+
+    def vues(chaine, debut, jusqu_a):
+        return [int(l["vues"]) for l in stats if l["releve"] == releve and l["chaine"] == chaine
+                and l["statut"] == "public" and l["sortie"] and debut <= quand(l["sortie"]) < jusqu_a]
+
+    res = {}
+    for c in youtube.CHAINES:
+        v, avant = vues(c, fin - SEMAINE, fin), vues(c, fin - 2 * SEMAINE, fin - SEMAINE)
+        res[c] = {"videos": len(v), "vues": sum(v), "mediane": statistics.median(v) if v else None,
+                  "mediane_semaine_avant": statistics.median(avant) if avant else None}
+    for c, r in res.items():
+        soeur = max((x["vues"] for k, x in res.items() if k != c), default=0)
+        r["meilleure_soeur"] = soeur
+        r["panne"] = r["videos"] >= 3 and soeur >= SOEUR_MIN and r["vues"] < PART_MIN_SOEURS * soeur
+        m0 = r["mediane_semaine_avant"]
+        r["chute"] = (r["videos"] >= 3 and m0 is not None and m0 >= CHUTE_BASE_MIN
+                      and r["mediane"] < CHUTE_MAX * m0)
+    return res
+
+
+def semaines_de_suite(stats, a, chaine, signal, maximum=8):
+    """Nombre de semaines d'affilée, en remontant depuis `a`, où le signal (panne ou chute) est levé sur la chaîne."""
+    n = 0
+    while n < maximum and portee(stats, a - n * SEMAINE).get(chaine, {}).get(signal):
+        n += 1
+    return n
+
+
+def signaux_portee(stats, a):
+    """Les chaînes en panne ou en chute à la date : chaîne, signal, semaines d'affilée, et une phrase pour Jules."""
+    signaux = []
+    for c, r in portee(stats, a).items():
+        for signal in ("panne", "chute"):
+            if not r[signal]:
+                continue
+            n = semaines_de_suite(stats, a, c, signal)
+            if signal == "panne":
+                p = r["vues"] / r["meilleure_soeur"] * 100
+                part = "moins de 0,1 %" if p < 0.1 else f"{p:.1f} %".replace(".", ",")
+                soeur = f"{r['meilleure_soeur']:,}".replace(",", " ")
+                texte = (f"chaîne {c} : {r['vues']} vues sur ses {r['videos']} vidéos sorties dans la semaine, contre "
+                         f"{soeur} pour la meilleure chaîne sœur sur les mêmes sujets ({part}). "
+                         f"YouTube ne la diffuse presque pas")
+            else:
+                texte = (f"chaîne {c} : {r['mediane']:g} vues par vidéo en médiane sur la semaine, contre "
+                         f"{r['mediane_semaine_avant']:g} la semaine d'avant")
+            signaux.append({"chaine": c, "signal": signal, "semaines": n,
+                            "texte": f"{texte}, {n} semaine{'s' if n > 1 else ''} d'affilée"})
+    return signaux
 
 
 def stock_programme(stock, stats, a):

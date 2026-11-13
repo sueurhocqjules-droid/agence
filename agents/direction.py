@@ -145,6 +145,8 @@ def dossier(maintenant):
         "bloquants_7j": bloquants(depuis),
         "pauses_actives": [l for l in etat_pauses() if l["action"] == "pause"],
         "alertes_7j": recentes(registre.lire("alertes"), "date", depuis),
+        "portee_des_chaines": {"par_chaine": mesures.portee(donnees["stats"], maintenant),
+                               "signaux": mesures.signaux_portee(donnees["stats"], maintenant)},
         "questions_a_jules": [q for q in questions.etat_questions(registre.lire("questions")).values()
                               if q["etat"] == "ouverte" or mesures.quand(q["date"]) >= depuis],
         "cibles_des_questions": sorted(questions.cibles_connues()),
@@ -176,6 +178,12 @@ Un blocage avec une date leve_le a été levé ensuite par un passage réussi : 
 Chaque proposition de la recherche porte sa preuve et sa prédiction : si tu la retiens, reprends-la en décision avec
 sa mesure et sa valeur attendue (ou la tienne), et dis dans le pourquoi qu'elle vient de la recherche.
 Le rapport des opérations dit si l'agence tourne : ses réparations relèvent de Jules quand il faut écrire du code.
+portee_des_chaines.signaux : une chaîne en panne (YouTube ne la diffuse presque pas, comparée à ses sœurs sur les mêmes
+sujets) ou en chute (ses vues par vidéo s'effondrent). Dès la première semaine, cherche la cause dans le dossier et
+décide toi-même des remèdes qui relèvent de l'agence, chacun avec la mesure vues_semaine:<chaîne> et sa valeur attendue.
+Dès que semaines atteint {mesures.SEMAINES_AVANT_JULES}, ton analyse propose à Jules 2 ou 3 solutions concrètes : ce que
+l'agence a déjà essayé et avec quel résultat, puis pour chaque solution ce qu'elle coûte et ce que tu en attends. Si
+l'une d'elles est la fermeture ou la refonte totale de la chaîne, elle passe aussi en question (Gouvernance).
 Tu rends ta réponse au format imposé, appliquée telle quelle par un script :
 - decisions : ce que tu décides, chacune avec sa raison. Quand elle a un effet mesurable, nomme la mesure (liste fermée)
   et la valeur attendue à l'échéance ; le critique la jugera sur les vrais chiffres. Une décision sans mesure reste notée.

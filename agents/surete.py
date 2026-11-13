@@ -7,6 +7,8 @@ Lancement : python -m agence.lancer garde_fous   (ou python -m agents.surete --e
 2. Seuils (organisation/seuils.toml) : alerte Telegram, puis pause des agents Claude et question pour reprendre.
 3. Sanctions : une vidéo rejetée par YouTube met sa chaîne en pause, avec une question à Jules pour reprendre.
 4. Pannes : un même programme en échec plusieurs passages d'affilée, alerte.
+5. Portée : une chaîne que YouTube ne diffuse presque pas (comparée à ses sœurs sur les mêmes sujets) ou dont les vues
+   s'effondrent d'une semaine à l'autre (mesures.signaux_portee), alerte une fois par semaine tant que ça dure.
 Une alerte ne part qu'une fois : sa clé est notée dans registre/alertes.csv.
 """
 import csv
@@ -19,7 +21,7 @@ import tomllib
 from datetime import datetime, timezone
 from pathlib import Path
 
-from agence import lancer, organisation, questions, registre, telegram
+from agence import lancer, mesures, organisation, questions, registre, telegram
 
 DEPOTS_PRIVES = ["sueurhocqjules-droid/agence"]  # chaines-studio : la clé de lecture ne donne pas accès à l'API des runs
 
@@ -171,6 +173,17 @@ class Surete:
             self.ratees += 1
 
 
+def alerter_portee(s, stats, maintenant):
+    """Une alerte par chaîne mal diffusée et par semaine, tant que ça dure ; la suite dit qui s'en occupe."""
+    semaine = f"{lancer.debut_semaine(maintenant):%Y-%m-%d}"
+    for p in mesures.signaux_portee(stats, maintenant):
+        suite = ("La Direction te propose ses solutions dans le mail de lundi, et te demande de trancher si c'est une "
+                 "refonte ou une fermeture de la chaîne." if p["semaines"] >= mesures.SEMAINES_AVANT_JULES else
+                 "La Direction cherche la cause et décide des remèdes dimanche. Rien à faire pour l'instant.")
+        s.alerter(f"portee:{p['chaine']}:{p['signal']}:{semaine}", "diffusion",
+                  f"{p['texte'][0].upper() + p['texte'][1:]}. {suite}")
+
+
 def passage(essai):
     reglages, maintenant, s = seuils(), datetime.now(timezone.utc), Surete(essai)
 
@@ -231,6 +244,8 @@ def passage(essai):
                 "Regarde d'abord la vidéo dans YouTube Studio pour comprendre ce qui coince. Tant que la cause n'est pas "
                 "corrigée (dis-le-moi à ta prochaine session), mieux vaut Non : la chaîne reste en pause jusqu'à ce que "
                 "tu me demandes de la relancer.")
+
+    alerter_portee(s, registre.lire("stats"), maintenant)
 
     seuil = reglages["echecs"]["alerte_consecutifs"]
     for quoi, depuis, n in echecs_en_serie(registre.DOSSIER / "journal", seuil):
