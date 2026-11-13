@@ -44,6 +44,10 @@ POSTES = {
     # vérifient à chaque passage qu'il reconnaît les pannes.
     "juge-banc": [("gemini", "gemini-flash-lite-latest", 2000), ("groq", "openai/gpt-oss-120b", 2000),
                   ("gemini", "gemini-flash-latest", 2000), ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 2000)],
+    # Relecture des PR (agence/relecture.py, règle 9) : jamais Claude, qui écrit les PR de l'Ingénierie. Gemini, dont
+    # le quota gratuit par minute tient un diff de 60k caractères ; Groq seulement pour un petit diff.
+    "relecteur-pr": [("gemini", "gemini-flash-lite-latest", 3000), ("gemini", "gemini-flash-latest", 3000),
+                     ("groq", "openai/gpt-oss-120b", 3000)],
 }
 
 
