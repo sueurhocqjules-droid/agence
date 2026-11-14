@@ -3,8 +3,9 @@
 #   - un agent écrit la demande et lance ce workflow (agence/ingenierie.py, `demander`) ;
 #   - Jules pose l'étiquette `ingenierie` sur une issue, ou lance `gh workflow run ingenierie.yml -f issue=<n>` ;
 #   - reprise sans Claude d'une PR restée ouverte (relecteur muet, banc en panne) : `-f pr=<n>`.
-# Le code qui décide (agence/ingenierie.py, protege.py, relecture.py) vient toujours de main. La PR vit dans une copie
-# de travail à part ($RUNNER_TEMP/travail) : ses tests et son banc y tournent, sans jeton GitHub ni jeton Claude.
+# Le code qui décide (agence/ingenierie.py, protege.py, relecture.py) vient toujours de main. Claude travaille dans une
+# copie à part ($RUNNER_TEMP/travail) ; les tests et le banc de la PR tournent dans un clone propre de son commit
+# ($RUNNER_TEMP/pr), sans jeton GitHub ni jeton Claude.
 # Une PR ouverte avec GITHUB_TOKEN ne déclenche aucun autre workflow : tout ce qui la contrôle est lancé ici.
 # Le jeton du workflow n'a pas le droit `workflows` : une PR de l'Ingénierie ne peut pas pousser dans .github/workflows/.
 name: Ingénierie
@@ -87,11 +88,17 @@ jobs:
       - name: Diagnostic temporaire (Node dans la copie de travail)
         if: ${{ steps.construire.outputs.pr || steps.reprendre.outputs.pr }}
         continue-on-error: true
-        working-directory: ${{ runner.temp }}/travail
         run: |
-          node --version
-          ls -la "$RUNNER_TEMP"
-          node --input-type=module -e "import * as w from 'file://$PWD/alarme/worker.js'; console.log(Object.keys(w))"
+          which -a node; node --version; echo "$PATH"
+          env | grep -i -E "^(node|npm)" || true
+          ls -la "$RUNNER_TEMP" "$HOME"
+          ls /home/runner/work/package.json /home/runner/package.json "$RUNNER_TEMP/package.json" 2>&1 || true
+          for d in travail pr; do
+            if [ -d "$RUNNER_TEMP/$d" ]; then
+              ls -la "$RUNNER_TEMP/$d"
+              node --input-type=module -e "import * as w from 'file://$RUNNER_TEMP/$d/alarme/worker.js'; console.log(Object.keys(w))" || true
+            fi
+          done
 
       # Code de la PR, sans aucun secret
       - name: Tests de la PR
@@ -99,7 +106,7 @@ jobs:
         if: ${{ steps.construire.outputs.pr || steps.reprendre.outputs.pr }}
         continue-on-error: true
         timeout-minutes: 10
-        working-directory: ${{ runner.temp }}/travail
+        working-directory: ${{ runner.temp }}/pr
         run: python -m unittest discover tests
       # Code de la PR, avec les seules clés des modèles gratuits (comme banc.yml), si elle touche un agent ou sa fiche
       - name: Banc des agents sur la PR
@@ -107,7 +114,7 @@ jobs:
         if: ${{ (steps.construire.outputs.banc || steps.reprendre.outputs.banc) == 'true' }}
         continue-on-error: true
         timeout-minutes: 25
-        working-directory: ${{ runner.temp }}/travail
+        working-directory: ${{ runner.temp }}/pr
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

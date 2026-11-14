@@ -114,7 +114,7 @@ jobs:
           gh api -X GET "repos/$GITHUB_REPOSITORY/issues" -f labels=equipe:recherche -f state=open \
             -f creator=sueurhocqjules-droid -f per_page=50 > "$RUNNER_TEMP/demandes-recherche.json"
           gh run list -R "$GITHUB_REPOSITORY" --limit 200 \
-            --json workflowName,status,conclusion,createdAt,url,event > "$RUNNER_TEMP/reveils.json"
+            --json workflowName,status,conclusion,createdAt,url,event,headBranch > "$RUNNER_TEMP/reveils.json"
       - name: Veilleur
         if: ${{ !cancelled() }}
         env:

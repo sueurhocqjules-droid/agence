@@ -24,6 +24,7 @@ MAX_REPARATIONS = 3
 TRACE = timedelta(minutes=90)  # un réveil qui a lancé un agent laisse une entrée de journal dans ce délai
 # Contrôles dont le rouge est un refus voulu (une PR qui touche un fichier protégé), pas une panne de l'agence
 CONTROLES = {"Fichiers protégés"}
+BRANCHES_INGENIERIE = "ingenierie/"   # même préfixe que agence/ingenierie.py (PREFIXE)
 
 
 def reveils(chemin, depuis):
@@ -46,7 +47,11 @@ def journaux(depuis):
 
 def chiffres(runs, entrees):
     """Part des réveils réussis par workflow et en tout, pannes sans trace, résultats des agents."""
-    runs = [r for r in runs if r["workflowName"] not in CONTROLES]
+    # Une PR de l'Ingénierie est ouverte avec le jeton du workflow : GitHub refuse alors de lancer les workflows
+    # `pull_request` et laisse un run en échec sans aucun job (vu le 14/11, PR #10). Ce n'est pas une panne :
+    # tests, banc, contrôle et relecture de cette PR tournent dans le run de l'Ingénierie
+    runs = [r for r in runs if r["workflowName"] not in CONTROLES
+            and not (r.get("event") == "pull_request" and str(r.get("headBranch") or "").startswith(BRANCHES_INGENIERIE))]
     par_workflow = {}
     for r in runs:
         if r["conclusion"] in ("cancelled", "skipped"):
