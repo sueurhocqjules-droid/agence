@@ -30,6 +30,21 @@ description = "la surveillance des coûts et des sanctions"
 secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
 hors_pause = true
 
+# Le guichet (agence/guichet.py) : ce que l'agence demande à Jules. Récapitulatif une fois par jour, urgent tout de suite.
+[guichet]
+proprietaire = "chef-operations"
+module = "agence.guichet"
+description = "le récapitulatif quotidien des demandes du guichet et des contacts à valider"
+secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
+
+# Les contacts (agence/contacts.py) : envoie les messages validés par Jules. GMAIL_SEND_TOKEN (droit gmail.send seul)
+# n'est pas encore accordé dans autorisations.toml : tant qu'il manque, rien ne part et le script le demande au guichet.
+[contacts]
+proprietaire = "chef-operations"
+module = "agence.contacts"
+description = "l'envoi des messages aux personnes, une fois validés par toi"
+secrets = ["GMAIL_SEND_TOKEN", "GH_TOKEN"]
+
 [prevu_realise]
 proprietaire = "analyste"
 module = "agents.prevu_realise"

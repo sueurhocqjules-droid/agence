@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   actions: read       # la Sûreté compte les minutes GitHub du mois
+  issues: write       # guichet et contacts : demandes écrites par l'agence, commentaire et fermeture d'un contact envoyé
 
 concurrency:
   group: registre     # un seul écrivain du registre à la fois
@@ -126,6 +127,26 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           PYTHONUTF8: "1"
         run: python -m agence.lancer guetteur
+      # Messages validés par Jules (issues `contact` + `valide`). Sans GMAIL_SEND_TOKEN (droit gmail.send seul), rien ne
+      # part : le script le demande au guichet, une fois. Jeton d'envoi à part de celui du Courrier (lecture seule)
+      - name: Contacts (messages validés)
+        if: ${{ !cancelled() }}
+        timeout-minutes: 5
+        env:
+          GMAIL_SEND_TOKEN: ${{ secrets.GMAIL_SEND_TOKEN }}
+          GH_TOKEN: ${{ github.token }}   # lecture et écriture des issues `contact` et `guichet`
+          PYTHONUTF8: "1"
+        run: python -m agence.lancer contacts envoyer
+      # En dernier : les demandes écrites pendant ce réveil sont dans le récapitulatif (une fois par jour, urgent tout de suite)
+      - name: Guichet (récapitulatif à Jules)
+        if: ${{ !cancelled() }}
+        timeout-minutes: 5
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_TOKEN: ${{ github.token }}   # lecture des issues `guichet` et `contact`
+          PYTHONUTF8: "1"
+        run: python -m agence.lancer guichet recap
       - name: Commiter le registre
         if: always()
         env:
