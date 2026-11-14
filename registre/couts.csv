@@ -127,3 +127,11 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-14T12:09:01+00:00,contacts,1,0,0,0,"ok : droit d'envoi absent, demande au guichet #13 (déjà faite), 0 message(s) validé(s) en attente, rien n'est parti"
 2026-11-14T12:09:02+00:00,guichet,0,0,0,0,"ok : 1 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : rien"
 2026-11-14T16:48:14+00:00,responsable-revenu,7,0,0,1,"ok : 4 règle(s) confirmée(s) sur 6, 0 à relire, 3 voie(s) de revenu écrite(s)"
+2026-11-14T21:26:54+00:00,reponses,0,0,0,0,ok : 0 réponse(s) de Jules
+2026-11-14T21:26:55+00:00,stats,3,0,0,0,"ok : 72 vidéos, 19923 vues"
+2026-11-14T21:26:58+00:00,garde_fous,3,0,0,0,"ok : 33.97 $ cette semaine, 0 alerte(s) envoyée(s)"
+2026-11-14T21:27:01+00:00,courrier,1,0,0,0,ok : 0 mail nouveau
+2026-11-14T21:27:01+00:00,flux,3,0,0,0,"ok : 0 programmées, 0 rejetées, 0 en rendu, 0 diffusées, 0 erreurs de diffusion"
+2026-11-14T21:27:05+00:00,guetteur,3,0,0,0,"ok : 0 commentaire(s) nouveau(x), 0 occasion(s) ; seuil le plus proche : Every Second (en) : 16 061 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
+2026-11-14T21:27:08+00:00,contacts,1,0,0,0,"ok : droit d'envoi absent, demande au guichet #13 (déjà faite), 0 message(s) validé(s) en attente, rien n'est parti"
+2026-11-14T21:27:10+00:00,guichet,0,0,0,0,"ok : 1 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : rien"
