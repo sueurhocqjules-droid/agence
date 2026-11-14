@@ -22,7 +22,7 @@ from agents import surete
 
 MAX_PROPOSITIONS = 3
 PREUVES = {"concept": ("titre", "chaine", "vues", "mediane_chaine", "ratio", "effort", "faisable", "cout_estime_usd",
-                       "propose_par"),
+                       "propose_par", "destination"),
            "outil": ("nom", "remplace", "economie_usd_semaine", "licence", "risque", "compte_requis", "essai")}
 
 

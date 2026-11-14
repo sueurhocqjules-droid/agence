@@ -10,7 +10,7 @@ on:
 
 permissions:
   contents: write
-  actions: read       # la Sûreté compte les minutes GitHub du mois
+  actions: write      # la Sûreté compte les minutes GitHub du mois ; les délais lancent l'Ingénierie (workflow_dispatch)
   issues: write       # guichet et contacts : demandes écrites par l'agence, commentaire et fermeture d'un contact envoyé
 
 concurrency:
@@ -127,6 +127,15 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           PYTHONUTF8: "1"
         run: python -m agence.lancer guetteur
+      # « Décider vite » (MISSION.md) : un besoin écrit depuis plus de 48 h fait partir en essai, chez l'Ingénierie, sa
+      # première option gratuite et sans compte. Sans modèle. Un départ par réveil au plus
+      - name: Délais des besoins (départ en essai à 48 h)
+        if: ${{ !cancelled() }}
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}   # écrit la demande à l'Ingénierie et lance son workflow
+          PYTHONUTF8: "1"
+        run: python -m agence.lancer delais partir
       # Messages validés par Jules (issues `contact` + `valide`). Sans GMAIL_SEND_TOKEN (droit gmail.send seul), rien ne
       # part : le script le demande au guichet, une fois. Jeton d'envoi à part de celui du Courrier (lecture seule)
       - name: Contacts (messages validés)

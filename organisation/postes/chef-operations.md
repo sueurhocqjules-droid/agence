@@ -12,7 +12,7 @@ reveil = "une fois par semaine, et sur issue equipe:operations"
 regle_de_deux = "[C] : aucun secret, décide sur le registre"
 secrets = ["clé du modèle gratuit attribué"]
 budget = { claude_usd_semaine = 0, appels_gratuits_jour = 20 }
-scripts = ["reveil", "lanceur", "registre", "stats", "catalogue", "guichet", "contacts"]
+scripts = ["reveil", "lanceur", "registre", "stats", "catalogue", "guichet", "contacts", "delais"]
 equipe = ["maintenance", "expert-modeles", "courrier"]
 +++
 # Chef des opérations
@@ -30,7 +30,8 @@ Résultats des réveils, journal des scripts, rapports de la Maintenance, de l'E
 Réparations demandées, retours à son équipe, rapport d'une ligne à la Direction.
 
 ## Outils
-Lecture du registre et de l'état des réveils. Deux scripts du socle tournent à chaque réveil, sans modèle :
+Lecture du registre et de l'état des réveils. Trois scripts du socle tournent à chaque réveil, sans modèle :
+- `delais` (`agence/delais.py`) : « Décider vite » appliqué par le code. Un besoin écrit depuis plus de 48 h fait partir en essai, chez l'Ingénierie, sa première option gratuite et sans compte (un départ par réveil au plus, jamais une option avec compte ou payante). Il mesure aussi le délai entre un besoin écrit et sa mise en service (cible 72 h en classe 1, une semaine en classe 2) : les besoins en retard figurent dans le rapport du dimanche (`delais_besoins`) et au bilan du lundi
 - `guichet` (`agence/guichet.py`) : le seul module par lequel un agent demande à Jules ce que l'agence ne peut pas faire seule (`guichet.demander`, format fixe : quoi, pourquoi, lien, ce que ça débloque, coût). Récapitulatif Telegram une fois par jour, message immédiat pour une demande `urgent`
 - `contacts` (`agence/contacts.py`) : un agent met un premier message en attente (`contacts.preparer`, issue `contact`), il part au réveil qui suit la pose de l'étiquette `valide` par Jules. Sans le droit d'envoi (`GMAIL_SEND_TOKEN`), rien ne part et le script le demande au guichet
 
@@ -38,7 +39,7 @@ Lecture du registre et de l'état des réveils. Deux scripts du socle tournent �
 Aucun jeton pour l'agent : les scripts du socle reçoivent les leurs à leur étape, et seulement les clés que Jules leur a accordées dans `organisation/autorisations.toml` (fichier protégé, appliqué par le lanceur).
 
 ## Mesure de réussite
-Part des réveils réussis, zéro panne non signalée, coût des scripts.
+Part des réveils réussis, zéro panne non signalée, coût des scripts, délai entre un besoin écrit et sa mise en service (72 h en classe 1).
 
 ## Journal
 `registre/journal/chef-operations.jsonl`

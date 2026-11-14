@@ -12,9 +12,11 @@ qu'une fois : fermée par Jules, elle n'est pas rouverte par un agent.
 """
 import json
 import os
+import re
 import subprocess
 import sys
-from datetime import datetime, timezone
+import tomllib
+from datetime import date, datetime, timezone
 from zoneinfo import ZoneInfo
 
 from agence import organisation, registre, telegram
@@ -29,6 +31,15 @@ ETAT = registre.DOSSIER / "guichet.json"
 PARIS = ZoneInfo("Europe/Paris")
 HEURE_RECAP = 6                       # pas de récapitulatif avant 6 h à Paris (le réveil de 0h17 ne réveille personne)
 CHAMPS = ("Quoi", "Pourquoi", "Lien", "Ce que ça débloque", "Coût")
+# Règle de la Sûreté (fiche surete.md) : un compte banni ne doit pas emporter ceux des autres chaînes. Le rappel est
+# ajouté par le code à toute demande de compte ou de chaîne, quel que soit l'agent qui l'écrit
+RAPPEL_ADRESSE = ("**Rappel de la Sûreté :** crée chaque compte sur une adresse distincte de celles des autres chaînes "
+                  "(compte Outlook de Jules, un alias par chaîne), jamais sur une adresse déjà utilisée : un "
+                  "bannissement ne doit pas emporter les autres chaînes.")
+DEMANDE_DE_COMPTE = re.compile(r"\bcomptes?\b|\bnouvelles?\s+cha[iî]nes?\b|\bcr[ée]\w*\s+(?:une?|la|les|des)\s+cha[iî]nes?\b",
+                               re.IGNORECASE)
+RESEAUX = ("youtube", "tiktok", "instagram", "facebook")   # ceux que le flux sait servir (agents/flux.py)
+DEROGATION = "derogation"             # organisation/seuils.toml : date du bilan où l'agence propose ce qu'elle ferait seule
 
 
 def _gh(*args, entree=None):
@@ -83,6 +94,8 @@ def demander(titre, quoi, pourquoi, debloque, par, lien="", cout="0 €", urgent
     gh = gh or _gh
     titre = sans_mention(titre, 120)
     texte = corps(quoi, pourquoi, lien, debloque, cout, par)
+    if demande_de_compte(titre, quoi):
+        texte += f"\n\n{RAPPEL_ADRESSE}"
     if os.environ.get("AGENCE_ESSAI") == "1":
         print(f"ESSAI : demande au guichet non envoyée : {titre}\n{texte}")
         return None, False
@@ -104,6 +117,48 @@ def demander(titre, quoi, pourquoi, debloque, par, lien="", cout="0 €", urgent
     registre.decider(par, f"demande au guichet #{numero} : {titre}", sans_mention(pourquoi, 300))
     print(f"Guichet : demande #{numero} écrite : {titre}")
     return numero, True
+
+
+def demande_de_compte(titre, quoi=""):
+    """Vrai si la demande porte sur un compte à créer ou une nouvelle chaîne : elle reçoit le rappel de la Sûreté."""
+    return bool(DEMANDE_DE_COMPTE.search(f"{titre} {quoi}"))
+
+
+def demander_comptes(chaine, reseaux, pourquoi, par, concept="", gh=None):
+    """Les comptes d'une nouvelle chaîne, regroupés en une seule demande urgente (Gouvernance : un message, sur une
+    adresse distincte des autres chaînes). Renvoie (numéro, nouvelle) comme `demander`."""
+    chaine = sans_mention(chaine, 60)
+    reseaux = [r for r in dict.fromkeys(reseaux) if r in RESEAUX]
+    if not chaine or not reseaux:
+        raise ValueError(f"nouvelle chaîne sans nom ou sans réseau connu ({', '.join(RESEAUX)})")
+    return demander(
+        f"Comptes de la nouvelle chaîne {chaine}",
+        quoi=f"créer en une fois les comptes de la nouvelle chaîne « {chaine} » ({', '.join(reseaux)}) et poser leurs "
+             f"clés pour l'agence" + (f". Concept de la chaîne : {sans_mention(concept, 300)}" if concept else ""),
+        pourquoi=pourquoi, debloque=f"le lancement de la chaîne « {chaine} » : l'agence fait tout le reste seule",
+        par=par, urgent=True, gh=gh)
+
+
+def comptes_traites(gh=None):
+    """Les demandes de compte que Jules a traitées (fermées) : la preuve sur laquelle l'agence propose, au bilan de
+    la dérogation, ce qu'elle pourrait traiter seule."""
+    return [{"numero": d["numero"], "titre": d["titre"], "ouverte_le": d["date"][:10], "fermee_le": d["ferme"][:10]}
+            for d in toutes(gh) if d["ferme"] and not d["pr"] and demande_de_compte(d["titre"], d["texte"])]
+
+
+def derogation(lundi, seuils=None):
+    """La dérogation des premières semaines (Gouvernance) : les comptes se créent avec Jules. Renvoie la date du bilan
+    où l'agence propose ce qu'elle pourrait traiter seule si `lundi` (le jour du bilan) est ce bilan-là, sinon None.
+    Jules l'avance en changeant `[derogation] bilan` dans organisation/seuils.toml."""
+    if seuils is None:
+        with open(organisation.DOSSIER / "seuils.toml", "rb") as f:
+            seuils = tomllib.load(f)
+    prevu = seuils.get(DEROGATION, {}).get("bilan")
+    if not prevu:
+        return None
+    prevu = prevu if isinstance(prevu, date) else date.fromisoformat(str(prevu))
+    jour = lundi.date() if isinstance(lundi, datetime) else lundi
+    return prevu if 0 <= (jour - prevu).days < 7 else None
 
 
 def signaler_pr(pr, quoi, pourquoi, debloque, lien, cout="0 €", detail="", gh=None):

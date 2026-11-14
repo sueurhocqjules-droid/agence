@@ -45,6 +45,14 @@ module = "agence.contacts"
 description = "l'envoi des messages aux personnes, une fois validés par toi"
 secrets = ["GMAIL_SEND_TOKEN", "GH_TOKEN"]
 
+# Les délais (agence/delais.py) : « Décider vite » appliqué par le code. Un besoin écrit depuis plus de 48 h fait partir
+# en essai, chez l'Ingénierie, sa première option gratuite et sans compte ; le délai besoin → mise en service est mesuré.
+[delais]
+proprietaire = "chef-operations"
+module = "agence.delais"
+description = "le départ en essai des besoins au délai dépassé et la mesure des délais"
+secrets = ["GH_TOKEN"]
+
 [prevu_realise]
 proprietaire = "analyste"
 module = "agents.prevu_realise"
