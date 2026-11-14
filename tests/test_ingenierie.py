@@ -64,14 +64,26 @@ class Demande(unittest.TestCase):
 
 
 class Seance(unittest.TestCase):
-    def lancer(self, sortie, code=0, env=None):
+    def lancer(self, sortie, code=0, env=None, isolee=False):
         vu = {}
 
         def executer(commande, **k):
             vu.update(commande=commande, **k)
             return subprocess.CompletedProcess(commande, code, stdout=sortie, stderr="")
         with mock.patch.dict(os.environ, env or {}):
-            return ingenierie.seance("consigne", 1.5, "/tmp/travail", executer), vu
+            return ingenierie.seance("consigne", 1.5, "/tmp/travail", executer, isolee), vu
+
+    def test_l_isolation_n_est_demandee_que_si_la_machine_la_permet(self):
+        ok = json.dumps({"result": "fait", "subtype": "success"})
+        self.assertEqual(self.lancer(ok, isolee=True)[1]["env"].get("CLAUDE_CODE_SUBPROCESS_ENV_SCRUB"), "1")
+        self.assertNotIn("CLAUDE_CODE_SUBPROCESS_ENV_SCRUB", self.lancer(ok, isolee=False)[1]["env"])
+        demarre = lambda *a, **k: subprocess.CompletedProcess(a, 0)   # noqa: E731
+        refuse = lambda *a, **k: subprocess.CompletedProcess(a, 1)    # noqa: E731
+        with mock.patch.object(ingenierie.shutil, "which", lambda nom: f"/usr/bin/{nom}"):
+            self.assertTrue(ingenierie.isolation_possible(demarre))
+            self.assertFalse(ingenierie.isolation_possible(refuse))   # AppArmor qui bloque bwrap, par exemple
+        with mock.patch.object(ingenierie.shutil, "which", lambda nom: None if nom == "socat" else "/usr/bin/bwrap"):
+            self.assertFalse(ingenierie.isolation_possible(demarre))
 
     def test_claude_ne_recoit_que_son_jeton_et_des_plafonds(self):
         s, vu = self.lancer(json.dumps({"result": "fait", "total_cost_usd": 0.42, "num_turns": 9, "subtype": "success",
@@ -108,7 +120,7 @@ class Seance(unittest.TestCase):
     def test_une_seance_trop_longue_est_un_echec(self):
         def executer(commande, **k):
             raise subprocess.TimeoutExpired(commande, k["timeout"])
-        self.assertFalse(ingenierie.seance("c", 1, ".", executer)["ok"])
+        self.assertFalse(ingenierie.seance("c", 1, ".", executer, False)["ok"])
 
     def test_la_consigne_porte_la_fiche_et_la_demande(self):
         texte = ingenierie.consigne(demande(texte="Ajoute tests/test_x.py"))
@@ -220,7 +232,7 @@ class Protection(unittest.TestCase):
     def test_le_code_de_la_pr_tourne_sans_jeton_github_ni_claude(self):
         etapes = re.split(r"\n      - ", WORKFLOW)
         dans_la_copie = [e for e in etapes if "working-directory: ${{ runner.temp }}/travail" in e]
-        self.assertEqual(len(dans_la_copie), 2)   # tests et banc
+        self.assertGreaterEqual(len(dans_la_copie), 2)   # tests et banc
         for etape in dans_la_copie:
             self.assertNotIn("github.token", etape)
             self.assertNotIn("CLAUDE_CODE_OAUTH_TOKEN", etape)

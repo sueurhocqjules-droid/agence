@@ -57,6 +57,16 @@ jobs:
           git config --global user.name "agence-robot"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      # De quoi isoler les commandes que lance Claude (ses tests ne voient alors pas son jeton). Si l'installation
+      # échoue (serveurs d'Ubuntu en panne le 11/11), la séance a lieu quand même, sans cette isolation
+      - name: Isolation des commandes de Claude (bubblewrap, socat)
+        if: ${{ !inputs.pr }}
+        continue-on-error: true
+        timeout-minutes: 3
+        run: |
+          sudo apt-get install -y --no-install-recommends bubblewrap socat
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
       # Par le lanceur : pause, budget de la semaine, journal. Claude ne reçoit que son jeton (agence/ingenierie.py)
       - name: Construire (séance Claude, puis PR ouverte par le script)
         id: construire
@@ -73,6 +83,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ inputs.pr }}
         run: python -m agence.ingenierie reprendre "$PR"
+
+      - name: Diagnostic temporaire (Node dans la copie de travail)
+        if: ${{ steps.construire.outputs.pr || steps.reprendre.outputs.pr }}
+        continue-on-error: true
+        working-directory: ${{ runner.temp }}/travail
+        run: |
+          node --version
+          ls -la "$RUNNER_TEMP"
+          node --input-type=module -e "import * as w from 'file://$PWD/alarme/worker.js'; console.log(Object.keys(w))"
 
       # Code de la PR, sans aucun secret
       - name: Tests de la PR
