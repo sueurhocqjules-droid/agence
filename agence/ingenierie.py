@@ -18,6 +18,7 @@ import base64
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -152,14 +153,29 @@ Demande #{demande['numero']} : {demande['titre']}
 >>>"""
 
 
-def seance(texte, plafond, dossier, executer=subprocess.run):
+def isolation_possible(executer=subprocess.run):
+    """Vrai si les commandes de Claude peuvent tourner isolées (bubblewrap et socat présents, et bwrap démarre).
+    Premier lancement réel, 14/11 : isolation demandée sans socat, Claude n'a pu lancer aucun test."""
+    if not (shutil.which("bwrap") and shutil.which("socat")):
+        return False
+    try:
+        return executer(["bwrap", "--ro-bind", "/", "/", "true"], capture_output=True, timeout=20).returncode == 0
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
+def seance(texte, plafond, dossier, executer=subprocess.run, isolee=None):
     """Lance Claude Code dans la copie de travail. Renvoie {ok, resume, cout, jetons, tours, erreur}."""
     commande = ["claude", "-p", "--model", MODELE, "--output-format", "json", "--max-turns", str(TOURS_MAX),
                 "--max-budget-usd", f"{plafond:.2f}", "--tools", OUTILS, "--allowedTools", PERMIS,
                 "--permission-mode", "dontAsk", "--strict-mcp-config", "--setting-sources", "",
                 "--no-session-persistence"]
     # Claude ne reçoit que son propre jeton : ni GH_TOKEN ni aucune autre clé du runner
-    env = lancer.env_cloisonne(os.environ, {"CLAUDE_CODE_OAUTH_TOKEN"}) | {"CLAUDE_CODE_SUBPROCESS_ENV_SCRUB": "1"}
+    env = lancer.env_cloisonne(os.environ, {"CLAUDE_CODE_OAUTH_TOKEN"})
+    # Quand la machine le permet, les commandes lancées par Claude (ses tests) tournent isolées, sans son jeton.
+    # Sinon elles tournent quand même : mieux vaut des tests lancés que pas de tests, sur une machine jetable
+    if isolation_possible() if isolee is None else isolee:
+        env["CLAUDE_CODE_SUBPROCESS_ENV_SCRUB"] = "1"
     try:
         proc = executer(commande, input=texte, capture_output=True, text=True, encoding="utf-8", timeout=DUREE_MAX_S,
                         cwd=str(dossier), env=env)
