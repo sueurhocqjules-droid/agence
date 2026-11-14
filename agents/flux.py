@@ -9,6 +9,7 @@ Lancement : python -m agents.flux [--essai]
 3. Diffusion : chaque vidéo déjà publique sur YouTube part en Reel sur le compte Instagram et la Page Facebook de sa
    langue (agence/meta.py), la plus ancienne d'abord, au rythme fixé par le Programmateur (organisation/diffusion.toml).
    Facebook n'accepte pas plus de 90 s : une vidéo plus longue y est notée « hors_format » et sautée.
+   TikTok : par Buffer (agence/buffer.py), même règle, même cadence ; une chaîne pas encore branchée sur Buffer est sautée.
 4. Ce qui manque sans rendu (ou dont le rendu a expiré avant sa diffusion) : poussé dans la file de studio-rendu
    (file/attente.txt), dont le rendu part tout seul. Le passage suivant le programme ou le diffuse.
 Coût : 0 jeton. Quota YouTube : ~1 600 unités par envoi. Minutes de rendu : dépôt public, gratuites.
@@ -26,7 +27,7 @@ from datetime import datetime, time, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from agence import controle, lancer, meta, mesures, registre, youtube
+from agence import buffer, controle, lancer, meta, mesures, registre, youtube
 
 DEPOT_RENDU = "sueurhocqjules-droid/studio-rendu"
 RENDU = Path(os.environ.get("RENDU_DIR") or Path(__file__).resolve().parents[2] / "studio-rendu")
@@ -165,15 +166,17 @@ def a_diffuser(sujets, titres_publics, deja, sautes, langue):
             and t not in deja and f"{s}-{langue}" not in sautes]
 
 
-def diffuser(essai, sujets, etats, pauses, dossier, maintenant):
-    """Reels Instagram et Facebook des vidéos déjà publiques sur YouTube. Renvoie (publiées, erreurs, à rendre)."""
+def diffuser(essai, sujets, etats, pauses, dossier, maintenant, fichiers=None):
+    """Reels Instagram et Facebook des vidéos déjà publiques sur YouTube. Renvoie (publiées, erreurs, à rendre).
+    fichiers : rendus déjà téléchargés et contrôlés ({nom: (fichier, durée) ou None}), partagés avec TikTok."""
     if not meta.jeton():
         print("Diffusion Meta : pas de jeton (META_TOKEN), rien envoyé")
         return [], [], []
     cadence = cadence_diffusion()
     lignes = registre.lire("diffusions")
     comptes_ig = meta.comptes_instagram()
-    publiees, erreurs, a_rendre, fichiers = [], [], [], {}
+    publiees, erreurs, a_rendre = [], [], []
+    fichiers = {} if fichiers is None else fichiers
     for langue in youtube.CHAINES:
         for reseau in ("instagram", "facebook"):
             ligne = lancer.pause_active([f"chaine:{langue}", f"{reseau}:{langue}", f"reseau:{reseau}"], pauses)
@@ -232,18 +235,136 @@ def diffuser(essai, sujets, etats, pauses, dossier, maintenant):
     return publiees, erreurs, a_rendre
 
 
+def diffuser_tiktok(essai, sujets, etats, pauses, dossier, maintenant, fichiers=None):
+    """Vidéos déjà publiques sur YouTube vers TikTok, par Buffer (agence/buffer.py), au rythme de diffusion.toml.
+    Chaînes et vidéos déjà envoyées lues dans Buffer ; une chaîne pas encore branchée est sautée et notée au journal.
+    Toutes les vidéos du passage sont hébergées dans un seul commit (Buffer les lit après coup), puis chaque post est
+    relu jusqu'à son envoi. Renvoie (publiées, erreurs, à rendre)."""
+    fichiers = {} if fichiers is None else fichiers
+    par_jour = cadence_diffusion().get("tiktok", 0)
+    if par_jour <= 0:
+        return [], [], []
+    if not buffer.jeton():
+        print("Diffusion TikTok : pas de clé Buffer (BUFFER_API_KEY), rien envoyé")
+        return [], [], []
+    lignes = registre.lire("diffusions")
+    try:
+        org = buffer.organisation()
+        chaines = buffer.chaines_tiktok(org)
+    except buffer.ErreurBuffer as e:
+        print(f"ERREUR tiktok : accès à Buffer : {e}")
+        if not essai:
+            diffusion("tiktok", "", "", "erreur", note=f"accès à Buffer : {e}"[:300])
+        return [], ["tiktok:buffer"], []
+    publiees, erreurs, a_rendre, envois = [], [], [], []
+    for langue in youtube.CHAINES:
+        ligne = lancer.pause_active([f"chaine:{langue}", f"tiktok:{langue}", "reseau:tiktok"], pauses)
+        if ligne:
+            print(f"PAUSE tiktok {langue} ({ligne['par']} : {ligne['raison']}) : aucune diffusion")
+            continue
+        restant = par_jour - publies_aujourdhui(lignes, "tiktok", langue, maintenant)
+        if restant <= 0:
+            continue
+        if langue not in chaines:
+            print(f"TikTok {langue} : @{buffer.TIKTOK[langue]} pas branché sur Buffer, sauté")
+            continue
+        try:
+            deja = buffer.posts(org, chaines[langue])
+        except buffer.ErreurBuffer as e:
+            print(f"ERREUR tiktok {langue} : lecture des posts : {e}")
+            erreurs.append(f"tiktok:{langue}")
+            continue
+        place = buffer.FILE_MAX - buffer.en_file(deja)
+        if place < restant:
+            print(f"TikTok {langue} : file Buffer à {buffer.FILE_MAX - place}/{buffer.FILE_MAX}, {max(place, 0)} envoi(s) au plus")
+            restant = place
+        sautes = {l["nom"] for l in lignes if l["reseau"] == "tiktok" and l["etat"] == "hors_format"}
+        for sujet in a_diffuser(sujets, etats[langue][2], buffer.titres(deja), sautes, langue):
+            if restant <= 0:
+                break
+            nom = f"{sujet}-{langue}"
+            if nom not in fichiers:
+                fichiers[nom] = fichier_controle(nom, dossier)
+            if not fichiers[nom]:
+                if nom not in a_rendre:
+                    a_rendre.append(nom)
+                restant -= 1
+                continue
+            fichier, duree = fichiers[nom]
+            if not buffer.DUREE_MIN_S <= duree <= buffer.DUREE_MAX_S:
+                print(f"HORS FORMAT tiktok {nom} : {duree:.0f} s")
+                if not essai:
+                    diffusion("tiktok", langue, nom, "hors_format", note=f"{duree:.0f} s")
+                continue
+            restant -= 1
+            if essai:
+                print(f"ESSAI diffusion tiktok {nom}")
+                continue
+            envois.append((langue, sujet, nom, fichier))
+    if not envois:
+        return publiees, erreurs, a_rendre
+
+    adresses = heberger_tous([f for *_, f in envois])
+    crees, bloquees = {}, set()
+    for langue, sujet, nom, fichier in envois:
+        if langue in bloquees:
+            continue
+        sujet_json, calcul_json = lire_sujet(sujet)
+        texte = buffer.legende(sujet_json[langue]["titre"], calcul_json["descriptions"][langue])
+        try:
+            # isAiGenerated : seulement pour des personnes ou scènes réalistes générées par IA ; les vidéos du moteur
+            # sont des animations calculées. Un futur concept qui en montre pose "ia_realiste": true dans son sujet
+            post_id = buffer.publier(chaines[langue], adresses[fichier], texte, sujet_json.get("ia_realiste", False))
+        except buffer.ErreurBuffer as e:
+            print(f"ERREUR tiktok {nom} : {e}")
+            diffusion("tiktok", langue, nom, "erreur", note=str(e)[:300])
+            erreurs.append(f"tiktok:{nom}")
+            bloquees.add(langue)  # limite atteinte ou accès coupé : plus rien sur ce compte pour ce passage
+            continue
+        crees[post_id] = (langue, nom)
+        print(f"ENVOYÉ tiktok {nom} : post Buffer {post_id}")
+    if not crees:
+        return publiees, erreurs, a_rendre
+    try:
+        relus = buffer.confirmer(org, {i: chaines[l] for i, (l, _) in crees.items()})
+    except buffer.ErreurBuffer as e:
+        print(f"Relecture des posts TikTok impossible ({e}) : notés comme envoyés")
+        relus = {}
+    for post_id, (langue, nom) in crees.items():
+        post = relus.get(post_id, {})
+        etat = buffer.statut(post) or "inconnu"
+        if etat == "error":
+            message = (post.get("error") or {}).get("message") or "erreur sans message"
+            print(f"ERREUR tiktok {nom} : Buffer n'a pas publié ({message})")
+            diffusion("tiktok", langue, nom, "erreur", post_id, note=message[:300])
+            erreurs.append(f"tiktok:{nom}")
+            continue
+        note = (post.get("externalLink") or "") if etat == "sent" else f"statut {etat} à la fin du passage"
+        diffusion("tiktok", langue, nom, "publie", post_id, note=note)
+        publiees.append(f"tiktok:{nom}")
+        print(f"OK tiktok {nom} : {etat} {post.get('externalLink') or ''}".rstrip())
+    return publiees, erreurs, a_rendre
+
+
 def heberger(fichier):
-    """Met la vidéo seule sur la branche « diffusion » du dépôt public studio-rendu (clé de déploiement déjà utilisée pour
-    la file) et renvoie son adresse publique, que Meta lit pour Instagram. Chaque envoi remplace le précédent : la branche
-    ne garde qu'une vidéo et ne déclenche aucun rendu (seul main le fait)."""
+    """Met la vidéo seule sur la branche « diffusion » du dépôt public studio-rendu et renvoie son adresse publique,
+    que Meta lit pour Instagram."""
+    return heberger_tous([fichier])[fichier]
+
+
+def heberger_tous(fichiers):
+    """Met les vidéos sur la branche « diffusion » du dépôt public studio-rendu (clé de déploiement déjà utilisée pour
+    la file), en un seul commit, et renvoie {fichier: adresse publique}. Chaque envoi remplace le précédent : la branche
+    ne garde que les vidéos du dernier envoi et ne déclenche aucun rendu (seul main le fait)."""
     def git(*args, entree=None):
         return subprocess.run(["git", *args], cwd=RENDU, check=True, capture_output=True, text=True,
                               input=entree).stdout.strip()
-    blob = git("hash-object", "-w", str(fichier))
-    arbre = git("mktree", "-z", entree=f"100644 blob {blob}\t{Path(fichier).name}\0")  # -z : pas de \r sous Windows
-    commit = git("commit-tree", arbre, "-m", f"Diffusion : {Path(fichier).name}")
+    # -z : pas de \r sous Windows ; mktree trie lui-même les entrées
+    arbre = git("mktree", "-z", entree="".join(f"100644 blob {git('hash-object', '-w', str(f))}\t{Path(f).name}\0"
+                                                for f in fichiers))
+    commit = git("commit-tree", arbre, "-m", f"Diffusion : {' '.join(Path(f).name for f in fichiers)}")
     git("push", "-q", "-f", "origin", f"{commit}:refs/heads/diffusion")
-    return f"https://raw.githubusercontent.com/{DEPOT_RENDU}/{commit}/{Path(fichier).name}"
+    return {f: f"https://raw.githubusercontent.com/{DEPOT_RENDU}/{commit}/{Path(f).name}" for f in fichiers}
 
 
 def fichier_controle(nom, dossier):
@@ -319,8 +440,11 @@ def passage(essai):
                   f"artefact {artefact['id']}, {releve}")
             print(f"OK {nom} : {video_id}, sortie {quand:%d/%m %H:%M} Paris")
 
-        diffusees, erreurs, pour_diffuser = diffuser(essai, sujets, etats, pauses, dossier, maintenant)
-        a_rendre += [n for n in pour_diffuser if n not in a_rendre]  # YouTube d'abord, puis la diffusion
+        fichiers = {}  # rendus téléchargés une seule fois pour tous les réseaux
+        diffusees, erreurs, pour_diffuser = diffuser(essai, sujets, etats, pauses, dossier, maintenant, fichiers)
+        tiktok = diffuser_tiktok(essai, sujets, etats, pauses, dossier, maintenant, fichiers)
+        diffusees, erreurs, pour_diffuser = diffusees + tiktok[0], erreurs + tiktok[1], pour_diffuser + tiktok[2]
+        a_rendre += [n for n in dict.fromkeys(pour_diffuser) if n not in a_rendre]  # YouTube d'abord, puis la diffusion
 
     a_rendre = a_rendre[:RENDUS_MAX]
     if a_rendre and rendu_en_cours():
