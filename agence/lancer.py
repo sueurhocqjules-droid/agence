@@ -91,7 +91,11 @@ def noter_journal(responsable, entree):
 
 def lancer(nom, arguments):
     postes, liste_scripts = organisation.fiches(), organisation.scripts()
-    responsable, module, autorises, budget = preparer(nom, postes, liste_scripts)
+    responsable, module, declares, budget = preparer(nom, postes, liste_scripts)
+    # Une clé passe si elle est déclarée ET accordée par Jules à ce nom (organisation/autorisations.toml, protégé)
+    autorises, non_accordes = organisation.cles_accordees(nom, declares)
+    if non_accordes:
+        print(f"{nom} : clés déclarées mais pas accordées par Jules, non transmises : {' '.join(non_accordes)}")
     cibles = [nom] + organisation.chaine_de_commandement(responsable, postes) + [TOUT]
     if liste_scripts.get(nom, {}).get("hors_pause"):
         cibles = [nom]  # sûreté et réponses de Jules : une pause générale ne doit pas couper le moyen de la lever
@@ -112,7 +116,8 @@ def lancer(nom, arguments):
 
     # Le vrai cloisonnement est fait par le workflow (une étape par agent, avec ses seuls secrets) :
     # un secret non déclaré présent ici trahit une étape mal réglée, on le signale.
-    en_trop = sorted(k for k in os.environ if ALLURE_SECRETE.search(k) and k not in autorises)
+    # (une clé déclarée sans accord est déjà dite plus haut ; un secret GitHub absent arrive vide, il ne compte pas)
+    en_trop = sorted(k for k, v in os.environ.items() if v and ALLURE_SECRETE.search(k) and k not in declares)
     if en_trop:
         print(f"ALERTE {nom} : secrets non déclarés dans l'environnement, retirés pour le programme : {' '.join(en_trop)}")
 

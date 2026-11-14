@@ -24,6 +24,24 @@ def scripts():
         return tomllib.load(f)
 
 
+def autorisations():
+    """Clé → postes et scripts qui ont le droit de la recevoir (organisation/autorisations.toml, fichier protégé :
+    seul Jules l'élargit). Fichier absent : aucune clé n'est accordée."""
+    chemin = DOSSIER / "autorisations.toml"
+    if not chemin.exists():
+        return {}
+    with open(chemin, "rb") as f:
+        return {cle: set(noms) for cle, noms in tomllib.load(f).get("cles", {}).items()}
+
+
+def cles_accordees(nom, declarees, table=None):
+    """(clés que `nom` reçoit, clés déclarées mais non accordées). Une clé passe si la fiche ou le script la déclare
+    ET si Jules l'a accordée à ce nom : un agent ne s'ouvre pas une clé en retouchant sa propre fiche."""
+    table = autorisations() if table is None else table
+    accordees = {cle for cle in declarees if nom in table.get(cle, ())}
+    return accordees, sorted(set(declarees) - accordees)
+
+
 def chaine_de_commandement(agent, postes):
     """L'agent puis ses supérieurs successifs, jusqu'à Jules exclu."""
     chaine = []

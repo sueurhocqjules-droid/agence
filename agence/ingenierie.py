@@ -26,11 +26,11 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-from agence import consignes, lancer, mesures, organisation, registre
+from agence import consignes, guichet, lancer, mesures, organisation, registre
 
 POSTE = "ingenierie"
 ETIQUETTE = "ingenierie"
-GUICHET = "guichet"
+GUICHET = guichet.ETIQUETTE
 JULES = "sueurhocqjules-droid"
 ROBOT = "github-actions[bot]"
 AUTEURS = (JULES, ROBOT)              # une demande ne compte qu'écrite par Jules ou par l'agence (jeton du workflow)
@@ -330,11 +330,10 @@ def conclure(pr, env=os.environ):
             _commenter("issue", lu["ISSUE"], f"Construit et fusionné par l'Ingénierie : {lien}")
             subprocess.run(["gh", "issue", "close", lu["ISSUE"], "-R", DEPOT], capture_output=True)
     elif choix == "jules":
-        _gh("pr", "edit", str(pr), "-R", DEPOT, "--add-label", GUICHET)
-        _commenter("pr", pr, "**Demande au guichet : fusion par Jules**\n\n"
-                             f"- **Quoi :** relire et fusionner cette PR, ou poser l'étiquette `accord-jules` puis la fusionner\n"
-                             f"- **Pourquoi :** elle touche un fichier protégé (règle 9), l'Ingénierie ne la fusionne pas seule\n"
-                             f"- **Lien :** {lien}\n- **Ce que ça débloque :** la demande #{lu['ISSUE']}\n- **Coût :** 0 €\n\n{liste}")
+        # Par le module unique du guichet : étiquette, format fixe, puis récapitulatif du jour à Jules
+        guichet.signaler_pr(pr, quoi="relire et fusionner cette PR, ou poser l'étiquette `accord-jules` puis la fusionner",
+                            pourquoi="elle touche un fichier protégé (règle 9), l'Ingénierie ne la fusionne pas seule",
+                            debloque=f"la demande #{lu['ISSUE']}", lien=lien, detail=liste, gh=_gh)
         resultat = f"attend Jules : PR #{pr} touche un fichier protégé (demande #{lu['ISSUE']})"
     else:
         _commenter("pr", pr, f"L'Ingénierie ne fusionne pas cette PR :\n\n{liste}\n\nElle reste ouverte. Relance des "

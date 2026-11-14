@@ -3,6 +3,8 @@
 Lancement : python -m agence.lancer bilan   (ou python -m agents.bilan --essai : affiche la page, n'envoie rien)
 
 Un lundi, la page couvre la semaine passée (lundi 0h à lundi 0h UTC). Un autre jour, la semaine en cours.
+Ordre fixé par la Gouvernance (MISSION.md, « Canaux ») : à valider, contacts en attente, demandes ouvertes, ce qui a
+été fait (organisation comprise), décisions jugées par le Critique, les 4 objectifs en chiffres.
 Envoi : une issue du dépôt agence qui mentionne Jules (la mention déclenche le mail de GitHub, le dépôt n'étant pas suivi), un résumé sur Telegram avec le lien,
 et une copie dans registre/bilans/. En tête, les sections écrites le dimanche par la Direction et le critique.
 """
@@ -12,7 +14,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from agence import lancer, mesures, questions, registre, telegram, youtube
+from agence import contacts, guichet, lancer, mesures, questions, registre, telegram, youtube
 from agents import analyste, guetteur, surete
 
 DEPOT = "sueurhocqjules-droid/agence"
@@ -48,27 +50,99 @@ def chaines(stats, debut, fin):
     return resultat, apres, avant
 
 
-def page(maintenant):
+ORDRE = ("1. À valider", "2. Contacts en attente", "3. Demandes ouvertes", "4. Ce qui a été fait",
+         "5. Décisions jugées par le Critique", "6. Les 4 objectifs en chiffres")   # MISSION.md, Gouvernance, « Canaux »
+
+
+def _lire_github(lecture, quoi):
+    """Une liste lue sur GitHub (guichet, contacts), ou None si elle est illisible : le bilan part quand même."""
+    try:
+        return lecture()
+    except Exception as e:
+        print(f"Bilan : {quoi} illisibles ({type(e).__name__})")
+        return None
+
+
+def _sous_section(lignes):
+    """Un bloc écrit avec un titre « ## » passe en « ### » sous l'une des six parties."""
+    return [("#" + l) if l.startswith("## ") else l for l in lignes]
+
+
+def jugees(decisions, debut, fin):
+    """Les décisions jugées par le Critique dans la période : (justes, fausses, indéterminées, lignes)."""
+    compte, lignes = {"juste": 0, "fausse": 0, "indeterminee": 0}, []
+    for d in decisions:
+        v = d.get("verdict")
+        if v and debut <= quand(v["date"]) < fin:
+            compte[v["verdict"]] += 1
+            lignes.append(f"- {v['verdict'].capitalize()} : {d['decision'][:140]} ({d['auteur']})"
+                          + (f". {v['commentaire'][:160]}" if v.get("commentaire") else ""))
+    return compte["juste"], compte["fausse"], compte["indeterminee"], lignes
+
+
+def organisation_faite(decisions, debut, fin):
+    """Ce que l'agence a changé chez elle dans la période : PR fusionnées par l'Ingénierie, postes, demandes."""
+    lignes = []
+    for d in decisions:
+        if not (d.get("date") and debut <= quand(d["date"]) < fin):
+            continue
+        if d["auteur"] in ("ingenierie", "responsable-organisation") or d["decision"].startswith("demande au guichet"):
+            lignes.append(f"- {d['decision'][0].upper() + d['decision'][1:160]} ({d['auteur']})")
+    return lignes
+
+
+def page(maintenant, demandes=None, attente=None, fermees=None):
+    """La page du lundi, dans l'ordre fixé par la Gouvernance (ORDRE). `demandes` (guichet), `attente` (contacts)
+    et `fermees` (demandes du guichet closes) sont lues sur GitHub si elles ne sont pas données."""
     debut, fin = periode(maintenant)
     reglages = surete.seuils()
     c = surete.compteur(fin - timedelta(seconds=1), registre.lire("couts"), surete.couts_atelier(), reglages, fin=fin)
     par_chaine, releve, avant = chaines(registre.lire("stats"), debut, fin)
     jour = lambda d: d.astimezone(PARIS).strftime("%d/%m")
+    if demandes is None:
+        demandes = _lire_github(guichet.ouvertes, "demandes du guichet")
+    if attente is None:
+        attente = _lire_github(contacts.en_attente, "contacts")
+    if fermees is None:
+        fermees = [d for d in _lire_github(guichet.toutes, "demandes fermées") or []
+                   if d["ferme"] and debut <= quand(d["ferme"].replace("Z", "+00:00")) < fin]
+    toutes_questions = questions.etat_questions(registre.lire("questions")).values()
+    ouvertes = [q for q in toutes_questions if q["etat"] == "ouverte"]
+    decisions = registre.decisions()
     lignes = [f"# Bilan de la semaine du {jour(debut)} au {jour(fin - timedelta(seconds=1))}", ""]
-    # Sections écrites le dimanche par la Direction et par le critique (que la Direction ne retouche pas)
-    for titre, fichier in (("Le mot de la Direction", "direction"), ("Le critique : les prédictions jugées", "critique")):
-        chemin = registre.DOSSIER / "bilans" / f"{fichier}-{fin:%Y-%m-%d}.md"
-        if chemin.exists():
-            lignes += [f"## {titre}", "", chemin.read_text(encoding="utf-8").strip(), ""]
+
+    lignes += [f"## {ORDRE[0]}", ""]
+    lignes += [f"- {q['texte']} (Oui : {questions.en_clair(q['si_oui'])}), à trancher par les boutons Telegram"
+               for q in ouvertes] or ["- Rien. Tu n'as rien à trancher cette semaine."]
+
+    lignes += ["", f"## {ORDRE[1]}", ""]
+    if attente is None:
+        lignes.append("- Liste illisible ce matin : voir les issues `contact` du dépôt")
+    else:
+        lignes += [f"- [#{x['numero']}]({x['lien']}) {x['titre']}, préparé le {jour(quand(x['date'].replace('Z', '+00:00')))}"
+                   for x in attente] or ["- Aucun message en attente de ta validation"]
+
+    lignes += ["", f"## {ORDRE[2]}", ""]
+    if demandes is None:
+        lignes.append("- Liste illisible ce matin : voir les issues `guichet` du dépôt")
+    else:
+        lignes += [f"- {'**Urgent** : ' if x['urgent'] else ''}[#{x['numero']}]({x['lien']}) {x['titre']}"
+                   f"{' (PR à fusionner)' if x['pr'] else ''}, depuis le {jour(quand(x['date'].replace('Z', '+00:00')))}"
+                   for x in demandes] or ["- Aucune demande ouverte au guichet"]
+
+    lignes += ["", f"## {ORDRE[3]}", ""]
+    mot = registre.DOSSIER / "bilans" / f"direction-{fin:%Y-%m-%d}.md"   # écrit le dimanche par la Direction
+    if mot.exists():
+        lignes += ["### Le mot de la Direction", "", mot.read_text(encoding="utf-8").strip(), ""]
     # Écrit par script : un problème de diffusion figure au bilan même si la Direction n'en a rien dit
     signaux = mesures.signaux_portee(registre.lire("stats"), fin)
     if signaux:
-        lignes += ["## Diffusion : à surveiller", ""] + [
+        lignes += ["### Diffusion : à surveiller", ""] + [
             f"- {p['texte'][0].upper() + p['texte'][1:]}."
             + (" Solutions de la Direction : voir son mot plus haut." if p["semaines"] >= mesures.SEMAINES_AVANT_JULES
                else "") for p in signaux] + [""]
 
-    lignes += ["## Chaînes", "", "| Chaîne | Vidéos sorties | Vues gagnées | Vues au total | Meilleure de la semaine |",
+    lignes += ["### Chaînes", "", "| Chaîne | Vidéos sorties | Vues gagnées | Vues au total | Meilleure de la semaine |",
                "|---|---|---|---|---|"]
     for langue in youtube.CHAINES:
         x = par_chaine.get(langue, {"sorties": 0, "gagnees": 0, "total": 0, "meilleure": None})
@@ -78,42 +152,57 @@ def page(maintenant):
     lignes += ["", f"Au total : +{total} vues. Dernier relevé : {releve[:16].replace('T', ' ') + ' UTC' if releve else 'aucun'}."
                + ("" if avant else " Aucun relevé avant la période : les vues gagnées comptent tout depuis la sortie."), ""]
 
-    lignes += argent(debut, fin)
-    lignes += investissements()
-
     stock = registre.lire("stock")
     dans = lambda l: debut <= quand(l["maj"]) < fin
     prog = sum(1 for l in stock if l["etat"] == "programme" and dans(l))
     rejets = [l["nom"] for l in stock if l["etat"] == "rejete" and dans(l)]
-    lignes += ["## Production", "", f"- {prog} vidéos programmées par le flux, sans intervention",
+    lignes += ["### Production", "", f"- {prog} vidéos programmées par le flux, sans intervention",
                f"- {len(rejets)} rejetées au contrôle" + (f" : {', '.join(rejets)}" if rejets else "")]
-    attente = sorted({l['nom'] for l in stock if l["etat"] == "programme" and quand(l["sortie_prevue"]) and quand(l["sortie_prevue"]) >= fin})
-    lignes += [f"- {len(attente)} vidéos programmées au-delà de la période", ""]
+    plus_tard = sorted({l['nom'] for l in stock if l["etat"] == "programme" and quand(l["sortie_prevue"]) and quand(l["sortie_prevue"]) >= fin})
+    lignes += [f"- {len(plus_tard)} vidéos programmées au-delà de la période", ""]
 
-    part = f", soit {c['pourcent']:.1f} % de ta limite hebdomadaire (objectif : moins de {reglages['claude']['limite_pourcent']} %)" \
-        if c["pourcent"] is not None else " (étalon en % de ta limite pas encore mesuré)"
-    detail = ", ".join(f"{a} {v['dollars']:.2f} $" for a, v in sorted(c["par_agent"].items()) if v["dollars"])
-    lignes += ["## Coûts", "", f"- Claude : {c['dollars']:.2f} $ équivalent API{part}" + (f". Détail : {detail}" if detail else ""),
-               f"- Modèles gratuits : {c['appels']} appels", "- Dépense réelle : 0 €"]
-    if not c["atelier_lu"]:
-        lignes.append("- Attention : les séances de l'atelier (chaines-studio) ne sont pas lisibles d'ici, leur coût manque")
+    lignes += ["### Organisation", ""]
+    lignes += organisation_faite(decisions, debut, fin) or ["- Aucun changement de code, de poste ou de demande cette semaine"]
     lignes.append("")
 
     pauses = registre.lire("pauses")
     actives = [l for l in surete_etat(pauses).values() if l["action"] == "pause"]
     alertes = [l for l in registre.lire("alertes") if debut <= quand(l["date"]) < fin]
-    lignes += ["## Sûreté", ""]
+    lignes += ["### Sûreté", ""]
     lignes += [f"- En pause : {l['cible']} depuis le {jour(quand(l['date']))} ({l['par']} : {l['raison']})" for l in actives] or ["- Rien en pause"]
     lignes += [f"- Alerte {l['niveau']} le {jour(quand(l['date']))} : {l['message']}" for l in alertes] or ["- Aucune alerte"]
-    lignes.append("")
 
-    ouvertes = [q for q in questions.etat_questions(registre.lire("questions")).values() if q["etat"] == "ouverte"]
-    lignes += ["## Questions pour toi", ""]
-    lignes += [f"- {q['texte']} (Oui : {questions.en_clair(q['si_oui'])}), à trancher par les boutons Telegram" for q in ouvertes] \
-        or ["- Aucune. Tu n'as rien à faire cette semaine."]
+    justes, fausses, indeterminees, verdicts = jugees(decisions, debut, fin)
+    lignes += ["", f"## {ORDRE[4]}", ""]
+    critique = registre.DOSSIER / "bilans" / f"critique-{fin:%Y-%m-%d}.md"   # écrit le dimanche, la Direction n'y touche pas
+    if critique.exists():
+        lignes += [critique.read_text(encoding="utf-8").strip(), ""]
+    lignes += verdicts or ([] if critique.exists() else ["- Aucune décision jugée cette semaine"])
+
+    lignes += ["", f"## {ORDRE[5]}", ""]
+    lignes += _sous_section(argent(debut, fin))
+    lignes += _sous_section(investissements())
+    part = f", soit {c['pourcent']:.1f} % de ta limite hebdomadaire (objectif : moins de {reglages['claude']['limite_pourcent']} %)" \
+        if c["pourcent"] is not None else " (étalon en % de ta limite pas encore mesuré)"
+    detail = ", ".join(f"{a} {v['dollars']:.2f} $" for a, v in sorted(c["par_agent"].items()) if v["dollars"])
+    lignes += ["### Économie", "", f"- Claude : {c['dollars']:.2f} $ équivalent API{part}" + (f". Détail : {detail}" if detail else ""),
+               f"- Modèles gratuits : {c['appels']} appels", "- Dépense réelle : 0 €"]
+    if not c["atelier_lu"]:
+        lignes.append("- Attention : les séances de l'atelier (chaines-studio) ne sont pas lisibles d'ici, leur coût manque")
+    repondues = [q for q in toutes_questions if q["etat"] == "repondue" and debut <= quand(q["date"]) < fin]
+    lignes += ["", "### Autonomie", "",
+               f"- Tes interventions cette semaine : {len(repondues)} réponse(s) Oui/Non, {len(fermees)} demande(s) du "
+               f"guichet traitée(s) (objectif : environ une par semaine)",
+               f"- En attente de toi : {len(ouvertes)} question(s), {len(attente or [])} contact(s), "
+               f"{len(demandes or [])} demande(s) au guichet",
+               "", "### Apprentissage", "",
+               f"- Décisions jugées sur les vrais chiffres : {justes} juste(s), {fausses} fausse(s), "
+               f"{indeterminees} indéterminée(s)"]
     lignes += ["", "_Chiffres écrits par script, sans modèle. Le mot de la Direction et le critique sont écrits le dimanche soir._"]
-    resume = (f"Bilan de la semaine : +{total} vues, {prog} vidéos programmées, {c['dollars']:.2f} $ Claude"
-              f"{', ' + str(len(ouvertes)) + ' question(s) pour toi' if ouvertes else ', rien à faire'}.")
+    a_faire = [f"{n} {nom}" for n, nom in ((len(ouvertes), "à valider"), (len(attente or []), "contact(s) en attente"),
+                                             (len(demandes or []), "demande(s) au guichet")) if n]
+    resume = (f"Bilan de la semaine : +{total} vues, {prog} vidéos programmées, {c['dollars']:.2f} $ Claude, "
+              f"{', '.join(a_faire) or 'rien à faire'}.")
     return "\n".join(lignes) + "\n", resume, debut
 
 
