@@ -6,7 +6,8 @@
 
 Le workflow `.github/workflows/ingenierie.yml` enchaîne : construire, tests et banc de la PR, contrôle des fichiers
 protégés et relecture (code de `main`), puis conclure. Ce module tourne toujours depuis `main` : la PR n'est qu'une
-copie de travail (`$RUNNER_TEMP/travail`), jamais le code qui décide de sa propre fusion.
+copie à part (`$RUNNER_TEMP/travail` pour Claude, `$RUNNER_TEMP/pr` pour ses tests), jamais le code qui décide de
+sa propre fusion.
 
 Règle de deux : Claude lit une demande écrite par Jules ou par l'agence (pas de contenu extérieur), n'a aucun jeton
 GitHub et ne lance aucune commande git. C'est ce script qui commite, pousse, ouvre la PR et la fusionne. Fusion seule
@@ -52,6 +53,12 @@ DEMANDES_MAX = 2                      # demandes qu'un agent peut écrire en un 
 
 def travail():
     return Path(os.environ.get("INGENIERIE_TRAVAIL") or Path(os.environ.get("RUNNER_TEMP") or tempfile.gettempdir()) / "travail")
+
+
+def copie_pr():
+    """Clone propre du commit de la PR : c'est là que tournent ses tests et son banc, pas dans le dossier où Claude
+    a travaillé (qui peut garder des fichiers ignorés par Git)."""
+    return travail().with_name("pr")
 
 
 def _gh(*args, entree=None):
@@ -253,6 +260,7 @@ def construire(numero):
     # Le coût est déjà au registre : une panne d'ici à la PR fait échouer l'étape, que le lanceur note comme bloquant
     _git(copie, "commit", "-q", "-m", f"{demande['titre'][:70]} (demande #{numero})")
     sha = _git(copie, "rev-parse", "HEAD").stdout.strip()
+    subprocess.run(["git", "clone", "-q", str(copie), str(copie_pr())], check=True)
     _git(copie, "push", "-q", f"https://github.com/{DEPOT}.git", f"HEAD:refs/heads/{branche}", auth=True)
     lien = _gh("pr", "create", "-R", DEPOT, "--head", branche, "--base", "main",
                "--title", _sans_mention(demande["titre"], 100), "--body-file", "-",
@@ -272,7 +280,7 @@ def reprendre(pr):
     if (p["state"] != "open" or p["user"]["login"] != ROBOT or not numero or p["base"]["ref"] != "main"
             or p["head"]["repo"]["full_name"] != DEPOT):
         sys.exit(f"PR #{pr} : pas une PR ouverte de l'Ingénierie, rien n'est repris")
-    copie = travail()
+    copie = copie_pr()
     subprocess.run(["git", "clone", "-q", str(consignes.RACINE), str(copie)], check=True)
     _git(copie, "fetch", "-q", f"https://github.com/{DEPOT}.git", branche, auth=True)
     _git(copie, "checkout", "-q", p["head"]["sha"])

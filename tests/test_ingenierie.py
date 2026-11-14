@@ -231,7 +231,8 @@ class Protection(unittest.TestCase):
 
     def test_le_code_de_la_pr_tourne_sans_jeton_github_ni_claude(self):
         etapes = re.split(r"\n      - ", WORKFLOW)
-        dans_la_copie = [e for e in etapes if "working-directory: ${{ runner.temp }}/travail" in e]
+        self.assertNotIn("working-directory: ${{ runner.temp }}/travail", WORKFLOW)   # jamais dans le dossier de Claude
+        dans_la_copie = [e for e in etapes if "working-directory: ${{ runner.temp }}/pr" in e]
         self.assertGreaterEqual(len(dans_la_copie), 2)   # tests et banc
         for etape in dans_la_copie:
             self.assertNotIn("github.token", etape)
@@ -247,6 +248,20 @@ class Protection(unittest.TestCase):
         self.assertNotIn("secrets.TELEGRAM", WORKFLOW)
         self.assertNotIn("YT_TOKEN", WORKFLOW)
         self.assertNotIn("META_TOKEN", WORKFLOW)
+
+
+class Operations(unittest.TestCase):
+    def test_un_declenchement_refuse_par_github_sur_une_pr_de_l_ingenierie_n_est_pas_une_panne(self):
+        from agents import chef_operations
+        self.assertTrue(ingenierie.PREFIXE.startswith(chef_operations.BRANCHES_INGENIERIE))
+        refuse = {"workflowName": "Mises à jour", "conclusion": "failure", "createdAt": "2026-11-14T01:17:22Z",
+                  "url": "u1", "event": "pull_request", "headBranch": "ingenierie/demande-9-1"}
+        vraie = refuse | {"headBranch": "dependabot/pip/x", "url": "u2"}
+        ok = {"workflowName": "Ingénierie", "conclusion": "success", "createdAt": "2026-11-14T01:16:40Z", "url": "u3",
+              "event": "issues", "headBranch": "main"}
+        c = chef_operations.chiffres([refuse, vraie, ok], [])
+        self.assertEqual(c["reveils_par_workflow"], {"Ingénierie": "1/1", "Mises à jour": "0/1"})
+        self.assertEqual([p["lien"] for p in c["pannes_sans_trace"]], ["u2"])
 
 
 class Direction(unittest.TestCase):
