@@ -14,7 +14,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from agence import contacts, guichet, lancer, mesures, questions, registre, telegram, youtube
+from agence import contacts, delais, guichet, lancer, mesures, questions, registre, telegram, youtube
 from agents import analyste, guetteur, surete
 
 DEPOT = "sueurhocqjules-droid/agence"
@@ -114,6 +114,9 @@ def page(maintenant, demandes=None, attente=None, fermees=None):
     lignes += [f"## {ORDRE[0]}", ""]
     lignes += [f"- {q['texte']} (Oui : {questions.en_clair(q['si_oui'])}), à trancher par les boutons Telegram"
                for q in ouvertes] or ["- Rien. Tu n'as rien à trancher cette semaine."]
+    if guichet.derogation(fin):   # Gouvernance, « Dérogation des premières semaines » : une fois, au bilan prévu
+        lignes.append("- Création des comptes : jusqu'ici tu les crées tous. La Direction propose dans son mot (partie 4) "
+                      "ce que l'agence pourrait traiter seule. À discuter dans Jarvis, rien ne change sans toi")
 
     lignes += ["", f"## {ORDRE[1]}", ""]
     if attente is None:
@@ -163,6 +166,8 @@ def page(maintenant, demandes=None, attente=None, fermees=None):
 
     lignes += ["### Organisation", ""]
     lignes += organisation_faite(decisions, debut, fin) or ["- Aucun changement de code, de poste ou de demande cette semaine"]
+    # « Le délai se mesure » (MISSION.md) : seuls les besoins qui dépassent leur cible remontent au bilan
+    lignes += [f"- Délai dépassé : {r}" for r in delais.phrases_retard(delais.mesure(fin))]
     lignes.append("")
 
     pauses = registre.lire("pauses")

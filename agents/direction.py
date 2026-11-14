@@ -16,7 +16,7 @@ import sys
 import tomllib
 from datetime import datetime, timedelta, timezone
 
-from agence import (besoins, catalogue, consignes, demandes, essais, ingenierie, lancer, memoire, mesures,
+from agence import (besoins, catalogue, consignes, demandes, essais, guichet, ingenierie, lancer, memoire, mesures,
                     organisation, questions, registre)
 from agents import analyste, surete
 
@@ -26,6 +26,7 @@ RECOMMANDATIONS = ["ne_rien_acheter", "proposer_a_jules"]   # Jules tranche chaq
 OUTILS_MAX = 2   # outils retenus par séance : chacun devient une demande à l'Ingénierie ou au guichet
 ESSAIS_MAX = len(essais.chaines())   # un essai par chaîne au plus (registre/essais.jsonl)
 LECONS_MAX = 2   # leçons proposées à la mémoire par séance : le Critique les relit
+CHAINES_MAX = 1  # nouvelle chaîne ouverte par séance (aucune limite au total) : ses comptes partent au guichet en un message
 
 
 def equipe_en_service(postes):
@@ -46,9 +47,18 @@ def schema(equipe, cas_simules=(), outils=()):
     return {
         "type": "object", "additionalProperties": False,
         "required": ["analyse", "decisions", "retours", "consignes", "questions", "investissements", "ingenierie",
-                     "outils", "essais", "lecons"],
+                     "outils", "essais", "lecons", "chaines"],
         "properties": {
             "outils": retenus,
+            "chaines": {"type": "array", "maxItems": CHAINES_MAX, "items": {
+                "type": "object", "additionalProperties": False, "required": ["nom", "concept", "reseaux", "pourquoi"],
+                "properties": {"nom": {"type": "string", "minLength": 1,
+                                       "description": "le nom de la nouvelle chaîne, 60 caractères au plus"},
+                               "concept": {"type": "string", "minLength": 1,
+                                           "description": "le concept qu'elle suit, tiré du dossier, en une phrase"},
+                               "reseaux": {"type": "array", "minItems": 1, "maxItems": len(guichet.RESEAUX),
+                                           "items": {"type": "string", "enum": list(guichet.RESEAUX)}},
+                               "pourquoi": texte}}},
             "essais": {"type": "array", "maxItems": ESSAIS_MAX, "items": {
                 "type": "object", "additionalProperties": False, "required": ["chaine", "ligne", "duree_jours", "raison"],
                 "properties": {"chaine": {"type": "string", "enum": essais.chaines()},
@@ -141,6 +151,21 @@ def voies_de_revenu():
             "page": "registre/regles-plateformes.md"}
 
 
+def derogation_comptes(lundi, traites=None):
+    """La semaine du bilan de la dérogation (organisation/seuils.toml), et seulement celle-là : ce que Jules a traité
+    au guichet pour les comptes, pour que la Direction propose ce que l'agence pourrait faire seule. Vide sinon."""
+    if not guichet.derogation(lundi):
+        return {}
+    try:
+        traites = guichet.comptes_traites() if traites is None else traites
+    except Exception as e:  # noqa: BLE001 : sans accès aux issues, la séance a lieu quand même
+        traites = f"demandes illisibles : {str(e)[:120]}"
+    return {"derogation_comptes": {
+        "regle": "Gouvernance, dérogation des premières semaines : les comptes se créent avec Jules. C'est le bilan où "
+                 "l'agence propose elle-même ce qu'elle pourrait traiter seule.",
+        "demandes_de_compte_traitees_par_jules": traites}}
+
+
 def dossier(maintenant):
     """Tout ce que la Direction lit, en données structurées tirées du registre."""
     depuis = maintenant - timedelta(days=7)
@@ -168,6 +193,7 @@ def dossier(maintenant):
                      "changement_en_attente": attente and {"decision": attente["decision"], "echeance": attente["echeance"]}}
     return {
         "date": maintenant.isoformat(timespec="minutes"),
+        **derogation_comptes(lundi),
         "objectifs": {
             "1_revenu": {"aujourd_hui": "0 € par mois : aucune monétisation ouverte pour l'instant",
                          "voies_du_responsable_du_revenu": voies_de_revenu()},
@@ -253,6 +279,12 @@ essais : la ligne que suit chaque chaîne et la durée minimale pendant laquelle
 exploitables. Une chaîne dans chaines_sans_essai suit une ligne que personne n'a datée : ouvre son essai (la ligne
 actuelle, une durée, sa raison). Tant que refonte_possible est faux, la chaîne garde sa ligne : le script refuse
 un nouvel essai. Une refonte totale d'une chaîne reste une question à Jules (Gouvernance).
+Concepts et chaînes : aucune limite au nombre de concepts ni de chaînes par concept, tant que ça sert les objectifs. Un
+concept du Veilleur dont la destination est « nouvelle chaîne » ne réoriente pas une chaîne qui marche : il s'ouvre
+à côté, par chaines.
+derogation_comptes (présent une seule semaine, celle du bilan prévu) : dis dans ton analyse, en trois lignes au plus,
+ce que l'agence pourrait traiter seule dans la création des comptes, avec les demandes traitées comme preuve. Jules
+en discute ensuite : rien ne change sans lui.
 Tu rends ta réponse au format imposé, appliquée telle quelle par un script :
 - decisions : ce que tu décides, chacune avec sa raison. Quand elle a un effet mesurable, nomme la mesure (liste fermée)
   et la valeur attendue à l'échéance ; le critique la jugera sur les vrais chiffres. Une décision sans mesure reste notée.
@@ -265,6 +297,9 @@ Tu rends ta réponse au format imposé, appliquée telle quelle par un script :
 - essais : au plus un par chaîne (ou « toutes » pour un format commun) : la ligne suivie, la durée minimale en jours
   ({essais.DUREE_MIN} à {essais.DUREE_MAX}) et pourquoi cette durée suffit. Le script cite lui-même le résultat de l'essai
   précédent. Rien à ouvrir : liste vide.
+- chaines : au plus {CHAINES_MAX} nouvelle chaîne par séance, quand un concept du dossier la justifie par ses chiffres : son nom,
+  son concept, ses réseaux. Le script demande ses comptes à Jules en un seul message au guichet (chaque chaîne sur une
+  adresse distincte) ; l'agence fait tout le reste. Le plus souvent : liste vide.
 - lecons : au plus {LECONS_MAX} leçons à proposer à la mémoire, chacune avec le fait, sa preuve (un fichier du registre, un
   identifiant de décision, un commit, un run ou une issue du dossier) et ce qu'elle change. Seulement ce qui
   changera une décision future. Le plus souvent : liste vide.
@@ -355,6 +390,17 @@ def appliquer(reponse, maintenant, avant, cas_simules=()):
         registre.decider("direction", f"essai ouvert sur {e['chaine']} pour {e['duree_jours']} jours : {e['ligne'][:200]}"
                          f" ({ident})", str(e["raison"])[:600])
         faits.append(f"essai ouvert sur {e['chaine']} ({e['duree_jours']} jours)")
+    for c in reponse.get("chaines", [])[:CHAINES_MAX]:
+        # Classe 2, à la Direction seule (Gouvernance) ; les comptes, eux, passent par Jules : une demande groupée
+        try:
+            numero, _ = guichet.demander_comptes(c.get("nom"), c.get("reseaux") or [], str(c.get("pourquoi"))[:600],
+                                                 "la Direction", c.get("concept", ""))
+        except (subprocess.CalledProcessError, OSError, ValueError) as e:
+            refus.append(f"nouvelle chaîne {c.get('nom')} : {str(getattr(e, 'stderr', '') or e)[-200:]}")
+            continue
+        registre.decider("direction", f"nouvelle chaîne : {str(c['nom'])[:60]} ({', '.join(c['reseaux'])}), comptes "
+                         "demandés au guichet" + (f" (#{numero})" if numero else ""), str(c["pourquoi"])[:600])
+        faits.append(f"nouvelle chaîne : {str(c['nom'])[:60]} (comptes demandés au guichet)")
     for l in reponse.get("lecons", [])[:LECONS_MAX]:
         raison = memoire.refus(l.get("fait"), l.get("preuve"), l.get("change"), memoire.lire())
         if raison:

@@ -27,10 +27,10 @@ Repérer dans le monde entier les concepts et formats qui surperforment et sont 
 Recherches publiques (YouTube et autres réseaux), vidéos envoyées par Jules (issue `equipe:recherche`).
 
 ## Sorties
-Fiches concept en champs structurés (lien, chiffres, pourquoi ça marche, faisable ou non, coût estimé), au Chef de la Recherche. Concrètement : `registre/concepts.jsonl`, état `propose`, 5 au plus par semaine. Les chiffres (vues, médiane, ratio) et le coût (effort × coût réel d'un sujet) sont posés par le script, jamais par le modèle.
+Fiches concept en champs structurés (lien, chiffres, pourquoi ça marche, faisable ou non, coût estimé), au Chef de la Recherche. Concrètement : `registre/concepts.jsonl`, état `propose`, sans plafond de nombre (Gouvernance : peu importe le nombre de concepts ou de chaînes par concept) : tout ce qui est réalisable parmi les 15 vidéos lues par passage. Chaque fiche dit sa `destination` : « chaîne existante » si le concept prolonge la ligne d'une de nos chaînes, « nouvelle chaîne » s'il s'en écarte (une chaîne qui marche n'est pas réorientée brutalement ; la Direction ouvre la nouvelle chaîne et ses comptes partent au guichet). Les chiffres (vues, médiane, ratio) et le coût (effort × coût réel d'un sujet) sont posés par le script, jamais par le modèle.
 
 ## Outils
-Méthode `outliers` (melvynx/video-agent-skills) refaite dans `agents/veilleur.py` sans son service payant : au moins 3 fois la médiane de la chaîne, médiane sur ses vidéos de 7 à 180 jours, 10 au moins. Source : API YouTube Data en lecture publique (~1 200 unités par semaine sur 10 000 par jour).
+Méthode `outliers` (melvynx/video-agent-skills) refaite dans `agents/veilleur.py` sans son service payant : au moins 3 fois la médiane de la chaîne, médiane sur ses vidéos de 7 à 180 jours, 10 au moins. Deux lectures : notre créneau (recherches par mots-clés) et, hors créneau, les Shorts les plus vus des 14 derniers jours dans chaque langue, sans mot-clé. Source : API YouTube Data en lecture publique (~1 500 unités par semaine sur 10 000 par jour).
 
 ## Secrets et permissions
 Une clé de lecture publique seulement.

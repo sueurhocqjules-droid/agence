@@ -17,7 +17,7 @@ import os
 import sys
 from datetime import datetime, timedelta, timezone
 
-from agence import consignes, mesures, modeles, organisation, postes, registre
+from agence import consignes, delais, mesures, modeles, organisation, postes, registre
 from agents.direction import bloquants
 
 MAX_REPARATIONS = 3
@@ -140,6 +140,9 @@ def passage(essai):
     runs = reveils(os.environ.get("REVEILS_JSON"), depuis)
     entrees = journaux(depuis)
     calcul = chiffres(runs or [], entrees)
+    # « Le délai se mesure » (MISSION.md) : besoin écrit → mise en service, contre 72 h (classe 1) ou une semaine
+    calcul["delais_besoins"] = delais.mesure(maintenant)
+    retards = delais.phrases_retard(calcul["delais_besoins"])
     if runs is None:
         calcul["reveils_reussis_pourcent"] = "inconnu : relevé des réveils absent"
     fiches = organisation.fiches()
@@ -156,6 +159,8 @@ def passage(essai):
     texte, modele, *_ = postes.demander("chef-operations", consigne(donnees, equipe))
     ligne, retours, reparations, ecartes = valider(modeles.extraire_json(texte) or {}, equipe, a_signaler)
     ligne = ligne or f"réveils réussis : {calcul['reveils_reussis_pourcent']} %, {len(calcul['pannes_sans_trace'])} panne(s) sans trace"
+    if retards:   # écrit par le script : un délai qui dérape remonte à la Direction même si le modèle n'en dit rien
+        ligne = f"{ligne.rstrip('. ')}. Délais dépassés : {'; '.join(retards[:5])}."
     print(f"RAPPORT {ligne}")
     for r in retours:
         print(f"RETOUR à {r['poste']} : {r['texte'][:160]}")

@@ -22,6 +22,12 @@ limite_pourcent = 20
 # Offre gratuite : 2 000 minutes par mois pour les dépôts privés (studio-rendu est public, ses minutes sont gratuites)
 alerte_minutes_mois = 1500
 
+[derogation]
+# Dérogation des premières semaines (MISSION.md, Gouvernance) : les comptes se créent avec Jules. Au bilan de cette
+# date (dernier lundi de décembre), la Direction propose ce que l'agence pourrait traiter seule, avec les demandes de
+# compte déjà traitées comme preuve. Jules l'avance en changeant cette date (un lundi).
+bilan = 2026-12-28
+
 [echecs]
 # Passages en échec d'affilée d'un même agent ou script avant d'alerter Jules
 alerte_consecutifs = 3
