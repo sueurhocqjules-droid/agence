@@ -101,7 +101,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           PYTHONUTF8: "1"
         run: python -m agence.lancer courrier
-      - name: Flux (rendu, contrôle, programmation, diffusion Instagram et Facebook)
+      - name: Flux (rendu, contrôle, programmation, diffusion Instagram, Facebook et TikTok)
         if: ${{ !cancelled() }}
         env:
           YT_TOKEN_EN: ${{ secrets.YT_TOKEN_EN }}
@@ -109,6 +109,7 @@ jobs:
           YT_TOKEN_PT: ${{ secrets.YT_TOKEN_PT }}
           GH_TOKEN: ${{ github.token }}   # lecture des artefacts du dépôt public studio-rendu
           META_TOKEN: ${{ secrets.META_TOKEN }}   # utilisateur système Meta : 3 comptes Instagram, 3 Pages
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}   # Buffer (offre Free) : publication TikTok sur les 3 comptes
           RENDU_DIR: rendu
           PYTHONUTF8: "1"
         run: python -m agence.lancer flux
