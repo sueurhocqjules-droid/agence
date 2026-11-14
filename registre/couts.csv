@@ -118,3 +118,11 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-14T07:01:15+00:00,guetteur,2,0,0,0,"ok : 0 commentaire(s) nouveau(x), 0 occasion(s) ; seuil le plus proche : Every Second (en) : 14 597 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
 2026-11-14T07:01:17+00:00,contacts,2,0,0,0,"ok : droit d'envoi absent, demande au guichet #13 (écrite), 0 message(s) validé(s) en attente, rien n'est parti"
 2026-11-14T07:01:20+00:00,guichet,0,0,0,0,"ok : 0 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : récapitulatif"
+2026-11-14T12:08:48+00:00,reponses,0,0,0,0,ok : 0 réponse(s) de Jules
+2026-11-14T12:08:49+00:00,stats,3,0,0,0,"ok : 72 vidéos, 18472 vues"
+2026-11-14T12:08:52+00:00,garde_fous,2,0,0,0,"ok : 33.97 $ cette semaine, 0 alerte(s) envoyée(s)"
+2026-11-14T12:08:54+00:00,courrier,1,0,0,0,ok : 0 mail nouveau
+2026-11-14T12:08:55+00:00,flux,3,0,0,0,"ok : 0 programmées, 0 rejetées, 0 en rendu, 0 diffusées, 0 erreurs de diffusion"
+2026-11-14T12:08:58+00:00,guetteur,2,0,0,0,"ok : 0 commentaire(s) nouveau(x), 0 occasion(s) ; seuil le plus proche : Every Second (en) : 14 739 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
+2026-11-14T12:09:01+00:00,contacts,1,0,0,0,"ok : droit d'envoi absent, demande au guichet #13 (déjà faite), 0 message(s) validé(s) en attente, rien n'est parti"
+2026-11-14T12:09:02+00:00,guichet,0,0,0,0,"ok : 1 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : rien"
