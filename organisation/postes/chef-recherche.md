@@ -21,7 +21,7 @@ equipe = ["veilleur", "chercheur-outils"]
 Préparer pour la Direction des propositions prouvées : nouveaux concepts, formats, réseaux, outils et modèles qui feraient avancer les objectifs. Propose, ne décide pas.
 
 ## Entrées
-Rapports du Veilleur et du Chercheur d'outils, demandes de la Direction, issues `equipe:recherche`.
+Les besoins chiffrés des agents (`registre/besoins.jsonl`), qui passent avant une idée nouvelle. Rapports du Veilleur et du Chercheur d'outils, demandes de la Direction, issues `equipe:recherche`.
 
 ## Sorties
 Un dossier par proposition (preuve, coût, ce qu'elle prédit), transmis à la Direction.

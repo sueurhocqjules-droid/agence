@@ -38,7 +38,7 @@ UNITES = {"cout_par_sujet": ["%"], "sujets_semaine": ["%"], "vues": ["%"], "pour
           "jours_stock": ["jours"]}
 POCHES = {"eur": "EUR", "claude_usd": "USD"}
 CHAMPS = {"date", "id", "poste", "lien", "source_gain", "prix", "devise", "periode", "poche", "mesure",
-          "gain_annonce", "unite"}
+          "gain_annonce", "unite", "besoin"}   # besoin : le besoin auquel l'achat répond (agence/besoins.py)
 PALIERS = [10, 20, 50, 100, 500]
 TIRAGES, SEMAINES, MOIS = 1000, 26, 6
 SEMAINES_PAR_MOIS = 52 / 12

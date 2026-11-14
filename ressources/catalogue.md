@@ -1,6 +1,6 @@
 # Catalogue de ressources
 
-Ce que l'agence a le droit d'utiliser. Une ressource gratuite et sans compte entre ici sans Jules, une fois son essai réussi dans le dépôt sans secrets (bilan dans la fiche). Une ressource qui demande un compte passe par le guichet, une ressource payante est une demande de capital (Gouvernance, `organisation/MISSION.md`). Ce qui n'est pas ici est hors de portée (les autres projets de Jules en particulier). Seule exception, en lecture : le Chercheur d'outils lit `ressources/boite-a-outils-jarvis.md`, copie de la boîte à outils de Jarvis, comme liste de candidats.
+Ce que l'agence a le droit d'utiliser. Une ressource gratuite et sans compte entre ici sans Jules, une fois son essai réussi dans le dépôt sans secrets (bilan dans la fiche). Une ressource qui demande un compte passe par le guichet, une ressource payante est une demande de capital (Gouvernance, `organisation/MISSION.md`). Le code qui choisit la voie est `agence/catalogue.py` : l'essai est une PR de l'Ingénierie (un test sans réseau ni secret, et la ligne de l'outil ajoutée au tableau ci-dessous dans la même PR), sa fusion vaut entrée au catalogue. Ce qui n'est pas ici est hors de portée (les autres projets de Jules en particulier). Seule exception, en lecture : le Chercheur d'outils lit `ressources/boite-a-outils-jarvis.md`, copie de la boîte à outils de Jarvis, comme liste de candidats.
 
 Colonnes : ce qu'elle sait faire, ce qu'elle coûte, quand elle est libre, si l'accord de Jules est nécessaire pour s'en servir.
 

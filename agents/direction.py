@@ -1,6 +1,7 @@
 """Direction : une séance Claude Opus par semaine, le dimanche soir après le critique et les chefs.
 
 Lancement : python -m agence.lancer direction   (ou python -m agents.direction --essai : séance réelle, rien appliqué)
+            python -m agents.direction --dossier [partie ...]   le dossier qu'elle lirait, sans séance (0 $)
 
 1. Script : un dossier structuré tiré du registre (mesures des 4 objectifs, verdicts du critique, plan du chef
    de contenu, blocages, pauses, alertes, questions, demandes de Jules, fiches de son équipe).
@@ -15,28 +16,37 @@ import sys
 import tomllib
 from datetime import datetime, timedelta, timezone
 
-from agence import consignes, demandes, ingenierie, lancer, mesures, organisation, questions, registre
+from agence import (besoins, catalogue, consignes, demandes, ingenierie, lancer, mesures, organisation, questions,
+                    registre)
 from agents import analyste, surete
 
 MODELE = "claude-opus-5-5"
 RETOURS_MAX, CONSIGNES_MAX, QUESTIONS_MAX = 5, 2, 2   # une question par semaine vise l'objectif 3 (autonomie)
 RECOMMANDATIONS = ["ne_rien_acheter", "proposer_a_jules"]   # Jules tranche chaque achat, dans Jarvis
+OUTILS_MAX = 2   # outils retenus par séance : chacun devient une demande à l'Ingénierie ou au guichet
 
 
 def equipe_en_service(postes):
     return [p for p in postes["direction"]["equipe"] if postes.get(p, {}).get("statut") == "en_service"]
 
 
-def schema(equipe, cas_simules=()):
-    """`cas_simules` : identifiants des améliorations simulées par l'Analyste, seuls achats qu'elle peut proposer."""
+def schema(equipe, cas_simules=(), outils=()):
+    """`cas_simules` : identifiants des améliorations simulées par l'Analyste, seuls achats qu'elle peut proposer.
+    `outils` : liens des candidats gratuits du dossier, seuls outils qu'elle peut retenir."""
     mesure = {"type": ["string", "null"], "enum": [*mesures.MESURES, None]}
     texte = {"type": "string", "minLength": 1}
     cas = ({"type": "array", "maxItems": 5, "items": {"type": "string", "enum": sorted(cas_simules)}} if cas_simules
            else {"type": "array", "maxItems": 0})
+    retenus = ({"type": "array", "maxItems": OUTILS_MAX, "items": {
+        "type": "object", "additionalProperties": False, "required": ["lien", "pourquoi"],
+        "properties": {"lien": {"type": "string", "enum": sorted(outils)}, "pourquoi": texte}}} if outils
+        else {"type": "array", "maxItems": 0})
     return {
         "type": "object", "additionalProperties": False,
-        "required": ["analyse", "decisions", "retours", "consignes", "questions", "investissements", "ingenierie"],
+        "required": ["analyse", "decisions", "retours", "consignes", "questions", "investissements", "ingenierie",
+                     "outils"],
         "properties": {
+            "outils": retenus,
             "ingenierie": {"type": "array", "maxItems": ingenierie.DEMANDES_MAX, "items": {
                 "type": "object", "additionalProperties": False, "required": ["titre", "quoi", "pourquoi", "preuve"],
                 "properties": {"titre": {"type": "string", "minLength": 1, "description": "une ligne : ce qui sera construit"},
@@ -114,6 +124,7 @@ def dossier(maintenant):
     critique = registre.DOSSIER / "bilans" / f"critique-{lundi:%Y-%m-%d}.md"
     plan = consignes.RACINE / "organisation" / "plan.toml"
     toutes = donnees["decisions"]
+    cas_analyste = analyste.derniers_cas()
     try:
         issues = demandes.demandes("direction")
     except Exception as e:  # noqa: BLE001 : sans accès aux issues, la séance a lieu quand même
@@ -144,6 +155,10 @@ def dossier(maintenant):
         "section_du_critique": critique.read_text(encoding="utf-8") if critique.exists() else "pas encore écrite",
         "plan_du_chef_de_contenu": tomllib.loads(plan.read_text(encoding="utf-8")) if plan.exists() else None,
         "heures_de_sortie": donnees["heures"],
+        "besoins": besoins.dossier(maintenant, cas_analyste),
+        "outils_candidats": [{k: c.get(k) for k in ("lien", "nom", "remplace", "pourquoi", "voie", "besoin", "risque",
+                                                    "licence", "economie_usd_semaine", "date")}
+                             for c in catalogue.candidats_ouverts(maintenant)],
         "propositions_de_la_recherche": recherche(depuis),
         "rapport_des_operations": (registre.lire_jsonl("operations", depuis) or [None])[-1],
         "decisions_7j": [{k: d.get(k) for k in ("auteur", "decision", "pourquoi", "prediction", "echeance")}
@@ -160,7 +175,7 @@ def dossier(maintenant):
         "cibles_des_questions": sorted(questions.cibles_connues()),
         "demandes_de_jules": issues,
         "equipe": equipe,
-        "investissements": {"business_cases": analyste.derniers_cas(),
+        "investissements": {"business_cases": cas_analyste,
                             "prevu_realise": analyste.ecarts(maintenant)[1],
                             "regle": "0 € tant que l'agence ne gagne rien ; € de Jules et $ de sa limite Claude jamais "
                                      "additionnés ; Jules décide de chaque achat"},
@@ -188,6 +203,12 @@ sa mesure et sa valeur attendue (ou la tienne), et dis dans le pourquoi qu'elle 
 Le rapport des opérations dit si l'agence tourne. Une réparation ou une construction qui demande d'écrire du code ne
 se remonte pas à Jules : elle va à l'Ingénierie (Gouvernance). Écris-la dans ingenierie, avec ce qu'il faut réparer ou
 construire et la panne ou le chiffre qui le montre : l'Ingénierie ouvre une PR le soir même.
+besoins : ce que les agents ont dit manquer, en chiffres, avec les options trouvées par la Recherche (3 au plus, les
+gratuites d'abord). Un besoin passe avant une idée nouvelle. Pour chacun, choisis : une option gratuite se retient dans
+outils (voie essai : l'Ingénierie l'essaie par une PR, sans secret, et sa fusion vaut entrée au catalogue, sans Jules ;
+voie guichet : un compte est à créer, la demande part au guichet) ; une option payante (voie capital) ne se retient que
+par investissements, avec son business case ; sans option, ou si un peu de code suffit, écris la demande dans ingenierie.
+Un besoin dont delai_depasse est vrai n'attend plus d'analyse : l'option gratuite la plus simple part en essai.
 portee_des_chaines.signaux : une chaîne en panne (YouTube ne la diffuse presque pas, comparée à ses sœurs sur les mêmes
 sujets) ou en chute (ses vues par vidéo s'effondrent). Dès la première semaine, cherche la cause dans le dossier et
 décide toi-même des remèdes qui relèvent de l'agence, chacun avec la mesure vues_semaine:<chaîne> et sa valeur attendue.
@@ -201,6 +222,8 @@ Tu rends ta réponse au format imposé, appliquée telle quelle par un script :
   une issue puis une PR, fusionnée seule si tout est vert. Écris quoi assez précisément pour être codé sans autre
   contexte. Rien de ce qui touche aux workflows, aux secrets, aux tests existants ou à la mission : ces PR-là
   attendent Jules. Pas de code à écrire cette semaine : liste vide.
+- outils : au plus {OUTILS_MAX} outils gratuits de outils_candidats à retenir, par leur lien, les plus utiles à un besoin
+  ou aux 4 objectifs. Le script les envoie sur leur voie (essai par l'Ingénierie, ou guichet). Rien à retenir : liste vide.
 - retours : trois lignes au plus par membre de ton équipe en service, sur sa mesure de réussite.
 - consignes : la nouvelle liste complète des consignes d'un membre, avec la mesure qu'elle doit améliorer. Un seul changement
   en attente par membre (refusé s'il en a déjà un), deux au plus par semaine : on doit savoir ce qui a joué.
@@ -218,7 +241,7 @@ def seance(donnees_dossier, reste):
     """Lance Claude sans outil. Renvoie (réponse structurée, coût en dollars, jetons)."""
     commande = ["claude", "-p", "--model", MODELE, "--output-format", "json",
                 "--json-schema", json.dumps(schema(equipe_en_service(organisation.fiches()),
-                                                   ids_simules(donnees_dossier))),
+                                                   ids_simules(donnees_dossier), liens_outils(donnees_dossier))),
                 "--tools", "", "--strict-mcp-config", "--setting-sources", "", "--no-session-persistence",
                 "--max-budget-usd", f"{reste:.2f}", "--system-prompt", consigne_systeme()]
     proc = subprocess.run(commande, input=json.dumps(donnees_dossier, ensure_ascii=False, indent=1, default=str),
@@ -238,9 +261,36 @@ def ids_simules(donnees_dossier):
     return (donnees_dossier.get("investissements", {}).get("business_cases") or {}).get("ids", [])
 
 
+def liens_outils(donnees_dossier):
+    return [c["lien"] for c in donnees_dossier.get("outils_candidats") or []]
+
+
+def retenir_outils(choisis, maintenant, retenir=None):
+    """Envoie chaque outil retenu sur sa voie (agence/catalogue.py). Le candidat est relu dans le registre par son
+    lien : rien de ce que la Direction écrit, hors sa raison, ne part dans la demande. Renvoie (faits, refus)."""
+    faits, refus = [], []
+    if not choisis:
+        return faits, refus
+    candidats = {c["lien"]: c for c in catalogue.candidats_ouverts(maintenant)}
+    for o in choisis[:OUTILS_MAX]:
+        c = candidats.get(o.get("lien"))
+        try:
+            if not c:
+                raise ValueError("lien absent des candidats ouverts")
+            voie, numero = (retenir or catalogue.retenir)(c, "la Direction", o["pourquoi"])
+        except (subprocess.CalledProcessError, OSError, ValueError) as e:
+            refus.append(f"outil {o.get('lien')} : {str(getattr(e, 'stderr', '') or e)[-200:]}")
+            continue
+        suite = "essai demandé à l'Ingénierie" if voie == catalogue.ESSAI else "compte demandé au guichet"
+        registre.decider("direction", f"outil retenu : {c.get('nom')} ({suite}" + (f", issue #{numero})" if numero else ")"),
+                         o["pourquoi"][:600])
+        faits.append(f"outil retenu : {str(c.get('nom'))[:60]} ({suite})")
+    return faits, refus
+
+
 def appliquer(reponse, maintenant, avant, cas_simules=()):
     """Applique la réponse, élément par élément : un élément refusé est noté, il n'arrête pas les autres."""
-    faits, refus = [], []
+    faits, refus = retenir_outils(reponse.get("outils", []), maintenant)
     for i in reponse.get("investissements", []):
         # Une recommandation, jamais un achat : notée au registre et dans le bilan, Jules tranche dans Jarvis
         inconnus = [c for c in i["cas"] if c not in cas_simules]
@@ -306,6 +356,11 @@ def main():
                   if l["agent"] == "direction" and mesures.quand(l["debut"]) >= lancer.debut_semaine(maintenant))
     reste = budget - depense
     d = dossier(maintenant)
+    if "--dossier" in sys.argv:   # le dossier seul, sans séance (0 $) : tout, ou les parties nommées ensuite
+        parties = sys.argv[sys.argv.index("--dossier") + 1:]
+        print(json.dumps({k: v for k, v in d.items() if not parties or k in parties}, ensure_ascii=False, indent=1,
+                         default=str))
+        return
     if "--essai" in sys.argv:
         reponse, cout, _ = seance(d, min(reste, 3))
         print(json.dumps(reponse, ensure_ascii=False, indent=1))

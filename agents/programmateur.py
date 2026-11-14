@@ -10,13 +10,15 @@ Lancement : python -m agence.lancer programmateur   (ou python -m agents.program
    plus un changement (déplacer, ajouter ou retirer une heure sur une chaîne) avec sa prédiction. Le script le vérifie
    (choix fermés : une hausse de cadence doit tenir dans le budget) et l'applique à organisation/creneaux.toml, que le
    flux lit. Le critique le juge au bout de deux semaines et l'annule s'il n'a rien amélioré.
+À chaque passage, avant tout : son besoin chiffré (sujets qui manquent par semaine pour la cadence la plus haute)
+va dans registre/besoins.jsonl, que la Recherche traite en priorité (agence/besoins.py). --besoin : ce besoin seul.
 """
 import statistics
 import sys
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from agence import consignes, mesures, modeles, postes, registre, youtube
+from agence import besoins, consignes, mesures, modeles, postes, registre, youtube
 from agents import surete
 
 PARIS = ZoneInfo("Europe/Paris")
@@ -95,12 +97,42 @@ def reduction_forcee(heures, groupes):
             for c, h in heures.items()}
 
 
+def besoin_de_sujets(rythme, capacite, cout, budget):
+    """Le besoin chiffré du Programmateur (boucle des besoins) : les sujets qui manquent chaque semaine pour sortir
+    à la cadence la plus haute permise. Il le demande à la Recherche au lieu de seulement baisser la cadence.
+    Renvoie (texte, manque), ou None tant que le coût d'un sujet n'est pas mesuré."""
+    if capacite is None:
+        return None
+    cible = 7 * CADENCE_MAX
+    manque = cible - capacite
+    paye = "que le budget paie" if 7 * rythme <= capacite else "que le budget ne paie pas non plus"
+    return (f"{CADENCE_MAX} sorties par jour et par chaîne demandent {cible} sujets par semaine, le budget de l'Auteur "
+            f"({budget:.0f} $ par semaine, {cout} $ par sujet) en paie {capacite} : il manque {manque} sujets par "
+            f"semaine. La cadence actuelle en demande {7 * rythme}, {paye}"), manque
+
+
+def exprimer_besoin(rythme, capacite, cout, budget):
+    """Écrit le besoin au registre (ou le ferme s'il ne manque plus rien). Renvoie la phrase pour la sortie."""
+    b = besoin_de_sujets(rythme, capacite, cout, budget)
+    if b is None:
+        return "besoin non chiffrable : coût d'un sujet inconnu"
+    ident, ecrit = besoins.exprimer(
+        "programmateur", "sujets", b[0], b[1], "sujets par semaine",
+        "plus de sorties par jour apportent plus de vues (objectif 1) ; les écrire sans Claude, ou pour moins de "
+        "dollars par sujet, garde l'agence dans son enveloppe (objectif 2)")
+    if b[1] <= 0:
+        return "besoin de sujets comblé" if ecrit else "aucun besoin de sujets"
+    return f"besoin {ident} : il manque {b[1]} sujets par semaine" + ("" if ecrit else " (déjà au registre)")
+
+
 def passage(essai):
     maintenant = datetime.now(timezone.utc)
     donnees = mesures.charger(surete.couts_atelier())
     heures, groupes = donnees["heures"], vues_a_48h(donnees["stats"])
     capacite, cout, budget = mesures.capacite(donnees["atelier"])
     rythme = max(len(h) for h in heures.values())
+    if not essai:   # avant tout le reste : le besoin est écrit même si la cadence baisse ou si rien d'autre ne change
+        print(exprimer_besoin(rythme, capacite, cout, budget))
     jours = {c: mesures.jours_de_stock(donnees["stock"], donnees["stats"], heures, maintenant, c) for c in heures}
     attente = consignes.en_attente("creneaux")
 
@@ -177,6 +209,10 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     if "--essai" in sys.argv:
         print(passage(essai=True)[0])
+        return
+    if "--besoin" in sys.argv:   # le besoin seul, sans modèle ni changement de créneaux
+        heures = mesures.heures_de_sortie()
+        print(exprimer_besoin(max(len(h) for h in heures.values()), *mesures.capacite(surete.couts_atelier() or [])))
         return
     with registre.seance("programmateur") as info:
         resultat, appels = passage(essai=False)

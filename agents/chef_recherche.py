@@ -17,7 +17,7 @@ import statistics
 import sys
 from datetime import datetime, timedelta, timezone
 
-from agence import mesures, modeles, postes, registre
+from agence import besoins, mesures, modeles, postes, registre
 from agents import surete
 
 MAX_PROPOSITIONS = 3
@@ -57,7 +57,8 @@ def demandes_de_jules():
 
 
 def valider(reponse, par_lien, avant):
-    """Propositions conformes aux choix fermés, preuves recopiées de la source. Renvoie (gardées, écartées)."""
+    """Propositions conformes aux choix fermés, preuves recopiées de la source. Renvoie (gardées, écartées).
+    Le besoin auquel répond une proposition est recopié de son rapport par le script (champ `besoin`)."""
     gardes, ecartes, vus = [], [], set()
     for p in (reponse.get("propositions") or [])[:MAX_PROPOSITIONS]:
         if not isinstance(p, dict):
@@ -78,7 +79,7 @@ def valider(reponse, par_lien, avant):
         else:
             vus.add(source)
             genre, fiche = par_lien[source]
-            gardes.append({"type": genre, "source": source,
+            gardes.append({"type": genre, "source": source, "besoin": fiche.get("besoin"),
                            **{k: modeles.propre(str(p[k]))[:500] for k in ("titre", "proposition", "preuve")},
                            "preuves_chiffrees": {k: fiche.get(k) for k in PREUVES[genre] if fiche.get(k) is not None},
                            "mesure": p["mesure"], "avant": avant.get(p["mesure"]), "attendu": p["attendu"],
@@ -99,6 +100,8 @@ def consigne(donnees):
         f"Choisis au plus {MAX_PROPOSITIONS} propositions, les mieux prouvées (une preuve vaut mieux qu'un avis : chiffres, "
         "liens, essais). Un concept vaut s'il bat nettement la médiane de nos chaînes et reste faisable ; un outil vaut "
         "s'il économise des dollars Claude sans perte de qualité. Aucune proposition vaut mieux qu'une proposition faible. "
+        "Les besoins passent d'abord : besoins_ouverts (s'il y en a) liste ce que les agents ont dit manquer, en chiffres, "
+        "et un rapport qui porte le champ besoin y répond. À preuve égale, propose d'abord ce qui comble un besoin. "
         "Réponds par un seul objet JSON, sans texte autour :\n"
         '{"propositions": [{"source": "le lien exact d\'un rapport", "titre": "en quelques mots", '
         '"proposition": "ce que la Direction devrait décider", "preuve": "les chiffres et faits des rapports qui la '
@@ -118,6 +121,7 @@ def passage(essai):
     avant = mesures.tableau(maintenant, donnees)
     capacite, cout, budget = mesures.capacite(atelier)
     texte, modele, *_ = postes.demander("chef-recherche", consigne({
+        "besoins_ouverts": besoins.pour_la_recherche(),
         "rapports": [{"type": t, **f} for t, f in par_lien.values()],
         "demandes_de_jules": demandes_de_jules(),
         "mediane_vues_de_nos_chaines": notre_mediane(donnees["stats"]),
