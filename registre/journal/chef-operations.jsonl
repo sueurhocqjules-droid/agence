@@ -26,3 +26,7 @@
 {"date": "2026-11-14T21:26:58+00:00", "quoi": "stats", "resultat": "ok", "code": 0, "duree_s": 3, "sortie": "ok : 72 vidéos, 19923 vues"}
 {"date": "2026-11-14T21:27:09+00:00", "quoi": "contacts", "resultat": "ok", "code": 0, "duree_s": 1, "sortie": "Guichet : déjà demandé (#13, ouverte) : Droit d'envoi Gmail (gmail.send) pour les messages validés\nok : droit d'envoi absent, demande au guichet #13 (déjà faite), 0 message(s) validé(s) en attente, rien n'est parti"}
 {"date": "2026-11-14T21:27:10+00:00", "quoi": "guichet", "resultat": "ok", "code": 0, "duree_s": 1, "sortie": "ok : 1 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : rien"}
+{"date": "2026-11-14T21:35:51+00:00", "quoi": "stats", "resultat": "ok", "code": 0, "duree_s": 4, "sortie": "ok : 72 vidéos, 19945 vues"}
+{"date": "2026-11-14T21:35:59+00:00", "quoi": "delais", "resultat": "ok", "code": 0, "duree_s": 0, "sortie": "ok : aucun départ en essai, 0 besoin(s) en retard sur leur cible"}
+{"date": "2026-11-14T21:36:00+00:00", "quoi": "contacts", "resultat": "ok", "code": 0, "duree_s": 1, "sortie": "Guichet : déjà demandé (#13, ouverte) : Droit d'envoi Gmail (gmail.send) pour les messages validés\nok : droit d'envoi absent, demande au guichet #13 (déjà faite), 0 message(s) validé(s) en attente, rien n'est parti"}
+{"date": "2026-11-14T21:36:01+00:00", "quoi": "guichet", "resultat": "ok", "code": 0, "duree_s": 1, "sortie": "ok : 1 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : rien"}
