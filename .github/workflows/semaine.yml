@@ -79,6 +79,7 @@ jobs:
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GH_TOKEN: ${{ github.token }}   # demande à l'Ingénierie quand il annule un changement de poste
         run: python -m agence.lancer critique
       - name: Programmateur
         if: ${{ !cancelled() }}
