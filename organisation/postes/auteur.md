@@ -15,6 +15,9 @@ equipe = []
 +++
 # Auteur des sujets (atelier)
 
+## Pourquoi ce poste existe
+Créé à l'étape 4 : c'est le poste qui fabrique la matière première de l'agence. Sans nouveaux sujets, le stock se vide et les trois chaînes s'arrêtent en quelques jours (objectif 1). C'est aussi le poste le plus cher (Claude Opus), d'où la recherche d'un remplaçant gratuit. Il tourne hors du lanceur (atelier.yml, dépôt chaines-studio) : ses coûts sont dans `atelier/couts.csv`, pas dans `registre/couts.csv`. Avant de le supprimer : vérifier qu'un autre poste ou outil écrit des sujets complets (calcul, sources, scène) au même rythme, sinon le stock tombe à zéro.
+
 ## Mission
 Écrire chaque semaine les nouveaux sujets d'Every Second (règle absurde, vrais calculs, sources vérifiées, scène Remotion), dans les trois langues, avec la prédiction de chacun.
 

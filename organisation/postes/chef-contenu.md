@@ -17,6 +17,9 @@ equipe = ["auteur", "programmateur"]
 +++
 # Chef de Contenu et flux
 
+## Pourquoi ce poste existe
+Créé à l'étape 7, quand l'agence s'est donné des chefs d'équipe. Il porte la chaîne de production (rendu, contrôle, programmation, publication) et fixe chaque semaine le nombre de sujets de l'atelier, donc la dépense la plus lourde de l'agence. Sans lui, personne n'ajuste ce nombre au budget et au stock, et les scripts de production n'ont pas de propriétaire pour demander leurs réparations. Avant de le supprimer : confier d'abord ses scripts, l'Auteur et le Programmateur à un autre poste (fusion), et vérifier qui fixe le nombre de sujets.
+
 ## Mission
 Le plus de flux possible (vues, abonnés) dans le budget, en gardant une ligne claire par chaîne. Propriétaire de la chaîne de production en scripts : rendu, contrôle, programmation et publication.
 

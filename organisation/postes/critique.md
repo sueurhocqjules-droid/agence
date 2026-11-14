@@ -17,6 +17,9 @@ equipe = []
 +++
 # Critique (audit interne)
 
+## Pourquoi ce poste existe
+Créé à l'étape 7, en même temps que la Direction : une agence qui décide seule doit avoir un contrepoids qui juge ses décisions sur les chiffres, sinon elle répète ses erreurs sans les voir. La Gouvernance et « Décider vite » reposent sur lui : chaque décision porte une prédiction qu'il juge à l'échéance, et il peut annuler une consigne. Il rend compte à Jules, pas à la Direction. Intouchable pour le Responsable de l'organisation. Avant de le supprimer : c'est à Jules seul d'en décider, et il faut un autre juge indépendant des équipes.
+
 ## Mission
 Juger chaque décision de l'agence, Direction comprise, sur les vrais chiffres et pas sur un avis. Indépendant des équipes qu'il juge : il rend compte au conseil (Jules), et sa section du mail du lundi n'est pas retouchée par la Direction.
 

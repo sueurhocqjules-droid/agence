@@ -114,6 +114,17 @@ def recherche(depuis):
             "outils": registre.lire_jsonl("candidats", depuis), "concepts": registre.lire_jsonl("concepts", depuis)}
 
 
+def voies_de_revenu():
+    """Le dernier passage du Responsable du revenu : voie la plus proche de chaque chaîne et état des règles."""
+    lignes = registre.lire_jsonl("revenu")
+    if not lignes:
+        return "pas encore de passage du Responsable du revenu"
+    d = lignes[-1]
+    return {"date": d["date"][:16], "ligne": d["ligne"], "regles": d["regles"],
+            "voies": [{k: v.get(k) for k in ("chaine", "voie", "besoin", "pourquoi")} for v in d["voies"]],
+            "page": "registre/regles-plateformes.md"}
+
+
 def dossier(maintenant):
     """Tout ce que la Direction lit, en données structurées tirées du registre."""
     depuis = maintenant - timedelta(days=7)
@@ -142,7 +153,8 @@ def dossier(maintenant):
     return {
         "date": maintenant.isoformat(timespec="minutes"),
         "objectifs": {
-            "1_revenu": "0 € par mois : aucune monétisation ouverte pour l'instant",
+            "1_revenu": {"aujourd_hui": "0 € par mois : aucune monétisation ouverte pour l'instant",
+                         "voies_du_responsable_du_revenu": voies_de_revenu()},
             "2_economie": {"dollars_claude_semaine": round(compte["dollars"], 2), "par_agent": compte["par_agent"],
                            "pourcent_de_la_limite": compte["pourcent"], "objectif": "moins de 20 % de la limite, 0 € dépensé"},
             "3_autonomie": {"interventions_de_jules_7j": mesures.valeur("interventions_jules", maintenant, donnees),
@@ -161,6 +173,7 @@ def dossier(maintenant):
                              for c in catalogue.candidats_ouverts(maintenant)],
         "propositions_de_la_recherche": recherche(depuis),
         "rapport_des_operations": (registre.lire_jsonl("operations", depuis) or [None])[-1],
+        "rapport_de_l_organisation": (registre.lire_jsonl("organisation", depuis) or [None])[-1],
         "decisions_7j": [{k: d.get(k) for k in ("auteur", "decision", "pourquoi", "prediction", "echeance")}
                          for d in toutes if mesures.quand(d["date"]) >= depuis][-40:],
         "predictions_ouvertes": [{k: d.get(k) for k in ("id", "auteur", "decision", "mesure", "avant", "attendu", "echeance")}

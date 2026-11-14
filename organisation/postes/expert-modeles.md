@@ -17,6 +17,9 @@ equipe = []
 +++
 # Expert en modèles (réassignation)
 
+## Pourquoi ce poste existe
+Créé à l'étape 8 : les postes tournent sur des modèles gratuits dont les quotas tombent et dont la qualité change d'un mois à l'autre. Sans lui, un poste dont le modèle est épuisé échoue jusqu'à ce que Jules change l'attribution à la main. Il choisit par script, sans Claude, et s'appuie sur le banc d'essai. Avant de le supprimer : vérifier qui réattribue un modèle quand un quota est atteint et rend le meilleur à la remise à zéro.
+
 ## Mission
 Que chaque agent ait toujours le meilleur modèle gratuit disponible pour son rôle. Quand un agent signale un quota atteint, lui en attribuer un autre dans la bibliothèque remplie par Jules, puis lui rendre le meilleur à la remise à zéro du quota.
 

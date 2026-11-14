@@ -44,6 +44,12 @@ POSTES = {
     # vérifient à chaque passage qu'il reconnaît les pannes.
     "juge-banc": [("gemini", "gemini-flash-lite-latest", 2000), ("groq", "openai/gpt-oss-120b", 2000),
                   ("gemini", "gemini-flash-latest", 2000), ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 2000)],
+    # Étape 12 : Responsable du revenu (peu de données, un choix fermé par chaîne) et Responsable de l'organisation
+    # (une ligne de chiffres par poste, ~8k jetons en entrée : Gemini d'abord, le quota par minute de Groq est juste)
+    "responsable-revenu": [("groq", "openai/gpt-oss-120b", 4000), ("gemini", "gemini-flash-latest", 4000),
+                           ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 4000)],
+    "responsable-organisation": [("gemini", "gemini-flash-latest", 5000), ("groq", "openai/gpt-oss-120b", 5000),
+                                 ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 5000)],
     # Relecture des PR (agence/relecture.py, règle 9) : jamais Claude, qui écrit les PR de l'Ingénierie. Gemini, dont
     # le quota gratuit par minute tient un diff de 60k caractères ; Groq seulement pour un petit diff.
     "relecteur-pr": [("gemini", "gemini-flash-lite-latest", 3000), ("gemini", "gemini-flash-latest", 3000),

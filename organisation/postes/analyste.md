@@ -17,6 +17,9 @@ equipe = []
 +++
 # Analyste des investissements (contrôle de gestion)
 
+## Pourquoi ce poste existe
+Créé à l'étape 11, quand l'agence a commencé à envisager des dépenses (paliers de capital, outils payants). Sans lui, une dépense se décide sur l'intuition de la Direction, et personne ne vérifie après coup qu'elle a rapporté ce qui était prévu : l'argent de Jules partirait sans contrôle. Il tourne sans modèle ni jeton, donc ne coûte presque rien. Avant de le supprimer : vérifier qui d'autre chiffre une dépense avant qu'elle soit faite et compare le prévu au réalisé.
+
 ## Mission
 Dire ce que rapporterait chaque dépense possible, avant qu'elle soit faite, et vérifier après coup si elle a rapporté ce qui était prévu. Il part de l'état actuel de l'agence (le cas « ne rien acheter », toujours présent comme référence), simule chaque amélioration payante, puis les paliers (10, 20, 50, 100, 500) et leurs combinaisons, et repère celles qui ne valent pas leur prix. Tout le revenu est réinvesti pour l'instant : il vérifie chaque mois s'il est vraiment nécessaire d'investir autant, en comparant le gain du dernier palier à son coût, et dit quel montant suffit. Il ne décide rien : la Direction recommande, Jules tranche. L'optimisation gratuite reste au Chercheur d'outils, à la Maintenance et à l'Expert en modèles.
 

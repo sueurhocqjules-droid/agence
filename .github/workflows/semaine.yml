@@ -1,6 +1,8 @@
 # Boucle de la semaine, le dimanche soir : le critique juge les prédictions échues, le Programmateur règle les créneaux,
-# le Chef de contenu fixe le nombre de sujets de l'atelier (lundi 1h UTC), la recherche (Chercheur d'outils, Veilleur,
-# Chef de la Recherche) prépare ses propositions, le Chef des opérations son rapport, puis la Direction (Claude) fait sa séance.
+# le Chef de contenu fixe le nombre de sujets de l'atelier (lundi 1h UTC), le Responsable du revenu relit les règles des
+# plateformes et chiffre la voie de revenu de chaque chaîne, la recherche (Chercheur d'outils, Veilleur, Chef de la
+# Recherche) prépare ses propositions, le Chef des opérations son rapport, le Responsable de l'organisation juge les
+# postes, puis la Direction (Claude) fait sa séance.
 # Le bilan du lundi matin reprend les sections du critique et de la Direction.
 name: Semaine
 
@@ -26,7 +28,7 @@ concurrency:
 jobs:
   semaine:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40   # deux postes de plus le 14/11 (revenu, organisation)
     env:
       AGENCE_COMMIT: ${{ inputs.essai && '0' || '1' }}    # chaque changement de consignes ou de créneaux a son commit
       AGENCE_ESSAI: ${{ inputs.essai && '1' || '0' }}     # essai : aucune action visible hors du runner
@@ -92,6 +94,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RENDU_DIR: rendu
         run: python -m agence.lancer chef-contenu
+      # Avant la Recherche : ses besoins chiffrés (voie de revenu de chaque chaîne) sont traités le soir même
+      - name: Responsable du revenu
+        if: ${{ !cancelled() }}
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: python -m agence.lancer responsable-revenu
       - name: Chercheur d'outils
         if: ${{ !cancelled() }}
         env:
@@ -139,6 +149,14 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           REVEILS_JSON: ${{ runner.temp }}/reveils.json
         run: python -m agence.lancer chef-operations
+      - name: Responsable de l'organisation
+        if: ${{ !cancelled() }}
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: python -m agence.lancer responsable-organisation
       - name: Direction
         if: ${{ !cancelled() }}
         env:

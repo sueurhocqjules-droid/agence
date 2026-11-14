@@ -15,6 +15,9 @@ equipe = []
 +++
 # Directeur financier (allocation du capital)
 
+## Pourquoi ce poste existe
+Écrit à l'étape 11 et laissé en sommeil : tant que le capital réinvesti est petit, la Direction l'alloue elle-même. Il existe pour le jour où celui qui décide ne doit plus être celui qui alloue (déclencheurs ci-dessous), avec un modèle différent de celui de la Direction pour ne pas partager ses angles morts. En sommeil, il ne coûte rien. Avant de le supprimer : vérifier qu'aucun déclencheur n'approche et que la séparation entre décider et allouer est assurée autrement.
+
 ## Mission
 Poste écrit, pas encore pourvu. Tant qu'il dort, la Direction alloue elle-même le capital réinvesti à partir des business cases de l'Analyste. Une fois réveillé, il répartit ce capital entre les paliers et les achats, selon les règles d'allocation de la Direction, et l'Analyste passe sous lui. Il propose, il n'achète pas : les agents n'ont jamais de moyen de paiement.
 

@@ -17,6 +17,9 @@ equipe = ["veilleur", "chercheur-outils"]
 +++
 # Chef de la Recherche
 
+## Pourquoi ce poste existe
+Créé à l'étape 8, pour que l'agence s'améliore sans attendre les idées de Jules (objectif 4). Le Veilleur et le Chercheur d'outils produisent beaucoup de pistes ; lui les trie, traite d'abord les besoins chiffrés des agents et ne transmet à la Direction que des propositions prouvées, ce qui garde la séance Claude de la Direction courte. Avant de le supprimer : vérifier qui trie les rapports de la Recherche et répond aux besoins chiffrés, sinon la Direction lit tout en vrac.
+
 ## Mission
 Préparer pour la Direction des propositions prouvées : nouveaux concepts, formats, réseaux, outils et modèles qui feraient avancer les objectifs. Propose, ne décide pas.
 

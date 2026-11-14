@@ -17,6 +17,9 @@ equipe = ["maintenance", "expert-modeles", "courrier"]
 +++
 # Chef des opérations
 
+## Pourquoi ce poste existe
+Créé à l'étape 8 : l'agence doit tourner seule, PC de Jules éteint (objectif 3). Il est propriétaire des scripts du socle (réveil, lanceur, registre, stats, guichet, contacts) et relève chaque semaine les réveils en échec. Sans lui, une panne du socle n'a personne pour la voir ni demander sa réparation, et c'est Jules qui la découvre. Avant de le supprimer : confier d'abord ses scripts et son équipe (Maintenance, Expert en modèles, Courrier) à un autre poste, et vérifier qui relit les réveils en échec.
+
 ## Mission
 Que l'agence tourne seule, PC éteint, au moindre coût : réveils, registre, statistiques, outils et modèles. Propriétaire des scripts du socle.
 
