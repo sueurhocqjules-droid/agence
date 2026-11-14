@@ -2,12 +2,12 @@
 # Semaine = depuis lundi 0h UTC, comme le lanceur.
 
 [claude]
-# Budgets Claude des fiches : Auteur 30 $ + Direction 8 $ = 38 $ équivalent API par semaine (ce que l'agence dépense
-# normalement). Seuils relevés par Jules le 13/11 : pause à 70 $ ≈ 20 % de sa limite (étalon ci-dessous), alerte à 60 $ ≈ 17 %
+# Budgets Claude des fiches : Auteur 30 $ + Direction 8 $ + Ingénierie 9 $ = 47 $ équivalent API par semaine au plus
+# (ce que l'agence dépense normalement, l'Ingénierie seulement quand une demande arrive). Seuils relevés par Jules le 13/11 : pause à 70 $ ≈ 20 % de sa limite (étalon ci-dessous), alerte à 60 $ ≈ 17 %
 alerte_usd_semaine = 60
 # Au-delà : pause des agents qui appellent Claude, et question à Jules pour reprendre
 pause_usd_semaine = 70
-pause_cibles = ["auteur", "direction"]
+pause_cibles = ["auteur", "direction", "ingenierie"]   # l'Ingénierie (9 $ par semaine au plus) ajoutée le 14/11
 # Étalon : combien de dollars équivalent API font 1 % de la limite hebdomadaire de Jules.
 # 0 = inconnu, le compteur ne donne alors que des dollars. Mesuré le 13/11/2026 (barre d'état, ~/.claude/limites.jsonl) :
 # la semaine est passée de 77 % à 80 % pendant le nightwork (12/11 23:17 → 23:50 UTC, rien d'autre ne tournait)

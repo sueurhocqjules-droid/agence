@@ -30,6 +30,9 @@ TOUJOURS = (
     "agence/protege.py",
     "agence/relecture.py",
     "agence/banc_agents.py",
+    # L'Ingénierie ne change ni le code qui décide de ses fusions, ni ses propres plafonds et consignes
+    "agence/ingenierie.py",
+    "organisation/postes/ingenierie.md",
 )
 # Protégés une fois écrits : l'Ingénierie peut ajouter un test ou un cas de banc, jamais en modifier, en retirer ou en
 # renommer un (règle 9 : « peut ajouter des tests, jamais en retirer ni en assouplir »).

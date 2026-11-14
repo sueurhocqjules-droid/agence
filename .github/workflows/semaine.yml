@@ -17,7 +17,7 @@ on:
 permissions:
   contents: write
   issues: write     # réponses du Chef de contenu et de la Direction aux demandes de Jules
-  actions: read     # relevé des réveils de la semaine pour le Chef des opérations
+  actions: write    # relevé des réveils de la semaine (Chef des opérations), lancement de l'Ingénierie par la Direction
 
 concurrency:
   group: registre     # même groupe que le réveil et le bilan : un seul écrivain du registre à la fois

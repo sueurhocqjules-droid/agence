@@ -13,6 +13,7 @@ Entreprise de contenu menée par des agents : scripts pour le routinier, modèle
 | `ressources/catalogue.md` | Ce que l'agence a le droit d'utiliser, avec coût et accord nécessaire |
 | `ressources/boite-a-outils-jarvis.md` | Copie de la boîte à outils de Jarvis, envoyée par le hook de fin de session de Jarvis (`.claude/hooks/boite-vers-agence.sh`) dès qu'elle change. Lue par le seul Chercheur d'outils, ne pas modifier ici |
 | `.github/workflows/reveil.yml` | Réveil programmé sur GitHub, PC éteint, qui commite le registre |
+| `.github/workflows/ingenierie.yml` | Ingénierie : une issue étiquetée `ingenierie` (posée par Jules, ou écrite par un agent avec `agence.ingenierie.demander`) devient une PR écrite par Claude Code, 40 tours et 3 $ au plus. Le script lance les tests, le banc, le contrôle des fichiers protégés et la relecture, puis fusionne seul si tout est vert. Fichier protégé touché : la PR attend Jules avec l'étiquette `guichet`. Reprise sans Claude d'une PR restée ouverte : `gh workflow run ingenierie.yml -f pr=<n>` |
 | `.github/workflows/protege.yml` | Fichiers protégés (règle 9) : PR rouge si elle touche `.github/`, `MISSION.md`, les autorisations de clés, le contrôle ou un test / cas de banc existant, sauf étiquette `accord-jules` posée par Jules (`agence/protege.py`). Relecture de chaque PR par Gemini en commentaire (`agence/relecture.py`) |
 
 ## Règles de construction

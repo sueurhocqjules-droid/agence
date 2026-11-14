@@ -9,5 +9,7 @@
 /agence/protege.py                @sueurhocqjules-droid
 /agence/relecture.py              @sueurhocqjules-droid
 /agence/banc_agents.py            @sueurhocqjules-droid
+/agence/ingenierie.py             @sueurhocqjules-droid
+/organisation/postes/ingenierie.md @sueurhocqjules-droid
 /tests/                           @sueurhocqjules-droid
 /banc/                            @sueurhocqjules-droid
