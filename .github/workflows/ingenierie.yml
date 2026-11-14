@@ -85,22 +85,8 @@ jobs:
           PR: ${{ inputs.pr }}
         run: python -m agence.ingenierie reprendre "$PR"
 
-      - name: Diagnostic temporaire (Node dans la copie de travail)
-        if: ${{ steps.construire.outputs.pr || steps.reprendre.outputs.pr }}
-        continue-on-error: true
-        run: |
-          which -a node; node --version; echo "$PATH"
-          env | grep -i -E "^(node|npm)" || true
-          ls -la "$RUNNER_TEMP" "$HOME"
-          ls /home/runner/work/package.json /home/runner/package.json "$RUNNER_TEMP/package.json" 2>&1 || true
-          for d in travail pr; do
-            if [ -d "$RUNNER_TEMP/$d" ]; then
-              ls -la "$RUNNER_TEMP/$d"
-              node --input-type=module -e "import * as w from 'file://$RUNNER_TEMP/$d/alarme/worker.js'; console.log(Object.keys(w))" || true
-            fi
-          done
-
-      # Code de la PR, sans aucun secret
+      # Code de la PR, sans aucun secret. Jamais dans $RUNNER_TEMP/travail : l'isolation de Claude y laisse des points
+      # de montage vides, dont un package.json que Node refuse (« Invalid package config », vu le 14/11)
       - name: Tests de la PR
         id: tests
         if: ${{ steps.construire.outputs.pr || steps.reprendre.outputs.pr }}
