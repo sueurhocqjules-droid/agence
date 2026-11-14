@@ -16,14 +16,16 @@ import sys
 import tomllib
 from datetime import datetime, timedelta, timezone
 
-from agence import (besoins, catalogue, consignes, demandes, ingenierie, lancer, mesures, organisation, questions,
-                    registre)
+from agence import (besoins, catalogue, consignes, demandes, essais, ingenierie, lancer, memoire, mesures,
+                    organisation, questions, registre)
 from agents import analyste, surete
 
 MODELE = "claude-opus-5-5"
 RETOURS_MAX, CONSIGNES_MAX, QUESTIONS_MAX = 5, 2, 2   # une question par semaine vise l'objectif 3 (autonomie)
 RECOMMANDATIONS = ["ne_rien_acheter", "proposer_a_jules"]   # Jules tranche chaque achat, dans Jarvis
 OUTILS_MAX = 2   # outils retenus par séance : chacun devient une demande à l'Ingénierie ou au guichet
+ESSAIS_MAX = len(essais.chaines())   # un essai par chaîne au plus (registre/essais.jsonl)
+LECONS_MAX = 2   # leçons proposées à la mémoire par séance : le Critique les relit
 
 
 def equipe_en_service(postes):
@@ -44,9 +46,23 @@ def schema(equipe, cas_simules=(), outils=()):
     return {
         "type": "object", "additionalProperties": False,
         "required": ["analyse", "decisions", "retours", "consignes", "questions", "investissements", "ingenierie",
-                     "outils"],
+                     "outils", "essais", "lecons"],
         "properties": {
             "outils": retenus,
+            "essais": {"type": "array", "maxItems": ESSAIS_MAX, "items": {
+                "type": "object", "additionalProperties": False, "required": ["chaine", "ligne", "duree_jours", "raison"],
+                "properties": {"chaine": {"type": "string", "enum": essais.chaines()},
+                               "ligne": {"type": "string", "minLength": 1,
+                                         "description": "la ligne que la chaîne suit pendant l'essai, en une phrase"},
+                               "duree_jours": {"type": "integer", "minimum": essais.DUREE_MIN, "maximum": essais.DUREE_MAX},
+                               "raison": {"type": "string", "minLength": 1,
+                                          "description": "pourquoi cette durée minimale suffit pour juger sur les chiffres"}}}},
+            "lecons": {"type": "array", "maxItems": LECONS_MAX, "items": {
+                "type": "object", "additionalProperties": False, "required": ["fait", "preuve", "change"],
+                "properties": {"fait": texte,
+                               "preuve": {"type": "string", "minLength": 1,
+                                          "description": "où le vérifier : fichier du registre, identifiant de décision, commit, run ou issue du dossier"},
+                               "change": {"type": "string", "minLength": 1, "description": "ce que cette leçon change dans les décisions"}}}},
             "ingenierie": {"type": "array", "maxItems": ingenierie.DEMANDES_MAX, "items": {
                 "type": "object", "additionalProperties": False, "required": ["titre", "quoi", "pourquoi", "preuve"],
                 "properties": {"titre": {"type": "string", "minLength": 1, "description": "une ligne : ce qui sera construit"},
@@ -165,6 +181,8 @@ def dossier(maintenant):
         "mesures_maintenant": mesures.tableau(maintenant, donnees),
         "mesures_il_y_a_7_jours": mesures.tableau(depuis, donnees),
         "section_du_critique": critique.read_text(encoding="utf-8") if critique.exists() else "pas encore écrite",
+        "memoire": memoire.dossier(maintenant),
+        "essais": essais.dossier(maintenant),
         "plan_du_chef_de_contenu": tomllib.loads(plan.read_text(encoding="utf-8")) if plan.exists() else None,
         "heures_de_sortie": donnees["heures"],
         "besoins": besoins.dossier(maintenant, cas_analyste),
@@ -228,6 +246,13 @@ décide toi-même des remèdes qui relèvent de l'agence, chacun avec la mesure 
 Dès que semaines atteint {mesures.SEMAINES_AVANT_JULES}, ton analyse propose à Jules 2 ou 3 solutions concrètes : ce que
 l'agence a déjà essayé et avec quel résultat, puis pour chaque solution ce qu'elle coûte et ce que tu en attends. Si
 l'une d'elles est la fermeture ou la refonte totale de la chaîne, elle passe aussi en question (Gouvernance).
+memoire : les leçons apprises par l'agence, tenues par le Critique. Relis-les avant toute décision engageante (budget
+d'une autre équipe, poste, nouvelle chaîne, ligne d'une chaîne) : ne refais pas ce qui a déjà échoué sans fait nouveau,
+et dis dans le pourquoi la leçon dont tu tiens compte.
+essais : la ligne que suit chaque chaîne et la durée minimale pendant laquelle elle la garde, pour donner des chiffres
+exploitables. Une chaîne dans chaines_sans_essai suit une ligne que personne n'a datée : ouvre son essai (la ligne
+actuelle, une durée, sa raison). Tant que refonte_possible est faux, la chaîne garde sa ligne : le script refuse
+un nouvel essai. Une refonte totale d'une chaîne reste une question à Jules (Gouvernance).
 Tu rends ta réponse au format imposé, appliquée telle quelle par un script :
 - decisions : ce que tu décides, chacune avec sa raison. Quand elle a un effet mesurable, nomme la mesure (liste fermée)
   et la valeur attendue à l'échéance ; le critique la jugera sur les vrais chiffres. Une décision sans mesure reste notée.
@@ -237,6 +262,12 @@ Tu rends ta réponse au format imposé, appliquée telle quelle par un script :
   attendent Jules. Pas de code à écrire cette semaine : liste vide.
 - outils : au plus {OUTILS_MAX} outils gratuits de outils_candidats à retenir, par leur lien, les plus utiles à un besoin
   ou aux 4 objectifs. Le script les envoie sur leur voie (essai par l'Ingénierie, ou guichet). Rien à retenir : liste vide.
+- essais : au plus un par chaîne (ou « toutes » pour un format commun) : la ligne suivie, la durée minimale en jours
+  ({essais.DUREE_MIN} à {essais.DUREE_MAX}) et pourquoi cette durée suffit. Le script cite lui-même le résultat de l'essai
+  précédent. Rien à ouvrir : liste vide.
+- lecons : au plus {LECONS_MAX} leçons à proposer à la mémoire, chacune avec le fait, sa preuve (un fichier du registre, un
+  identifiant de décision, un commit, un run ou une issue du dossier) et ce qu'elle change. Seulement ce qui
+  changera une décision future. Le plus souvent : liste vide.
 - retours : trois lignes au plus par membre de ton équipe en service, sur sa mesure de réussite.
 - consignes : la nouvelle liste complète des consignes d'un membre, avec la mesure qu'elle doit améliorer. Un seul changement
   en attente par membre (refusé s'il en a déjà un), deux au plus par semaine : on doit savoir ce qui a joué.
@@ -314,6 +345,23 @@ def appliquer(reponse, maintenant, avant, cas_simules=()):
         registre.decider("direction", f"investissements {i['poche']} : {i['recommandation']}"
                          + (f" ({' + '.join(i['cas'])})" if i["cas"] else ""), i["pourquoi"][:600])
         faits.append(f"investissements {i['poche']} : {i['recommandation']}")
+    for e in reponse.get("essais", [])[:ESSAIS_MAX]:
+        try:
+            ident = essais.ouvrir("direction", e.get("chaine"), e.get("ligne"), e.get("duree_jours"), e.get("raison"),
+                                  maintenant)
+        except ValueError as err:
+            refus.append(f"essai sur {e.get('chaine')} : {err}")
+            continue
+        registre.decider("direction", f"essai ouvert sur {e['chaine']} pour {e['duree_jours']} jours : {e['ligne'][:200]}"
+                         f" ({ident})", str(e["raison"])[:600])
+        faits.append(f"essai ouvert sur {e['chaine']} ({e['duree_jours']} jours)")
+    for l in reponse.get("lecons", [])[:LECONS_MAX]:
+        raison = memoire.refus(l.get("fait"), l.get("preuve"), l.get("change"), memoire.lire())
+        if raison:
+            refus.append(f"leçon « {str(l.get('fait'))[:60]} » : {raison}")
+            continue
+        memoire.proposer("direction", l["fait"], l["preuve"], l["change"])
+        faits.append(f"leçon proposée au Critique : {l['fait'][:80]}")
     equipe = equipe_en_service(organisation.fiches())
     for d in reponse["decisions"]:
         mesure = d["mesure"] if d["mesure"] in mesures.MESURES and isinstance(d["attendu"], (int, float)) else None

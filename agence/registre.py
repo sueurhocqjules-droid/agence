@@ -61,12 +61,13 @@ def refuses():
 
 
 def decider(auteur, decision, pourquoi, prediction=None, mesure=None, echeance=None, avant=None, attendu=None,
-            changement=None):
+            changement=None, organisation=None):
     """Note une décision au journal d'audit, avec sa raison, et renvoie son identifiant.
 
     Avec une mesure (liste fermée de agence/mesures.py), sa valeur avant, la valeur attendue et l'échéance,
     le critique la jugera sur les vrais chiffres. `changement` décrit un changement de consignes ou de réglage
-    (poste, fichier, section, ancien, nouveau), que le critique annule s'il n'a rien amélioré.
+    (poste, fichier, section, ancien, nouveau), que le critique annule s'il n'a rien amélioré. `organisation`
+    décrit un changement de poste (action creer, supprimer ou fusionner, postes, nouveau), annulé de la même façon.
     """
     ident = f"{auteur}-{datetime.now(timezone.utc):%Y%m%d%H%M%S%f}"
     entree = {"id": ident, "date": maintenant(), "auteur": auteur, "decision": decision, "pourquoi": pourquoi,
@@ -74,6 +75,8 @@ def decider(auteur, decision, pourquoi, prediction=None, mesure=None, echeance=N
               "verdict": None}
     if changement:
         entree["changement"] = changement
+    if organisation:
+        entree["organisation"] = organisation
     with open(DOSSIER / "decisions.jsonl", "a", encoding="utf-8") as f:
         f.write(json.dumps(entree, ensure_ascii=False) + "\n")
     return ident

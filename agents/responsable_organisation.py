@@ -27,7 +27,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from agence import besoins, consignes, guichet, ingenierie, mesures, modeles, organisation, postes, registre
+from agence import besoins, consignes, guichet, ingenierie, memoire, mesures, modeles, organisation, postes, registre
 from agents.chef_operations import journaux
 
 POSTE = "responsable-organisation"
@@ -185,7 +185,8 @@ def consigne(donnees):
         "justifient clairement ; sinon null. Un poste récent ou sans données n'est pas inutile : ses chiffres "
         "manquent, c'est tout (lis registre_depuis et passages_attendus_au_moins). Un besoin ouvert se comble "
         "d'abord par un outil (la Recherche les traite), un nouveau poste seulement si aucun poste existant ne peut "
-        "le porter. Ne propose rien si changement_en_cours n'est pas null. Ne supprime ni n'absorbe "
+        "le porter. Relis memoire (les leçons apprises) avant de proposer un changement : ne refais pas ce qui a "
+        "déjà échoué sans fait nouveau. Ne propose rien si changement_en_cours n'est pas null. Ne supprime ni n'absorbe "
         "jamais un poste marqué intouchable, et lis sa section « Pourquoi ce poste existe » avant de proposer sa "
         "suppression. N'utilise que les chiffres des données. En français, sans tiret long."
     )
@@ -316,7 +317,10 @@ def appliquer(c, fiches, maintenant, donnees_mesures=None, demander_ing=None, de
             avant = None
     echeance = (maintenant + timedelta(days=ESSAI_J)).isoformat(timespec="seconds")
     ident = registre.decider(POSTE, f"changement de poste : {titre.lower()}", c["pourquoi"], c["prediction"],
-                             c["mesure"], echeance, avant, c["attendu"])
+                             c["mesure"], echeance, avant, c["attendu"],
+                             organisation={"action": c["action"], "postes": c["postes"],
+                                           "nouveau": (c.get("nouveau") or {}).get("id"),
+                                           "superieur": fiches.get((c["postes"] or [None])[-1], {}).get("superieur")})
     fait = [f"décision {ident} (échéance {echeance[:10]})"]
     if c["action"] == "supprimer":
         pause(c["postes"][0], POSTE, f"poste supprimé par le Responsable de l'organisation : {c['pourquoi'][:200]}")
@@ -360,6 +364,7 @@ def passage(essai, demander=postes.demander, maintenant=None):
     donnees = {"date": maintenant.isoformat(timespec="minutes"), "postes": tableau,
                "sans_poste_pour_y_repondre": sans_poste(maintenant),
                "besoins_ouverts": besoins.pour_la_recherche(), "changement_en_cours": en_cours,
+               "memoire": memoire.pour_un_agent(),
                "cles_connues": sorted(cles_connues),
                "regle": "embauche, suppression et fusion sans Jules, dans l'enveloppe Claude ; nouvelle clé ou "
                         "nouveau compte par le guichet ; retour arrière par Git"}

@@ -23,7 +23,7 @@ import sys
 import urllib.request
 from datetime import datetime, timezone
 
-from agence import besoins, mesures, modeles, postes, registre, youtube
+from agence import besoins, memoire, mesures, modeles, postes, registre, youtube
 
 POSTE = "responsable-revenu"
 ETAT = "regles-plateformes.json"
@@ -214,7 +214,8 @@ def consigne(donnees):
         '{"ligne": "ton rapport à la Direction en une phrase, avec les chiffres", '
         f'"voies": [{{"chaine": "une de {sorted(donnees["distances"])}", "voie": "une de {sorted(VOIES)}", '
         '"pourquoi": "une ou deux phrases, avec les chiffres des données"}]}\n'
-        "Une voie par chaîne. N'utilise que les chiffres des données, n'en invente aucun. Ne tire aucun chiffre "
+        "Une voie par chaîne. Relis memoire (les leçons apprises) avant de choisir. N'utilise que les chiffres des "
+        "données, n'en invente aucun. Ne tire aucun chiffre "
         "d'une règle dont l'état n'est pas « confirmee ». En français, sans tiret long."
     )
 
@@ -263,7 +264,8 @@ def passage(essai, lire=lire_page, demander=postes.demander):
                "regles": [{"id": r["id"], "plateforme": r["plateforme"], "regle": r["regle"],
                            "etat": etat[r["id"]]["etat"]} for r in REGLES],
                "signaux_de_diffusion": [s["texte"] for s in mesures.signaux_portee(
-                   registre.lire("stats"), datetime.now(timezone.utc))]}
+                   registre.lire("stats"), datetime.now(timezone.utc))],
+               "memoire": memoire.pour_un_agent()}
     modele = None
     try:
         texte, modele, *_ = demander(POSTE, consigne(donnees))

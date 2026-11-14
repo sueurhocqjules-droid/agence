@@ -1,0 +1,16 @@
+# Mémoire de l'entreprise
+
+> Les leçons apprises, une par ligne (MISSION.md, règle 7). Tenue par le Critique (`agents/critique.py`, par
+> `agence/memoire.py`) : n'importe quel agent propose une leçon, lui seul écrit ici. Lue avant toute décision
+> engageante par la Direction, le Responsable de l'organisation, l'Ingénierie, le Chef de contenu et le
+> Responsable du revenu. Elle reste courte : une leçon qui ne change plus aucune décision en sort.
+
+| Fait | Preuve | Date | Ce que ça change | À revoir le |
+|---|---|---|---|---|
+| La chaîne espagnole n'est presque pas diffusée par YouTube : 0,04 % des vues de la chaîne anglaise sur les mêmes sujets, quand la portugaise en fait 7,8 % | registre/stats.csv (relevés du 13/11), signal « panne » de agence/mesures.py | 2026-11-13 | Les mêmes sujets sortent partout : un écart entre chaînes parle de la chaîne, pas des sujets. Chercher la cause côté chaîne avant de changer les sujets ou la cadence | 2026-12-13 |
+| Un sujet livré coûte 3,74 $ de Claude, séances ratées comprises : l'enveloppe de 30 $ paie 8 sujets par semaine | couts.csv de l'atelier, commit 3b2780a ; besoin programmateur-sujets dans registre/besoins.jsonl | 2026-11-12 | Monter la cadence ne se décide pas sans un moyen moins cher d'écrire un sujet ou une hausse d'enveloppe (Jules) | 2026-12-12 |
+| Une séance Claude lancée en journée est coupée par la limite de 5 h de l'abonnement, partagée avec Jules : une séance de 8 $ n'a rien livré | commits bd6b023 et bf19f9d de chaines-studio | 2026-11-12 | Les séances Claude longues se lancent la nuit (atelier le lundi à 1 h UTC), jamais en journée ; une séance coupée garde ses sujets finis et note son coût | 2027-02-12 |
+| Le relais « DSH », qui donne accès à des modèles payants sans clé ni inscription, a été refusé : fuite de données possible, coupure sans préavis | registre/refus.jsonl (13/11), cas du banc banc/agents/ | 2026-11-13 | Aucun relais non officiel vers un modèle payant, même gratuit : la Recherche ne le repropose pas | 2027-05-13 |
+| Le 11/11, les runners n'ont plus joint les serveurs d'Ubuntu : ffmpeg, téléchargé à chaque run, a manqué, et le flux n'a rien programmé de l'après-midi | commit fd8c777 (ffmpeg figé dans la release « outils » de studio-rendu) | 2026-11-11 | Un outil dont un run dépend est figé dans une release dont l'empreinte est vérifiée, jamais téléchargé chez un tiers à chaque run | 2027-05-11 |
+| YouTube a refusé un envoi sur les 3 chaînes le 11/11 (uploadLimitExceeded) : c'est la limite d'envois de la chaîne, pas le quota de l'API ; l'envoi est passé le lendemain | registre/journal/chef-contenu.jsonl (11/11, 19:54 et 21:14 UTC) | 2026-11-11 | Un refus d'envoi se retente au réveil suivant, ce n'est pas une panne ; la cadence ne dépasse pas 5 sorties par jour et par chaîne | 2027-02-11 |
+| Instagram refuse l'envoi direct du fichier vidéo avec notre jeton (réservé aux applications « Facebook Login for Business ») | commit 5551ad0 (vidéo lue depuis une adresse publique) | 2026-11-13 | Toute diffusion vers un réseau qui lit une adresse passe par la branche diffusion de studio-rendu (Instagram, TikTok par Buffer) | 2027-05-13 |

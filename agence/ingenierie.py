@@ -145,7 +145,8 @@ Tes consignes :
 {consignes.lire_section(fiche, "Consignes")}
 
 Comment tu travailles :
-- Lis d'abord `organisation/MISSION.md`, puis seulement les fichiers dont la demande a besoin.
+- Lis d'abord `organisation/MISSION.md` et `organisation/MEMOIRE.md` (les leçons apprises), puis seulement les
+  fichiers dont la demande a besoin.
 - Tu modifies les fichiers ; un script commite, ouvre la PR et la fusionne si tout est vert. Aucune commande git,
   aucun appel réseau, aucun jeton : la seule commande que tu peux lancer est `python -m unittest discover tests`.
 - Avant de finir, lance les tests et corrige jusqu'au vert. Si tu ne peux pas finir proprement, ne laisse aucun
