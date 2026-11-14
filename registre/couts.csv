@@ -96,3 +96,4 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-13T22:35:50+00:00,courrier,2,0,0,1,"ok : 4 mail(s) : 0 collaboration, 3 plateforme, 0 sanction, 1 autre ; 0 transmis"
 2026-11-13T22:35:52+00:00,flux,3,0,0,0,"ok : 0 programmées, 0 rejetées, 0 en rendu, 0 diffusées, 0 erreurs de diffusion"
 2026-11-13T22:35:55+00:00,guetteur,3,0,0,1,"ok : 1 commentaire(s) nouveau(x), 0 occasion(s) ; seuil le plus proche : Every Second (en) : 12 874 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
+2026-11-14T01:17:00+00:00,ingenierie,16,103738,0.1078,0,"ok : demande #9, 1 fichier(s), 0.11 $"
