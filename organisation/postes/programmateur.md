@@ -24,7 +24,7 @@ Décider, réseau par réseau, de la cadence et des heures qui apportent le plus
 Stats par vidéo, heure et réseau. Limites de rythme de chaque plateforme (tenues par la Sûreté).
 
 ## Sorties
-Un essai de cadence à la fois par réseau, noté au journal avec sa prédiction. Le calendrier des créneaux appliqué par `flux` : `organisation/creneaux.toml` pour YouTube, `organisation/diffusion.toml` pour les Reels par jour sur Instagram et Facebook (vidéos déjà publiques sur YouTube, la plus ancienne d'abord).
+Un essai de cadence à la fois par réseau, noté au journal avec sa prédiction. Le calendrier des créneaux appliqué par `flux` : `organisation/creneaux.toml` pour YouTube, `organisation/diffusion.toml` pour les Reels par jour sur Instagram et Facebook (vidéos déjà publiques sur YouTube, la plus ancienne d'abord). À chaque passage, son besoin chiffré dans `registre/besoins.jsonl` : les sujets qui manquent par semaine pour sortir à la cadence la plus haute (5 par jour), que la Recherche traite en priorité. Il ne se contente pas de baisser la cadence, il demande ; le besoin se ferme de lui-même quand le budget paie cette cadence.
 
 ## Outils
 Script `creneaux`, lecture du registre.
