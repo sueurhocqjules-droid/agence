@@ -17,3 +17,6 @@
 {"date": "2026-11-13T22:35:47+00:00", "quoi": "stats", "resultat": "ok", "code": 0, "duree_s": 3, "sortie": "ok : 72 vidéos, 16030 vues"}
 {"date": "2026-11-14T03:11:13+00:00", "quoi": "stats", "resultat": "ok", "code": 0, "duree_s": 3, "sortie": "ok : 72 vidéos, 17714 vues"}
 {"date": "2026-11-14T06:28:58+00:00", "quoi": "stats", "resultat": "ok", "code": 0, "duree_s": 2, "sortie": "ok : 72 vidéos, 18055 vues"}
+{"date": "2026-11-14T07:01:07+00:00", "quoi": "stats", "resultat": "ok", "code": 0, "duree_s": 3, "sortie": "ok : 72 vidéos, 18259 vues"}
+{"date": "2026-11-14T07:01:19+00:00", "quoi": "contacts", "resultat": "ok", "code": 0, "duree_s": 2, "sortie": "Guichet : demande #13 écrite : Droit d'envoi Gmail (gmail.send) pour les messages validés\nok : droit d'envoi absent, demande au guichet #13 (écrite), 0 message(s) validé(s) en attente, rien n'est parti"}
+{"date": "2026-11-14T07:01:20+00:00", "quoi": "guichet", "resultat": "ok", "code": 0, "duree_s": 1, "sortie": "ok : 0 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : récapitulatif"}
