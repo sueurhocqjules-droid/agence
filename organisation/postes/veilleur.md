@@ -17,6 +17,9 @@ equipe = []
 +++
 # Veilleur des concepts et formats
 
+## Pourquoi ce poste existe
+Créé à l'étape 8 : Every Second n'a qu'un concept, et ses vues dépendent de concepts et formats qui marchent ailleurs. Sans lui, les idées nouvelles ne viennent que de Jules (objectif 4). Il repère les Shorts à au moins 3 fois la médiane de leur chaîne, par script, et fait débattre les vidéos que Jules propose. Avant de le supprimer : vérifier qui d'autre cherche des concepts qui surperforment et répond aux vidéos envoyées par Jules.
+
 ## Mission
 Repérer dans le monde entier les concepts et formats qui surperforment et sont réalisables par l'agence. Fait aussi débattre avec le critique les vidéos que Jules propose.
 

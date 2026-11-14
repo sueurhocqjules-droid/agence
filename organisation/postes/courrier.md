@@ -17,6 +17,9 @@ equipe = []
 +++
 # Courrier (tri de boite-chaines)
 
+## Pourquoi ce poste existe
+Créé à l'étape 9 : les plateformes (avertissements, monétisation) et les marques (collaborations) écrivent à boite-chaines, et Jules ne lit pas cette boîte tous les jours. Un avertissement manqué peut coûter une chaîne, une collaboration manquée coûte du revenu (objectifs 1 et 3). Il classe sur les en-têtes seulement et ne répond jamais. Avant de le supprimer : vérifier qui d'autre lit boite-chaines et prévient Jules d'un mail de plateforme ou de collaboration.
+
 ## Mission
 Que rien d'important n'échappe dans la boîte boite-chaines. Filtres Gmail par chaîne d'abord, l'agent classe le reste.
 

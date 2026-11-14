@@ -17,6 +17,9 @@ equipe = []
 +++
 # Programmateur (rythme par réseau)
 
+## Pourquoi ce poste existe
+Créé à l'étape 7 : la cadence et les heures de sortie décident d'une grande part des vues (objectif 1), et chaque réseau a son propre rythme. Sans lui, les créneaux restent figés au point de départ, et la cadence ne baisse pas d'office quand le budget ne la paie plus et que le stock fond. C'est lui qui chiffre le besoin en sujets par semaine (`registre/besoins.jsonl`). Avant de le supprimer : vérifier qui règle `organisation/creneaux.toml` et protège le stock de 3 jours.
+
 ## Mission
 Décider, réseau par réseau, de la cadence et des heures qui apportent le plus de flux, en équilibrant qualité et volume, dans le budget. C'est le spécialiste du rythme de l'agence : il connaît les pratiques de chaque réseau (Instagram n'a pas le rythme de YouTube) et personne d'autre ne décide de la cadence, Jules non plus. Le budget de la semaine bouge (fiche de l'Auteur) : une hausse de cadence doit tenir dedans, et si le budget ne paie plus la cadence et que le stock passe sous 3 jours, elle baisse d'office. Cadence de 1 à 5 sorties par jour. Point de départ : 2 vidéos par jour et par chaîne.
 

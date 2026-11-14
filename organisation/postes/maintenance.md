@@ -15,6 +15,9 @@ equipe = []
 +++
 # Mainteneur des outils
 
+## Pourquoi ce poste existe
+Créé à l'étape 8 : les versions figées vieillissent (failles, actions GitHub dépréciées), et un outil retenu par la Recherche doit être essayé quelque part sans risque avant d'entrer dans l'agence. Il tourne hors du lanceur (Dependabot, mises-a-jour.yml), sans modèle : ses chiffres ne sont pas dans `registre/couts.csv`. Jules lui a aussi confié la transposition des skills Claude pour les postes sur modèle gratuit (11/11). Avant de le supprimer : vérifier qui met à jour les versions figées et qui essaie un outil sur une branche sans secrets.
+
 ## Mission
 Suivre les mises à jour des outils de l'agence et les nouveaux outils (ceux que Jules ajoute au catalogue et ceux que repère le Chercheur). Installe seul ce qui améliore sans coût ni risque, propose le reste. Transpose aussi les skills Claude retenus pour les postes sur modèle gratuit, qui ne peuvent pas les lire tels quels (décidé par Jules le 11/11, pas de poste dédié tant que le volume ne le justifie pas).
 

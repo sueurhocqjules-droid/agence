@@ -16,6 +16,9 @@ equipe = []
 +++
 # Responsable sûreté
 
+## Pourquoi ce poste existe
+Créé à l'étape 6, avant les chefs : une agence qui publie seule peut perdre une chaîne sur une sanction, ou dépenser trop en une nuit, plus vite que Jules ne le verrait. Il peut tout mettre en pause seul et prévenir Jules, sans modèle, à chaque réveil. La Gouvernance exige ce poste. Intouchable pour le Responsable de l'organisation. Avant de le supprimer : c'est à Jules seul d'en décider, et il faut un autre poste qui coupe le flux sur un seuil.
+
 ## Mission
 Éviter qu'une sanction, un quota ou une dépense coûte le flux ou l'argent. Surveille le rythme des actions (publications, appels d'API, minutes GitHub), les quotas et les avertissements des plateformes (YouTube, TikTok, Instagram, GitHub). Peut mettre en pause seule une chaîne, un agent ou une action, et prévient la Direction et Jules.
 

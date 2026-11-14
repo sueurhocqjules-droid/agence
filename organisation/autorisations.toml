@@ -23,14 +23,14 @@ YOUTUBE_API_KEY = ["guetteur", "veilleur"]
 META_TOKEN = ["flux"]
 BUFFER_API_KEY = ["flux"]
 # Jeton du workflow GitHub (droits fixés par chaque workflow)
-GH_TOKEN = ["flux", "garde_fous", "bilan", "guichet", "contacts", "chef-contenu", "chercheur-outils", "direction", "ingenierie"]
+GH_TOKEN = ["flux", "garde_fous", "bilan", "guichet", "contacts", "chef-contenu", "chercheur-outils", "direction", "ingenierie", "responsable-organisation"]
 # Bot Telegram : messages à Jules seulement
 TELEGRAM_BOT_TOKEN = ["reponses", "garde_fous", "bilan", "guichet", "courrier", "guetteur", "direction"]
 # Boîte boite-chaines : lecture et filtres, rien d'autre
 GMAIL_TOKEN = ["courrier"]
 # Modèles gratuits
-GROQ_API_KEY = ["chef-operations", "chef-contenu", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "critique", "programmateur"]
-GEMINI_API_KEY = ["chef-operations", "chef-contenu", "chercheur-outils", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "critique", "programmateur"]
-OPENROUTER_API_KEY = ["chercheur-outils", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur"]
+GROQ_API_KEY = ["chef-operations", "chef-contenu", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "critique", "programmateur", "responsable-organisation", "responsable-revenu"]
+GEMINI_API_KEY = ["chef-operations", "chef-contenu", "chercheur-outils", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "critique", "programmateur", "responsable-organisation", "responsable-revenu"]
+OPENROUTER_API_KEY = ["chercheur-outils", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "responsable-organisation", "responsable-revenu"]
 # Abonnement Claude de Jules
 CLAUDE_CODE_OAUTH_TOKEN = ["direction", "ingenierie"]
