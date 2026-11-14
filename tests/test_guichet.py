@@ -3,6 +3,7 @@ import base64
 import json
 import os
 import re
+import tempfile
 import unittest
 from datetime import datetime, timezone
 from email import message_from_bytes
@@ -56,7 +57,11 @@ class Demande(unittest.TestCase):
         patch = mock.patch.object(guichet.registre, "decider", lambda *a, **k: self.decisions.append(a))
         patch.start()
         self.addCleanup(patch.stop)
-        for p in (mock.patch("builtins.print"), mock.patch.dict(os.environ, {"AGENCE_ESSAI": ""})):
+        dossier = tempfile.TemporaryDirectory()
+        self.addCleanup(dossier.cleanup)
+        self.etat = Path(dossier.name) / "guichet.json"
+        for p in (mock.patch("builtins.print"), mock.patch.dict(os.environ, {"AGENCE_ESSAI": ""}),
+                  mock.patch.object(guichet, "ETAT", self.etat)):
             p.start()
             self.addCleanup(p.stop)
 
@@ -83,6 +88,7 @@ class Demande(unittest.TestCase):
         self.assertIn("**Ce que ça débloque :** 3 vignettes par jour", entree)
         self.assertIn("**Coût :** 0 €", entree)
         self.assertEqual(len(self.decisions), 1)
+        self.assertEqual([n["numero"] for n in json.loads(self.etat.read_text(encoding="utf-8"))["nouvelles"]], [77])
 
     def test_urgent_ajoute_l_etiquette(self):
         gh = FauxGitHub()
@@ -131,7 +137,16 @@ class Recap(unittest.TestCase):
 
     def demande(self, numero, urgent=False):
         return {"numero": numero, "titre": f"demande {numero}", "lien": f"https://x/{numero}", "urgent": urgent,
-                "texte": "- **Quoi :** x", "pr": False}
+                "texte": "- **Quoi :** x", "pr": False, "date": "2026-11-14T05:00:00Z"}
+
+    def test_une_demande_ecrite_au_meme_reveil_est_dans_le_recapitulatif(self):
+        # GitHub ne liste pas tout de suite une issue neuve : elle vient de l'état laissé par `demander`
+        etat, envoyes, envois = self.passage(self.MATIN, {"nouvelles": [self.demande(13)]})
+        self.assertEqual(envoyes, ["récapitulatif"])
+        self.assertIn("#13 demande 13", envois[0])
+        self.assertNotIn("nouvelles", etat)
+        _, _, envois = self.passage(self.MATIN, {"nouvelles": [self.demande(13)]}, [self.demande(13)])
+        self.assertEqual(envois[0].count("#13"), 1)      # déjà listée par GitHub : pas en double
 
     def test_un_recapitulatif_par_jour(self):
         etat, envoyes, envois = self.passage(self.MATIN, {}, [self.demande(1)])
@@ -296,8 +311,10 @@ class Service:
 
 class Envoi(unittest.TestCase):
     def setUp(self):
-        self.lignes = []
+        dossier = tempfile.TemporaryDirectory()
+        self.addCleanup(dossier.cleanup)
         for p in (mock.patch.object(contacts.registre, "decider", lambda *a, **k: None), mock.patch("builtins.print"),
+                  mock.patch.object(guichet, "ETAT", Path(dossier.name) / "guichet.json"),
                   mock.patch.object(guichet.registre, "decider", lambda *a, **k: None),
                   mock.patch.dict(os.environ, {"AGENCE_ESSAI": ""}),
                   mock.patch("builtins.open", mock.mock_open())):

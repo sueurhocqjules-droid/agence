@@ -11,7 +11,7 @@ La mémoire commune de l'agence. Chaque agent y lit et y écrit, en ajout seulem
 | `pauses.csv` | une mise en pause ou une reprise (la dernière ligne d'une cible fait foi) | `date`, `cible` (agent, script, chef d'une équipe, `chaine:en|es|pt`, ou `tout`), `action` (pause, reprise), `par`, `raison` |
 | `questions.csv` | une question à Jules sur Telegram, puis sa réponse (la dernière ligne d'un `id` fait foi) | `date`, `id`, `par`, `texte`, `si_oui`, `si_non` (action fermée : `rien`, `pause:<cible>`, `reprise:<cible>`), `etat` (ouverte, repondue), `reponse`, `message_id` |
 | `alertes.csv` | une alerte envoyée par la Sûreté (sa `cle` empêche de la renvoyer) | `date`, `cle`, `niveau` (budget, quota, sanction, panne), `message` |
-| `guichet.json` | l'état du récapitulatif du guichet (`agence/guichet.py`) | `recap` (jour du dernier récapitulatif envoyé à Jules, heure de Paris), `urgents` (numéros des demandes urgentes déjà signalées) |
+| `guichet.json` | l'état du récapitulatif du guichet (`agence/guichet.py`) | `recap` (jour du dernier récapitulatif envoyé à Jules, heure de Paris), `urgents` (numéros des demandes urgentes déjà signalées), `nouvelles` (demandes écrites pendant le réveil en cours, vidées par le récapitulatif) |
 | `contacts.jsonl` | un message envoyé à une personne après validation de Jules (`agence/contacts.py`). Les demandes du guichet et les messages en attente vivent dans les issues `guichet` et `contact` du dépôt, pas ici | `date`, `issue`, `chaine`, `objet`, `destinataires` (nombre), `domaines` (jamais l'adresse entière) |
 | `telegram.json` | le dernier clic lu sur Telegram | `decalage` |
 | `bilans/<date>.md` | le bilan d'une semaine, copie de l'issue envoyée à Jules | |

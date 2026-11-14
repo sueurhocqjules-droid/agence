@@ -52,6 +52,10 @@ def corps(quoi, pourquoi, lien, debloque, cout, par=""):
     return "\n".join(lignes) + (f"\n\n_Demande de {sans_mention(par, 60)}, écrite par l'agence._" if par else "")
 
 
+def lire_etat():
+    return json.loads(ETAT.read_text(encoding="utf-8")) if ETAT.exists() else {}
+
+
 def _issues(etiquettes, etat="open", gh=None):
     brut = (gh or _gh)("api", "-X", "GET", f"repos/{DEPOT}/issues", "-f", f"labels={etiquettes}", "-f", f"state={etat}",
                        "-f", "per_page=100")
@@ -90,6 +94,13 @@ def demander(titre, quoi, pourquoi, debloque, par, lien="", cout="0 €", urgent
     lien_issue = gh("issue", "create", "-R", DEPOT, "--title", titre, "--label", etiquettes, "--body-file", "-",
                     entree=texte)
     numero = int(lien_issue.strip().rsplit("/", 1)[-1])
+    # GitHub met quelques secondes à lister une issue neuve (réveil du 14/11 : la demande #13, écrite une seconde
+    # avant le récapitulatif, n'y figurait pas). Elle est donc notée ici pour le récapitulatif du même réveil
+    etat = lire_etat()
+    etat.setdefault("nouvelles", []).append({"numero": numero, "titre": titre, "lien": lien_issue.strip(),
+                                             "urgent": urgent, "texte": texte, "pr": False,
+                                             "date": registre.maintenant()})
+    ETAT.write_text(json.dumps(etat, ensure_ascii=False) + "\n", encoding="utf-8")
     registre.decider(par, f"demande au guichet #{numero} : {titre}", sans_mention(pourquoi, 300))
     print(f"Guichet : demande #{numero} écrite : {titre}")
     return numero, True
@@ -144,7 +155,10 @@ def message_recap(demandes, contacts, cles):
 def passage(maintenant, etat, demandes, contacts, cles, envoyer):
     """Un passage du guichet. Message immédiat pour une demande urgente pas encore signalée, récapitulatif une fois
     par jour (premier réveil après 6 h à Paris). Renvoie (nouvel état, ce qui a été envoyé)."""
-    etat = {"recap": etat.get("recap", ""), "urgents": list(etat.get("urgents", []))}
+    connus = {d["numero"] for d in demandes}
+    demandes = list(demandes) + [n for n in etat.get("nouvelles", []) if n["numero"] not in connus]
+    demandes.sort(key=lambda d: (not d["urgent"], d["date"]))
+    etat = {"recap": etat.get("recap", ""), "urgents": list(etat.get("urgents", []))}   # « nouvelles » : vidées ici
     envoyes = []
     ouverts = {d["numero"] for d in demandes}
     for d in demandes:
@@ -171,8 +185,7 @@ def main():
         print(message_recap(demandes, attente, cles) or "Guichet : rien d'ouvert.")
         return
     with registre.seance("guichet") as info:
-        etat = json.loads(ETAT.read_text(encoding="utf-8")) if ETAT.exists() else {}
-        etat, envoyes = passage(datetime.now(timezone.utc), etat, demandes, attente, cles, telegram.envoyer)
+        etat, envoyes = passage(datetime.now(timezone.utc), lire_etat(), demandes, attente, cles, telegram.envoyer)
         ETAT.write_text(json.dumps(etat, ensure_ascii=False) + "\n", encoding="utf-8")
         info["resultat"] = (f"ok : {len(demandes)} demande(s) ouverte(s), {len(attente)} contact(s) à valider, "
                             f"envoyé : {', '.join(envoyes) or 'rien'}")
