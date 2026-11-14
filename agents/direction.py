@@ -15,7 +15,7 @@ import sys
 import tomllib
 from datetime import datetime, timedelta, timezone
 
-from agence import consignes, demandes, lancer, mesures, organisation, questions, registre
+from agence import consignes, demandes, ingenierie, lancer, mesures, organisation, questions, registre
 from agents import analyste, surete
 
 MODELE = "claude-opus-5-5"
@@ -35,8 +35,16 @@ def schema(equipe, cas_simules=()):
            else {"type": "array", "maxItems": 0})
     return {
         "type": "object", "additionalProperties": False,
-        "required": ["analyse", "decisions", "retours", "consignes", "questions", "investissements"],
+        "required": ["analyse", "decisions", "retours", "consignes", "questions", "investissements", "ingenierie"],
         "properties": {
+            "ingenierie": {"type": "array", "maxItems": ingenierie.DEMANDES_MAX, "items": {
+                "type": "object", "additionalProperties": False, "required": ["titre", "quoi", "pourquoi", "preuve"],
+                "properties": {"titre": {"type": "string", "minLength": 1, "description": "une ligne : ce qui sera construit"},
+                               "quoi": {"type": "string", "minLength": 1,
+                                        "description": "ce qu'il faut construire ou réparer, assez précis pour être codé "
+                                                       "sans autre contexte : fichiers ou agents concernés, résultat attendu"},
+                               "pourquoi": texte,
+                               "preuve": {"type": "string", "description": "le chiffre, la panne ou la proposition du dossier qui le montre"}}}},
             "investissements": {"type": "array", "maxItems": len(analyste.POCHES), "items": {
                 "type": "object", "additionalProperties": False, "required": ["poche", "recommandation", "cas", "pourquoi"],
                 "properties": {"poche": {"type": "string", "enum": list(analyste.POCHES)},
@@ -177,8 +185,9 @@ Ta séance : tu reçois le dossier de la semaine en JSON. Tu n'as aucun outil : 
 Un blocage avec une date leve_le a été levé ensuite par un passage réussi : ce n'est plus une panne en cours.
 Chaque proposition de la recherche porte sa preuve et sa prédiction : si tu la retiens, reprends-la en décision avec
 sa mesure et sa valeur attendue (ou la tienne), et dis dans le pourquoi qu'elle vient de la recherche.
-Le rapport des opérations dit si l'agence tourne. Une réparation qui demande d'écrire du code ne se remonte pas à
-Jules : elle va à l'Ingénierie (Gouvernance). Reprends-la en décision, avec ce qu'il faut réparer et la panne qui le montre.
+Le rapport des opérations dit si l'agence tourne. Une réparation ou une construction qui demande d'écrire du code ne
+se remonte pas à Jules : elle va à l'Ingénierie (Gouvernance). Écris-la dans ingenierie, avec ce qu'il faut réparer ou
+construire et la panne ou le chiffre qui le montre : l'Ingénierie ouvre une PR le soir même.
 portee_des_chaines.signaux : une chaîne en panne (YouTube ne la diffuse presque pas, comparée à ses sœurs sur les mêmes
 sujets) ou en chute (ses vues par vidéo s'effondrent). Dès la première semaine, cherche la cause dans le dossier et
 décide toi-même des remèdes qui relèvent de l'agence, chacun avec la mesure vues_semaine:<chaîne> et sa valeur attendue.
@@ -188,6 +197,10 @@ l'une d'elles est la fermeture ou la refonte totale de la chaîne, elle passe au
 Tu rends ta réponse au format imposé, appliquée telle quelle par un script :
 - decisions : ce que tu décides, chacune avec sa raison. Quand elle a un effet mesurable, nomme la mesure (liste fermée)
   et la valeur attendue à l'échéance ; le critique la jugera sur les vrais chiffres. Une décision sans mesure reste notée.
+- ingenierie : au plus {ingenierie.DEMANDES_MAX} demandes de code à l'Ingénierie, les plus utiles aux 4 objectifs. Chacune devient
+  une issue puis une PR, fusionnée seule si tout est vert. Écris quoi assez précisément pour être codé sans autre
+  contexte. Rien de ce qui touche aux workflows, aux secrets, aux tests existants ou à la mission : ces PR-là
+  attendent Jules. Pas de code à écrire cette semaine : liste vide.
 - retours : trois lignes au plus par membre de ton équipe en service, sur sa mesure de réussite.
 - consignes : la nouvelle liste complète des consignes d'un membre, avec la mesure qu'elle doit améliorer. Un seul changement
   en attente par membre (refusé s'il en a déjà un), deux au plus par semaine : on doit savoir ce qui a joué.
@@ -271,6 +284,15 @@ def appliquer(reponse, maintenant, avant, cas_simules=()):
             faits.append(f"question à Jules : {q['texte'][:80]}")
         except ValueError as e:
             refus.append(f"question « {q['texte'][:60]} » : {e}")
+    for d in reponse.get("ingenierie", [])[:ingenierie.DEMANDES_MAX]:
+        try:
+            numero = ingenierie.demander(d["titre"], d["quoi"], d["pourquoi"], "la Direction", d.get("preuve", ""))
+        except (subprocess.CalledProcessError, OSError, ValueError) as e:
+            refus.append(f"demande à l'Ingénierie « {d['titre'][:60]} » : {str(getattr(e, 'stderr', '') or e)[-200:]}")
+            continue
+        registre.decider("direction", f"demande à l'Ingénierie : {d['titre'][:200]}"
+                         + (f" (issue #{numero})" if numero else ""), d["pourquoi"][:600])
+        faits.append(f"demande à l'Ingénierie : {d['titre'][:80]}")
     for r in refus:
         registre.decider("direction", "élément refusé par le script", r)
     return faits, refus

@@ -16,7 +16,7 @@ class Controle(unittest.TestCase):
     def test_refuse_les_fichiers_toujours_proteges(self):
         for chemin in (".github/workflows/reveil.yml", ".github/CODEOWNERS", "organisation/MISSION.md",
                        "organisation/autorisations.toml", "agence/protege.py", "agence/relecture.py",
-                       "agence/banc_agents.py"):
+                       "agence/banc_agents.py", "agence/ingenierie.py", "organisation/postes/ingenierie.md"):
             for statut in ("modified", "added", "removed"):
                 with self.subTest(chemin=chemin, statut=statut):
                     self.assertTrue(protege.raison(chemin, statut))
