@@ -1,0 +1,24 @@
+{
+ "id": "temoin-stratege-reponses-sans-poste",
+ "poste": "stratege",
+ "panne": "14/11/2026 : témoin de stratege-reponses-sans-poste. Le Responsable de l'organisation se comptait comme rédacteur de réponses parce que son code contient le motif contacts.preparer( : ce dossier doit être refusé.",
+ "sortie": {
+  "sans_poste": {
+   "postes_qui_redigent_une_reponse": [
+    "responsable_organisation"
+   ]
+  }
+ },
+ "attendu": "echec",
+ "criteres": [
+  {
+   "id": "pas-de-faux-redacteur",
+   "type": "code",
+   "verif": "sans",
+   "sur": "sans_poste.postes_qui_redigent_une_reponse",
+   "motifs": [
+    "responsable_organisation"
+   ]
+  }
+ ]
+}

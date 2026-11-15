@@ -218,6 +218,7 @@ def dossier(maintenant):
         "propositions_de_la_recherche": recherche(depuis),
         "rapport_des_operations": (registre.lire_jsonl("operations", depuis) or [None])[-1],
         "rapport_de_l_organisation": (registre.lire_jsonl("organisation", depuis) or [None])[-1],
+        "ecarts_du_stratege": (registre.lire_jsonl("ecarts", depuis) or [None])[-1],
         "decisions_7j": [{k: d.get(k) for k in ("auteur", "decision", "pourquoi", "prediction", "echeance")}
                          for d in toutes if mesures.quand(d["date"]) >= depuis][-40:],
         "predictions_ouvertes": [{k: d.get(k) for k in ("id", "auteur", "decision", "mesure", "avant", "attendu", "echeance")}
@@ -282,6 +283,10 @@ un nouvel essai. Une refonte totale d'une chaîne reste une question à Jules (G
 Concepts et chaînes : aucune limite au nombre de concepts ni de chaînes par concept, tant que ça sert les objectifs. Un
 concept du Veilleur dont la destination est « nouvelle chaîne » ne réoriente pas une chaîne qui marche : il s'ouvre
 à côté, par chaines.
+ecarts_du_stratege : ce que la mission promet et que l'agence ne fait pas, trouvé par le Stratège, chacun avec sa
+preuve et son remède. Un écart de voie direction attend ta décision : retiens son remède par le champ qui lui va
+(ingenierie, essais, chaines, outils, decisions, questions si c'est du conseil), ou dis dans ton analyse pourquoi tu
+l'écartes. Ceux de voie poste vont au Responsable de l'organisation, ceux de voie besoin à la Recherche.
 derogation_comptes (présent une seule semaine, celle du bilan prévu) : dis dans ton analyse, en trois lignes au plus,
 ce que l'agence pourrait traiter seule dans la création des comptes, avec les demandes traitées comme preuve. Jules
 en discute ensuite : rien ne change sans lui.

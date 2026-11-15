@@ -135,8 +135,8 @@ def signaux(c):
 def sans_poste(maintenant):
     """Ce qui arrive sans poste pour y répondre : aucun agent ne rédige de message de contact (contacts.preparer)."""
     depuis = maintenant - FENETRE
-    redacteurs = sorted(p.stem for p in (RACINE / "agents").glob("*.py")
-                        if "contacts.preparer(" in p.read_text(encoding="utf-8"))
+    redacteurs = sorted(p.stem for p in (RACINE / "agents").glob("*.py")   # ce fichier écrit le motif : exclu
+                        if p.name != Path(__file__).name and "contacts.preparer(" in p.read_text(encoding="utf-8"))
     commentaires = [o for o in registre.lire_jsonl("occasions") if mesures.quand(o["date"]) >= depuis]
     mails = [m for m in registre.lire_jsonl("courrier") if mesures.quand(m["date"]) >= depuis]
     par_type = {}
@@ -148,6 +148,13 @@ def sans_poste(maintenant):
     return {"postes_qui_redigent_une_reponse": redacteurs or "aucun",
             "commentaires_classes_28j": par_type, "mails_classes_28j": par_categorie,
             "occasions_28j": sum(1 for o in commentaires if o.get("occasion"))}
+
+
+def propositions_du_stratege(fiches, maintenant):
+    """Les postes qui manquent selon le Stratège (registre/ecarts.jsonl, voie poste), pas encore créés."""
+    return [{k: e.get(k) for k in ("id", "source", "promesse", "constat", "preuve", "poste")}
+            for l in registre.lire_jsonl("ecarts", maintenant - FENETRE) for e in l.get("ecarts") or []
+            if e.get("voie") == "poste" and (e.get("poste") or {}).get("id") not in fiches]
 
 
 def changement_en_cours(decisions, maintenant):
@@ -185,7 +192,10 @@ def consigne(donnees):
         "justifient clairement ; sinon null. Un poste récent ou sans données n'est pas inutile : ses chiffres "
         "manquent, c'est tout (lis registre_depuis et passages_attendus_au_moins). Un besoin ouvert se comble "
         "d'abord par un outil (la Recherche les traite), un nouveau poste seulement si aucun poste existant ne peut "
-        "le porter. Relis memoire (les leçons apprises) avant de proposer un changement : ne refais pas ce qui a "
+        "le porter. propositions_du_stratege : des postes qui manquent selon le Stratège, qui compare la mission à ce que "
+        "fait l'agence, chacun avec son constat chiffré : un besoin sans poste comme les autres, que tu peux reprendre "
+        "tel quel en changement creer si les données le justifient. Relis memoire (les leçons apprises) avant de "
+        "proposer un changement : ne refais pas ce qui a "
         "déjà échoué sans fait nouveau. Ne propose rien si changement_en_cours n'est pas null. Ne supprime ni n'absorbe "
         "jamais un poste marqué intouchable, et lis sa section « Pourquoi ce poste existe » avant de proposer sa "
         "suppression. N'utilise que les chiffres des données. En français, sans tiret long."
@@ -364,6 +374,7 @@ def passage(essai, demander=postes.demander, maintenant=None):
     donnees = {"date": maintenant.isoformat(timespec="minutes"), "postes": tableau,
                "sans_poste_pour_y_repondre": sans_poste(maintenant),
                "besoins_ouverts": besoins.pour_la_recherche(), "changement_en_cours": en_cours,
+               "propositions_du_stratege": propositions_du_stratege(fiches, maintenant),
                "memoire": memoire.pour_un_agent(),
                "cles_connues": sorted(cles_connues),
                "regle": "embauche, suppression et fusion sans Jules, dans l'enveloppe Claude ; nouvelle clé ou "

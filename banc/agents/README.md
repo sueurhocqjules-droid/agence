@@ -16,7 +16,7 @@ En CI : `.github/workflows/banc.yml`, sur toute PR (et tout push sur `main`) qui
 | Enregistré | La mauvaise réponse du modèle repasse dans le code d'aujourd'hui. Sans réseau, toujours le même résultat | `reponse_modele` |
 | Témoin | Une sortie fautive donnée telle quelle, que le banc doit refuser. Un témoin qui passe veut dire que le banc ne voit plus la panne | `sortie` et `"attendu": "echec"` |
 
-La Direction tourne sur Claude : le banc ne rejoue pas sa séance (coût). Il vérifie ce qu'elle lit : sa consigne d'aujourd'hui et les blocages que le script tire des journaux.
+La Direction et le Stratège tournent sur Claude : le banc ne rejoue pas leur séance (coût). Il vérifie ce qu'ils lisent : leur consigne d'aujourd'hui et ce que le script tire du registre (blocages, réseaux sans stats, portée, demandes sans poste).
 
 ## Critères
 
@@ -42,5 +42,8 @@ Chaque panne a au moins un cas qui doit passer et un témoin qui doit échouer. 
 | La Recherche propose le relais DSH | `chercheur-outils-dsh-refuse` et `chef-recherche-dsh-refuse` (enregistrés), `chercheur-outils-relais-direct`, `temoin-chercheur-outils-relais` |
 | La Recherche annonce un gain impossible (texte seulement, « vers 0 ») et un outil qui demande un GPU | `chef-recherche-gain-impossible` (enregistré, reconstitué) |
 | La Direction croit que le code repasse par Jules | `direction-code-a-l-ingenierie`, `temoin-direction-code-a-jules` |
+| Des réseaux diffusent sans stats, personne ne le voit (15/11) | `stratege-reseaux-sans-stats`, `temoin-stratege-reseaux-sans-stats` |
+| La chaîne espagnole n'est pas diffusée, personne ne le voit (13/11) | `stratege-chaine-non-diffusee`, `temoin-stratege-chaine-non-diffusee` |
+| Des commentaires et des mails sans poste pour y répondre (14/11) | `stratege-reponses-sans-poste`, `temoin-stratege-reponses-sans-poste` |
 
 Cible de la règle 8 : 20 à 50 cas. Les réponses enregistrées des deux premières pannes sont reconstituées (les originales n'ont pas été gardées) ; les suivantes devront garder la vraie réponse du modèle.

@@ -1,0 +1,76 @@
+{
+ "id": "stratege-reponses-sans-poste",
+ "poste": "stratege",
+ "panne": "14/11/2026 : le Guetteur classait des commentaires (2 questions en 28 jours) et le courrier arrivait, mais aucun poste ne rédigeait de réponse. Jules l'a vu lui-même. Le Stratège lit ro.sans_poste (qui s'excluait à tort lui-même jusqu'au 15/11).",
+ "adaptateur": "stratege",
+ "entree": {
+  "maintenant": "2026-11-15T12:00:00+00:00",
+  "occasions": [
+   {
+    "date": "2026-11-12T23:19:52+00:00",
+    "par": "guetteur",
+    "id": "c0",
+    "chaine": "en",
+    "type": "question",
+    "urgence": "basse",
+    "occasion": false,
+    "extrait": "x"
+   },
+   {
+    "date": "2026-11-12T23:19:52+00:00",
+    "par": "guetteur",
+    "id": "c1",
+    "chaine": "en",
+    "type": "question",
+    "urgence": "basse",
+    "occasion": false,
+    "extrait": "x"
+   },
+   {
+    "date": "2026-11-12T23:19:52+00:00",
+    "par": "guetteur",
+    "id": "c2",
+    "chaine": "en",
+    "type": "compliment",
+    "urgence": "basse",
+    "occasion": false,
+    "extrait": "x"
+   }
+  ],
+  "courrier": [
+   {
+    "date": "2026-11-12T23:27:00+00:00",
+    "id": "m1",
+    "categorie": "plateforme",
+    "chaine": null
+   }
+  ]
+ },
+ "criteres": [
+  {
+   "id": "questions-comptees",
+   "type": "code",
+   "verif": "egal",
+   "sur": "sans_poste.commentaires_classes_28j.question",
+   "valeur": 2
+  },
+  {
+   "id": "pas-de-faux-redacteur",
+   "type": "code",
+   "verif": "sans",
+   "sur": "sans_poste.postes_qui_redigent_une_reponse",
+   "motifs": [
+    "responsable_organisation"
+   ]
+  },
+  {
+   "id": "consigne-lit-sans-poste",
+   "type": "code",
+   "verif": "avec",
+   "sur": "seance",
+   "motifs": [
+    "sans_poste_pour_y_repondre"
+   ]
+  }
+ ]
+}

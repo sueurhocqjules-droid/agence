@@ -36,4 +36,4 @@ GROQ_API_KEY = ["chef-operations", "chef-contenu", "chef-recherche", "courrier",
 GEMINI_API_KEY = ["chef-operations", "chef-contenu", "chercheur-outils", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "critique", "programmateur", "responsable-organisation", "responsable-revenu"]
 OPENROUTER_API_KEY = ["chercheur-outils", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "responsable-organisation", "responsable-revenu"]
 # Abonnement Claude de Jules
-CLAUDE_CODE_OAUTH_TOKEN = ["direction", "ingenierie"]
+CLAUDE_CODE_OAUTH_TOKEN = ["direction", "ingenierie", "stratege"]
