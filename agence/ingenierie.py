@@ -48,7 +48,7 @@ PERMIS = "Read,Edit,Write,Glob,Grep,Bash(python -m unittest),Bash(python -m unit
 # Mêmes chemins que banc.yml : une PR qui les touche passe le banc avant fusion (règle 8)
 BANC_SUR = ("agents/", "agence/", "organisation/postes/", "organisation/MISSION.md", "banc/agents/",
             "registre/refus.jsonl")
-DEMANDES_MAX = 2                      # demandes qu'un agent peut écrire en un passage
+DEMANDES_MAX = 5                      # demandes qu'un agent peut écrire en un passage (2 → 5 le 15/11, semaine de lancement, Jules)
 
 
 def travail():

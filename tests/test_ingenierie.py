@@ -273,7 +273,7 @@ class Direction(unittest.TestCase):
 
     def test_sa_demande_devient_une_issue_et_une_decision(self):
         reponse = {"decisions": [], "retours": [], "consignes": [], "questions": [], "investissements": [],
-                   "ingenierie": [{"titre": "Réparer le relevé", "quoi": "q", "pourquoi": "p", "preuve": "run 1"}] * 3}
+                   "ingenierie": [{"titre": "Réparer le relevé", "quoi": "q", "pourquoi": "p", "preuve": "run 1"}] * (ingenierie.DEMANDES_MAX + 1)}
         demandes, notes = [], []
         with mock.patch.object(direction.ingenierie, "demander", lambda *a: demandes.append(a) or 31), \
                 mock.patch.object(direction.registre, "decider", lambda *a, **k: notes.append(a)):

@@ -7,7 +7,7 @@
 alerte_usd_semaine = 60
 # Au-delà : pause des agents qui appellent Claude, et question à Jules pour reprendre
 pause_usd_semaine = 70
-pause_cibles = ["auteur", "direction", "ingenierie"]   # l'Ingénierie (9 $ par semaine au plus) ajoutée le 14/11
+pause_cibles = ["auteur", "direction", "ingenierie"]   # l'Ingénierie (15 $ par semaine au plus depuis le 15/11) ajoutée le 14/11
 # Étalon : combien de dollars équivalent API font 1 % de la limite hebdomadaire de Jules.
 # 0 = inconnu, le compteur ne donne alors que des dollars. Mesuré le 13/11/2026 (barre d'état, ~/.claude/limites.jsonl) :
 # la semaine est passée de 77 % à 80 % pendant le nightwork (12/11 23:17 → 23:50 UTC, rien d'autre ne tournait)
