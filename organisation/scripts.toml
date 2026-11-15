@@ -34,7 +34,7 @@ hors_pause = true
 [guichet]
 proprietaire = "chef-operations"
 module = "agence.guichet"
-description = "le récapitulatif quotidien des demandes du guichet et des contacts à valider"
+description = "le récapitulatif quotidien des demandes du guichet et des contacts à valider, et des équipes dont les demandes de Jules sont illisibles"
 secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
 
 # Les contacts (agence/contacts.py) : envoie les messages validés par Jules. GMAIL_SEND_TOKEN (droit gmail.send seul)
