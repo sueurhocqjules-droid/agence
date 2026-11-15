@@ -5,3 +5,5 @@
 {"date": "2026-11-14T06:19:29+00:00", "quoi": "conclure", "resultat": "ok", "sortie": "ok : PR #12 fusionnée seule (demande #11)"}
 {"date": "2026-11-15T10:35:33+00:00", "quoi": "ingenierie", "resultat": "ok", "code": 0, "duree_s": 43, "sortie": "ok : PR #21 pour la demande #17, 0.16 $ (3 fichier(s))"}
 {"date": "2026-11-15T10:41:44+00:00", "quoi": "conclure", "resultat": "ok", "sortie": "ok : PR #21 fusionnée seule (demande #17)"}
+{"date": "2026-11-15T10:36:13+00:00", "quoi": "ingenierie", "resultat": "ok", "code": 0, "duree_s": 83, "sortie": "ok : PR #22 pour la demande #18, 0.37 $ (7 fichier(s))"}
+{"date": "2026-11-15T10:42:10+00:00", "quoi": "conclure", "resultat": "echec", "bloquant": "attend Jules : PR #22 touche un fichier protégé (demande #18)"}
