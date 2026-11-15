@@ -45,3 +45,4 @@ Vues et abonnés gagnés par semaine sur toutes les chaînes, rapportés au coû
 - Stock minimal : 7 jours de publications programmées d'avance
 
 ## Retours
+- 2026-11-15, direction : Stock à 3 jours, avec 8 sujets payés pour 22 nécessaires : garde la cadence que le stock permet. Deux outils gratuits partent en essai pour baisser le coût d'un sujet. Les erreurs d'envoi sur Instagram (4 sur 22) doivent remonter comme bloquant : c'est commandé à l'Ingénierie.
