@@ -22,7 +22,9 @@ DECALAGE = registre.DOSSIER / "telegram.json"
 GARDE_S = 6 * 3600  # un clic sur une question inconnue plus récente que ça est gardé (registre en retard)
 CLIC = re.compile(r"^q:([0-9a-z-]{1,24}):(oui|non)$")
 REVEILS_UTC = (5, 11, 17, 23)  # heures UTC du cron de reveil.yml, à la minute 17
-NOMS_CHAINES = {"en": "Every Second (anglais)", "es": "A Cada Segundo (espagnol)", "pt": "Cada Segundo (portugais)"}
+LANGUES = {"en": "anglais", "es": "espagnol", "pt": "portugais"}
+# Noms tirés de youtube.CHAINES, seule source : une copie à la main avait inversé l'espagnol et le portugais
+NOMS_CHAINES = {l: f"{nom} ({LANGUES.get(l, l)})" for l, (nom, _) in youtube.CHAINES.items()}
 
 
 def cibles_connues():

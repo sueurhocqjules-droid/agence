@@ -95,7 +95,7 @@ class Questions(unittest.TestCase):
         texte = questions.message("Je reprends ?", "YouTube a refusé la vidéo X", "reprise:chaine:pt", "rien", "surete",
                                   "regarde d'abord", datetime(2026, 11, 11, 21, 30, tzinfo=timezone.utc))
         for attendu in ("Pourquoi : YouTube a refusé la vidéo X", "Pour t'aider à choisir : regarde d'abord",
-                        "Oui : je relance les envois sur la chaîne Cada Segundo (portugais)", "Non : ça reste en pause",
+                        "Oui : je relance les envois sur la chaîne A Cada Segundo (portugais)", "Non : ça reste en pause",
                         "vers 00h17"):
             self.assertIn(attendu, texte)
 
