@@ -198,3 +198,4 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-15T22:07:52+00:00,stratege,60,34398,0.3517,0,"ok : 9 écart(s), 0 suivi(s), 0 refusé(s), 0.35 $"
 2026-11-15T22:08:53+00:00,responsable-organisation,112,0,0,1,"ok : 20 postes relus, 6 signal(aux), changement : creer"
 2026-11-15T22:10:45+00:00,direction,124,62791,0.627,0,"ok : 26 appliqué(s), 0 refusé(s), 0.63 $"
+2026-11-15T22:12:50+00:00,ingenierie,10,59140,0.0855,0,echec : la séance n'a rien changé dans le dépôt
