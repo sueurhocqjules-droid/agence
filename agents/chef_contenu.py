@@ -84,6 +84,7 @@ def passage(essai):
     except Exception as e:  # noqa: BLE001 : sans accès aux issues, le plan se fait quand même
         print(f"Demandes de Jules illisibles : {str(e)[:120]}")
         issues = []
+        demandes.signaler("contenu", "chef-contenu", e)
     fiches = {p: consignes.chemin_fiche(p).read_text(encoding="utf-8") for p in ("chef-contenu", "auteur", "programmateur")}
     vues = {l: mesures.vues_gagnees(donnees["stats"], maintenant, l) for l in donnees["heures"]}
     jours = {l: mesures.jours_de_stock(donnees["stock"], donnees["stats"], donnees["heures"], maintenant, l)

@@ -108,6 +108,7 @@ def dossier(maintenant):
         issues = demandes.demandes("direction")
     except Exception as e:  # noqa: BLE001 : sans accès aux issues, la séance a lieu quand même
         issues = [{"erreur": f"demandes illisibles : {str(e)[:120]}"}]
+        demandes.signaler("direction", "direction", e)
     return {
         "date": maintenant.isoformat(timespec="minutes"),
         "postes": postes_de_l_agence(),

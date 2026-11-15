@@ -190,7 +190,7 @@ def _ligne(d):
     return f"{'URGENT ' if d['urgent'] else ''}#{d['numero']} {d['titre']}\n{d['lien']}"
 
 
-def message_recap(demandes, contacts, cles):
+def message_recap(demandes, contacts, cles, illisibles=()):
     """Le récapitulatif du jour, ou None s'il n'y a rien à dire."""
     morceaux = []
     if demandes:
@@ -201,13 +201,16 @@ def message_recap(demandes, contacts, cles):
     if cles:
         morceaux.append("Clés déclarées sans ton accord (non transmises) : "
                         + ", ".join(f"{cle} pour {nom}" for cle, nom in cles))
+    if illisibles:
+        morceaux.append("Demandes de Jules illisibles, ces équipes ne les voient pas : "
+                        + ", ".join(f"{e} ({err})" for e, err in illisibles))
     if not morceaux:
         return None
     return "\n\n".join(["Récapitulatif du guichet", *morceaux,
                         "Rien ne presse sauf ce qui est marqué URGENT : l'agence continue sur autre chose."])
 
 
-def passage(maintenant, etat, demandes, contacts, cles, envoyer):
+def passage(maintenant, etat, demandes, contacts, cles, envoyer, illisibles=()):
     """Un passage du guichet. Message immédiat pour une demande urgente pas encore signalée, récapitulatif une fois
     par jour (premier réveil après 6 h à Paris). Renvoie (nouvel état, ce qui a été envoyé)."""
     connus = {d["numero"] for d in demandes}
@@ -224,7 +227,7 @@ def passage(maintenant, etat, demandes, contacts, cles, envoyer):
     etat["urgents"] = [n for n in etat["urgents"] if n in ouverts]
     ici = maintenant.astimezone(PARIS)
     if ici.hour >= HEURE_RECAP and etat["recap"] != f"{ici:%Y-%m-%d}":
-        texte = message_recap(demandes, contacts, cles)
+        texte = message_recap(demandes, contacts, cles, illisibles)
         if texte:
             envoyer(texte)
             envoyes.append("récapitulatif")
@@ -235,12 +238,14 @@ def passage(maintenant, etat, demandes, contacts, cles, envoyer):
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     from agence import contacts   # ici seulement : contacts importe ce module
+    from agence import demandes as lecture
     demandes, attente, cles = ouvertes(), contacts.en_attente(), cles_sans_autorisation()
+    pannes = lecture.illisibles()
     if "recap" not in sys.argv[1:]:
-        print(message_recap(demandes, attente, cles) or "Guichet : rien d'ouvert.")
+        print(message_recap(demandes, attente, cles, pannes) or "Guichet : rien d'ouvert.")
         return
     with registre.seance("guichet") as info:
-        etat, envoyes = passage(datetime.now(timezone.utc), lire_etat(), demandes, attente, cles, telegram.envoyer)
+        etat, envoyes = passage(datetime.now(timezone.utc), lire_etat(), demandes, attente, cles, telegram.envoyer, pannes)
         ETAT.write_text(json.dumps(etat, ensure_ascii=False) + "\n", encoding="utf-8")
         info["resultat"] = (f"ok : {len(demandes)} demande(s) ouverte(s), {len(attente)} contact(s) à valider, "
                             f"envoyé : {', '.join(envoyes) or 'rien'}")
