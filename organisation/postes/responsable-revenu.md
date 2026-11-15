@@ -51,3 +51,4 @@ Le revenu en € (objectif 1). En attendant : chaque chaîne a sa voie et son be
 - Une voie qui crée du service client ou des pertes passe après les autres
 
 ## Retours
+- 2026-11-15, direction : Voies bien chiffrées. Confirme cette semaine à leur source officielle les règles tiktok_recompenses et meta_monetisation. Ajoute pour chaque chaîne la distance aux seuils de ces réseaux dès que leurs stats sont branchées.
