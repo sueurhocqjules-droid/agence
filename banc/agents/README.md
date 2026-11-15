@@ -40,6 +40,7 @@ Chaque panne a au moins un cas qui doit passer et un témoin qui doit échouer. 
 | Le Chef des opérations invente des retours | `chef-operations-retours-inventes` (enregistré), `chef-operations-semaine-calme-direct`, `temoin-chef-operations-retour-invente` |
 | Des pannes réparées comptées comme ouvertes | `chef-operations-panne-levee-direct`, `direction-blocage-leve` |
 | La Recherche propose le relais DSH | `chercheur-outils-dsh-refuse` et `chef-recherche-dsh-refuse` (enregistrés), `chercheur-outils-relais-direct`, `temoin-chercheur-outils-relais` |
+| La Recherche annonce un gain impossible (texte seulement, « vers 0 ») et un outil qui demande un GPU | `chef-recherche-gain-impossible` (enregistré, reconstitué) |
 | La Direction croit que le code repasse par Jules | `direction-code-a-l-ingenierie`, `temoin-direction-code-a-jules` |
 
 Cible de la règle 8 : 20 à 50 cas. Les réponses enregistrées des deux premières pannes sont reconstituées (les originales n'ont pas été gardées) ; les suivantes devront garder la vraie réponse du modèle.
