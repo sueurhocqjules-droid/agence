@@ -10,7 +10,7 @@ Créer une entreprise de contenu sur tous les réseaux sociaux, en exploitant le
 
 Toute tâche se rattache à l'un d'eux (champ `objectifs` de chaque fiche). Peu importe le comment, seule leur atteinte compte : le plus vite et le plus efficacement possible, avec toutes les ressources accessibles (budget de la semaine, outils et modèles gratuits, machines, comptes que Jules peut créer).
 
-1. **Revenu :** premier palier de 50 €/mois, sans délai imposé. Toute voie légale (pub, affiliation, produit), en évitant ce qui crée du service client ou des pertes
+1. **Revenu :** le premier euro le plus tôt possible, puis 50 €/mois (revenu des 30 derniers jours) **au plus tard le 18/12/2026**. Cette date est un plafond, pas un rythme : chaque semaine gagnée sur elle compte, et s'approcher du chiffre n'autorise jamais à ralentir. Chaque dimanche, la Direction dit combien d'avance ou de retard elle a sur le chemin le plus court vers ce palier, et le Critique la juge sur cet écart. Toute voie légale (pub, affiliation, produit), en évitant ce qui crée du service client ou des pertes
 2. **Économie :** moins de 20 % de la limite hebdomadaire de l'abonnement Claude de Jules, et 0 € de dépense tant que l'agence ne gagne rien. L'enveloppe Claude de la semaine est le `claude_usd_semaine` de la fiche de l'Auteur : Jules l'ajuste selon ce qui lui reste de sa propre consommation, vers le haut comme vers le bas, et l'agence s'y adapte d'elle-même (cadence, nombre de sujets, modèles gratuits à la place de Claude). Une réserve ponctuelle accordée par Jules (colonne `reserve_usd` de l'atelier) ne compte pas dans les plafonds de la Sûreté. Dès le premier revenu, tout l'argent gagné est réinvesti, réparti par l'équipe Argent (budget Claude, outils payants, nouveaux réseaux)
 3. **Autonomie :** environ une intervention de Jules par semaine
 4. **Apprentissage :** savoir ce qui a marché ou non et pourquoi, se critiquer sur les vrais chiffres
@@ -19,7 +19,7 @@ Toute tâche se rattache à l'un d'eux (champ `objectifs` de chaque fiche). Peu 
 
 ## Gouvernance
 
-> Décidée par Jules le 13/11. Aucun agent ne modifie cette section, la mission ni les 4 objectifs.
+> Décidée par Jules le 13/11 (échéance du revenu posée le 15/11). Aucun agent ne modifie cette section, la mission ni les 4 objectifs.
 
 - **Jules est l'actionnaire majoritaire et le carnet d'adresses de l'agence, rien de plus.** Il ne décide que :
   - **la fermeture et la refonte totale d'une chaîne** (toutes ses vidéos, son identité ou son thème) : proposées dans le mail du lundi avec le contexte et la prédiction, validées par un Oui/Non Telegram envoyé le même jour. Sans réponse, rien ne se fait : la chaîne garde sa ligne et la décision revient le lundi suivant
