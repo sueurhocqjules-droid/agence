@@ -27,7 +27,7 @@ Que l'agence tourne seule, PC éteint, au moindre coût : réveils, registre, st
 Résultats des réveils, journal des scripts, rapports de la Maintenance, de l'Expert en modèles et du Courrier, issues `equipe:operations`.
 
 ## Sorties
-Réparations demandées, retours à son équipe, rapport d'une ligne à la Direction.
+Réparations demandées, retours à son équipe, rapport d'une ligne à la Direction. Le script ne coupe jamais cette ligne au milieu d'une phrase : au-delà de 600 signes, il garde les phrases entières qui tiennent.
 
 ## Outils
 Lecture du registre et de l'état des réveils. Trois scripts du socle tournent à chaque réveil, sans modèle :
