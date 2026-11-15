@@ -153,3 +153,4 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-15T02:41:29+00:00,delais,0,0,0,0,"ok : aucun départ en essai, 0 besoin(s) en retard sur leur cible"
 2026-11-15T02:41:29+00:00,contacts,1,0,0,0,"ok : droit d'envoi absent, demande au guichet #13 (déjà faite), 0 message(s) validé(s) en attente, rien n'est parti"
 2026-11-15T02:41:31+00:00,guichet,0,0,0,0,"ok : 1 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : rien"
+2026-11-15T10:34:50+00:00,ingenierie,38,240858,0.1557,0,"ok : demande #17, 3 fichier(s), 0.16 $"
