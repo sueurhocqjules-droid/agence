@@ -55,6 +55,17 @@ class Branchement(unittest.TestCase):
                 threads.brancher("es", "code")
         ecrire.assert_not_called()
 
+    def test_jeton_genere_pose_sans_secret(self):
+        with mock.patch.object(threads, "secret") as secret, \
+                mock.patch.object(threads, "appel", return_value={"id": "7", "username": "cadasegundolab"}), \
+                mock.patch.object(threads, "lire", return_value={}), \
+                mock.patch.object(threads, "ecrire") as ecrire:
+            fiche = threads.poser("es", " jeton-genere\n", MAINTENANT)
+        secret.assert_not_called()
+        self.assertEqual((fiche["id"], fiche["jeton"]), ("7", "jeton-genere"))
+        self.assertEqual(fiche["expire"], (MAINTENANT + timedelta(days=60)).isoformat(timespec="seconds"))
+        ecrire.assert_called_once_with({"es": fiche})
+
     def test_jetons_chiffres_relus(self):
         with tempfile.TemporaryDirectory() as d, \
                 mock.patch.object(threads, "FICHIER", Path(d) / "threads.enc"), \

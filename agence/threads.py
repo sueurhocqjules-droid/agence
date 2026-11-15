@@ -5,6 +5,9 @@ Branchement, en local, une fois par compte (le compte doit avoir accepté l'invi
     python -m agence.threads lien es                          # adresse à ouvrir, connecté au compte Threads de la chaîne
     python -m agence.threads brancher es "<adresse de retour>"  # l'adresse où Threads renvoie, ou son seul code
     python -m agence.threads etat                             # comptes branchés et fin de validité, sans les jetons
+Plus simple, sans secret : le générateur de jetons de l'appli (Threads API > Settings > User Token Generator,
+compte public seulement), puis le jeton par l'entrée standard :
+    python -m agence.threads poser es < fichier_du_jeton
 Le code (valable 1 h, une seule fois) s'échange contre un jeton de 60 jours, avec le secret de l'appli
 (THREADS_APP_SECRET, .env de Jarvis seulement : le réveil n'en a pas besoin). Les jetons sont rangés chiffrés dans
 registre/threads.enc (openssl, clé THREADS_CLE, secret GitHub d'agence et .env de Jarvis) et le réveil les renouvelle
@@ -36,6 +39,7 @@ TEXTE_MAX_OCTETS = 500          # 500 caractères, un émoji compte pour ses oct
 DUREE_MAX_S = 300
 RENOUVELER_APRES = timedelta(days=7)   # Threads exige au moins 24 h ; le réveil passe plusieurs fois par jour
 PREVENIR_AVANT = timedelta(days=15)    # fin de validité proche : le renouvellement échoue depuis des jours
+JETON_GENERE_S = 60 * 24 * 3600        # un jeton du générateur de l'appli vaut 60 jours
 
 
 class ErreurThreads(RuntimeError):
@@ -154,13 +158,23 @@ def brancher(langue, texte, maintenant=None):
         "client_id": APP_ID, "client_secret": app_secret, "grant_type": "authorization_code",
         "redirect_uri": REDIRECTION, "code": code_de(texte)})["access_token"]
     long = appel("GET", HOTE + "access_token", {"grant_type": "th_exchange_token", "client_secret": app_secret}, court)
-    profil = appel("GET", "me", {"fields": "id,username"}, long["access_token"])
+    return _ranger(langue, long["access_token"], long["expires_in"], maintenant)
+
+
+def poser(langue, jeton, maintenant=None):
+    """Range un jeton de 60 jours déjà fait par le générateur de l'appli (Threads API > Settings > User Token
+    Generator, un bouton par testeur) : pas besoin du secret de l'appli."""
+    return _ranger(langue, jeton.strip(), JETON_GENERE_S, maintenant or datetime.now(timezone.utc))
+
+
+def _ranger(langue, jeton, expire_dans, maintenant):
+    """Vérifie que le jeton est bien celui du compte de la chaîne, puis le range chiffré."""
+    profil = appel("GET", "me", {"fields": "id,username"}, jeton)
     if profil.get("username", "").lower() != COMPTES[langue]:
-        raise ErreurThreads(f"autorisation donnée par @{profil.get('username')}, attendu @{COMPTES[langue]} : "
-                            "se connecter au bon compte Threads et recommencer")
+        raise ErreurThreads(f"jeton de @{profil.get('username')}, attendu @{COMPTES[langue]} : "
+                            "prendre celui du bon compte Threads et recommencer")
     comptes = lire()
-    comptes[langue] = _fiche({"id": profil["id"], "nom": profil["username"]}, long["access_token"],
-                             long["expires_in"], maintenant)
+    comptes[langue] = _fiche({"id": profil["id"], "nom": profil["username"]}, jeton, expire_dans, maintenant)
     ecrire(comptes)
     return comptes[langue]
 
@@ -220,6 +234,9 @@ def main():
         print(lien(reste[0]))
     elif action == "brancher" and len(reste) == 2 and reste[0] in COMPTES:
         fiche = brancher(reste[0], reste[1])
+        print(f"@{fiche['nom']} branché (id {fiche['id']}), jeton valable jusqu'au {fiche['expire'][:10]}")
+    elif action == "poser" and len(reste) == 1 and reste[0] in COMPTES:
+        fiche = poser(reste[0], sys.stdin.read())   # jeton par l'entrée standard : jamais dans l'historique
         print(f"@{fiche['nom']} branché (id {fiche['id']}), jeton valable jusqu'au {fiche['expire'][:10]}")
     elif action == "etat":
         comptes = lire()
