@@ -7,7 +7,7 @@ Chaque poste juge les données qu'il reçoit et le Critique juge les décisions 
 chiffre, donc personne ne le voyait. Le Stratège compare la mission et les fiches à ce que l'agence fait vraiment.
 1. Script : un dossier tiré du registre, qui montre aussi ce qui manque (réseau sans stats, demande sans poste pour
    y répondre, chaîne que personne ne diffuse) à côté de ce que les postes rapportent.
-2. Claude, sans aucun outil : rend au plus 3 écarts au format fixé (--json-schema), chacun avec son remède.
+2. Claude, sans aucun outil : rend tous les écarts qu'il prouve, le plus grave d'abord, au format fixé (--json-schema), chacun avec son remède.
 3. Script : vérifie chaque écart (choix fermés) et l'envoie sur une voie qui existe déjà : le dossier de la
    Direction, les propositions de postes lues par le Responsable de l'organisation, ou un besoin chiffré pour la
    Recherche. Chaque écart va au journal d'audit, avec sa prédiction quand elle est mesurable (le Critique la juge).
@@ -17,18 +17,18 @@ import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 
-from agence import besoins, consignes, demandes, guichet, lancer, memoire, mesures, modeles, organisation, registre
+from agence import (besoins, consignes, demandes, guichet, lancer, memoire, mesures, modeles, organisation, registre,
+                    suivi_ecarts)
 from agents import direction
 from agents import responsable_organisation as ro
 
 POSTE = "stratege"
 MODELE = "claude-opus-5-5"   # la réflexion la plus difficile de l'agence : le modèle le plus fort, une fois par semaine
-FICHIER = "ecarts"           # registre/ecarts.jsonl
+FICHIER = suivi_ecarts.FICHIER      # registre/ecarts.jsonl
 FENETRE = timedelta(days=28)
-SUIVI = timedelta(days=56)   # ses écarts passés qu'il suit au lieu de les reproposer
-ECARTS_MAX = 3
+ECARTS_MAX = 10   # plafond anti-emballement, pas une limite de travail : le budget limite (décision de Jules, 15/11)
 VOIES = ("direction", "poste", "besoin")
-ETATS = ("ouvert", "comble", "abandonne")
+ETATS = suivi_ecarts.ETATS
 
 
 # --- 1. Dossier ----------------------------------------------------------------------------------------------------
@@ -77,12 +77,9 @@ def reseaux(maintenant, diffusions=None, stats=None):
 
 
 def ecarts_passes(maintenant):
-    """Ses écarts des 8 dernières semaines avec leur dernier état (le suivi le plus récent fait foi)."""
-    lignes = registre.lire_jsonl(FICHIER, maintenant - SUIVI)
-    etats = {s["id"]: s for l in lignes for s in l.get("suivi") or []}
-    return [{"id": e["id"], "date": l["date"][:10], "voie": e["voie"], "constat": e["constat"], "remede": e["remede"],
-             "etat": etats.get(e["id"], {}).get("etat", "ouvert"), "suivi": etats.get(e["id"], {}).get("pourquoi")}
-            for l in lignes for e in l.get("ecarts") or []]
+    """Ses écarts suivis (agence/suivi_ecarts.py), en bref : tous les ouverts quel que soit leur âge, les fermés récents."""
+    return [{k: e.get(k) for k in ("id", "date", "semaines", "voie", "constat", "remede", "etat", "suivi")}
+            for e in suivi_ecarts.passes(maintenant)]
 
 
 def verdicts(decisions):
@@ -207,9 +204,11 @@ Où regarder :
 - bloquants_7j, besoins_ouverts, demandes_de_jules : ce qui revient sans qu'un poste le règle. Une demande de Jules
   est un écart qu'il a dû voir lui-même : cherche quelle promesse elle touche et ce qui d'autre manque à côté.
 - mes_ecarts_passes et verdicts_du_critique_sur_mes_ecarts : suis chacun de tes écarts encore ouverts (suivi : comblé,
-  ouvert ou abandonné, avec le fait qui le montre). Ne repropose pas un écart ouvert sans fait nouveau.
-Choisis les 3 écarts au plus qui coûtent le plus aux 4 objectifs, le plus grave d'abord. Moins vaut mieux : aucun
-écart prouvé, liste vide. Chacun envoie son remède sur une voie :
+  ouvert ou abandonné, avec le fait qui le montre). Ne repropose pas un écart ouvert sans fait nouveau. Un écart que la
+  Direction a écarté dans son analyse, avec sa raison, passe en abandonné. semaines dit depuis combien de temps il est
+  ouvert : à partir de 2, il s'empile, la Direction doit y répondre et Jules le voit dans le bilan du lundi.
+Rends tous les écarts que tu prouves, le plus grave pour les 4 objectifs d'abord : il n'y a pas de quota, seulement un
+plafond anti-emballement. Un écart sans preuve n'en est pas un : aucun écart prouvé, liste vide. Chacun envoie son remède sur une voie :
 - direction : la Direction le lit dans son dossier et décide (demande de code à l'Ingénierie, essai de format, nouvelle
   chaîne, outil, nouveaux comptes au guichet, question à Jules si c'est du conseil). La voie par défaut. Un réseau hors
   de reseaux_que_le_flux_sait_servir demande d'abord du code pour l'y brancher : dis-le dans le remède.

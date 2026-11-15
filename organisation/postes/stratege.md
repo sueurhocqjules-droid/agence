@@ -27,11 +27,11 @@ Chaque semaine, comparer ce que la mission et les fiches promettent à ce que l'
 Son dossier, tiré du registre par le script : les postes (mission, supérieur, statut), chaque réseau avec ses diffusions et s'il a ses stats au registre, la portée de chaque chaîne, ce qui arrive sans poste pour y répondre, les besoins ouverts, les blocages des journaux, les derniers rapports (opérations, organisation, Critique, Recherche, revenu), la mémoire, les demandes de Jules et ses propres écarts des semaines passées. La mission et cette fiche forment sa consigne.
 
 ## Sorties
-`registre/ecarts.jsonl` : son rapport d'une ligne et au plus 3 écarts, chacun avec la promesse, le constat chiffré, sa preuve dans le dossier et un remède sur l'une de ces voies :
+`registre/ecarts.jsonl` : son rapport d'une ligne et tous les écarts qu'il prouve, le plus grave d'abord (pas de quota : le budget limite, avec un plafond anti-emballement de 10), chacun avec la promesse, le constat chiffré, sa preuve dans le dossier et un remède sur l'une de ces voies :
 - `direction` : la Direction le lit dans son dossier et décide (demande à l'Ingénierie, essai de format, nouvelle chaîne, outil, question à Jules si c'est du conseil)
 - `poste` : un poste qui manque, lu par le Responsable de l'organisation, qui reste seul à créer un poste et applique ses propres règles
 - `besoin` : un manque chiffré, écrit par `besoins.exprimer`, que la Recherche traite (3 options au plus) avant la Direction
-Chaque écart est aussi noté au journal d'audit avec sa prédiction : le Critique le juge à l'échéance. Le suivi de ses écarts des semaines passées (comblé, ouvert, abandonné).
+Chaque écart est aussi noté au journal d'audit avec sa prédiction : le Critique le juge à l'échéance. Le suivi de ses écarts des semaines passées (comblé, ouvert, abandonné). Un écart ouvert depuis 2 semaines s'empile (`agence/suivi_ecarts.py`) : la Direction doit y répondre chaque semaine, et le bilan du lundi le montre à Jules, avec le nombre dans le message Telegram.
 
 ## Outils
 Module `agents/stratege.py` (`--dossier` : ce qu'il lirait, sans séance ; `--essai` : séance réelle, rien écrit). Ni web, ni fichiers, ni commandes pendant la séance.
