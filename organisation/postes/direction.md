@@ -13,7 +13,7 @@ regle_de_deux = "[C] seulement : la séance Claude n'a aucun outil et lit des do
 secrets = ["CLAUDE_CODE_OAUTH_TOKEN (pour tourner)", "TELEGRAM_BOT_TOKEN et GH_TOKEN (script autour de la séance)"]
 budget = { claude_usd_semaine = 8, appels_gratuits_jour = 0 }
 scripts = ["bilan"]
-equipe = ["chef-contenu", "chef-recherche", "chef-operations", "surete", "guetteur", "analyste", "directeur-financier", "ingenierie", "responsable-organisation", "responsable-revenu"]
+equipe = ["chef-contenu", "chef-recherche", "chef-operations", "surete", "guetteur", "analyste", "directeur-financier", "ingenierie", "responsable-organisation", "responsable-revenu", "stratege"]
 +++
 # Directeur général
 

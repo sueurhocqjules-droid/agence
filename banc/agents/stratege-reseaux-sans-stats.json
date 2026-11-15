@@ -1,0 +1,168 @@
+{
+ "id": "stratege-reseaux-sans-stats",
+ "poste": "stratege",
+ "panne": "15/11/2026 : les vidéos partaient sur Instagram, Facebook et TikTok depuis le 13/11, mais seul YouTube avait ses stats au registre. Personne ne l'a signalé, Jules l'a vu lui-même (issue #25). Réparé par stratege.reseaux, qui croise les diffusions et les tables de stats.",
+ "adaptateur": "stratege",
+ "entree": {
+  "maintenant": "2026-11-15T12:00:00+00:00",
+  "stats": [
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "en",
+    "video_id": "en0",
+    "titre": "sujet 0",
+    "statut": "public",
+    "sortie": "2026-11-08T15:00:00+00:00",
+    "vues": 4000,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "en",
+    "video_id": "en1",
+    "titre": "sujet 1",
+    "statut": "public",
+    "sortie": "2026-11-09T15:00:00+00:00",
+    "vues": 4000,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "en",
+    "video_id": "en2",
+    "titre": "sujet 2",
+    "statut": "public",
+    "sortie": "2026-11-10T15:00:00+00:00",
+    "vues": 4000,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "es",
+    "video_id": "es0",
+    "titre": "sujet 0",
+    "statut": "public",
+    "sortie": "2026-11-08T15:00:00+00:00",
+    "vues": 1,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "es",
+    "video_id": "es1",
+    "titre": "sujet 1",
+    "statut": "public",
+    "sortie": "2026-11-09T15:00:00+00:00",
+    "vues": 2,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "es",
+    "video_id": "es2",
+    "titre": "sujet 2",
+    "statut": "public",
+    "sortie": "2026-11-10T15:00:00+00:00",
+    "vues": 2,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "pt",
+    "video_id": "pt0",
+    "titre": "sujet 0",
+    "statut": "public",
+    "sortie": "2026-11-08T15:00:00+00:00",
+    "vues": 500,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "pt",
+    "video_id": "pt1",
+    "titre": "sujet 1",
+    "statut": "public",
+    "sortie": "2026-11-09T15:00:00+00:00",
+    "vues": 500,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "pt",
+    "video_id": "pt2",
+    "titre": "sujet 2",
+    "statut": "public",
+    "sortie": "2026-11-10T15:00:00+00:00",
+    "vues": 500,
+    "likes": 0,
+    "commentaires": 0
+   }
+  ],
+  "diffusions": [
+   {
+    "date": "2026-11-13T11:42:00+00:00",
+    "reseau": "instagram",
+    "chaine": "en",
+    "nom": "paper-en",
+    "etat": "publie",
+    "media_id": "1",
+    "note": ""
+   },
+   {
+    "date": "2026-11-13T11:42:00+00:00",
+    "reseau": "facebook",
+    "chaine": "en",
+    "nom": "paper-en",
+    "etat": "publie",
+    "media_id": "1",
+    "note": ""
+   },
+   {
+    "date": "2026-11-13T11:42:00+00:00",
+    "reseau": "tiktok",
+    "chaine": "es",
+    "nom": "paper-es",
+    "etat": "publie",
+    "media_id": "1",
+    "note": ""
+   }
+  ]
+ },
+ "criteres": [
+  {
+   "id": "trois-reseaux-sans-stats",
+   "type": "code",
+   "verif": "egal",
+   "sur": "reseaux.reseaux_sans_stats",
+   "valeur": [
+    "facebook",
+    "instagram",
+    "tiktok"
+   ]
+  },
+  {
+   "id": "youtube-a-ses-stats",
+   "type": "code",
+   "verif": "egal",
+   "sur": "reseaux.par_reseau.youtube.stats_au_registre",
+   "valeur": true
+  },
+  {
+   "id": "consigne-lit-les-reseaux",
+   "type": "code",
+   "verif": "avec",
+   "sur": "seance",
+   "motifs": [
+    "reseaux_sans_stats"
+   ]
+  }
+ ]
+}

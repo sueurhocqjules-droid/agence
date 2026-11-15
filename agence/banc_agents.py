@@ -22,8 +22,9 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-from agence import modeles, organisation, postes, registre
-from agents import chef_operations, chef_recherche, chercheur_outils, direction
+from agence import mesures, modeles, organisation, postes, registre
+from agents import chef_operations, chef_recherche, chercheur_outils, direction, stratege
+from agents import responsable_organisation as ro
 
 DOSSIER = Path(__file__).resolve().parent.parent / "banc" / "agents"
 VERDICTS_JUGE = ("oui", "non", "inconnu")
@@ -84,8 +85,35 @@ def _direction(entree, repondre):
     return sortie
 
 
+def _stratege(entree, repondre):
+    """Le Stratège tourne sur Claude : comme pour la Direction, le banc ne rejoue pas sa séance (coût). Il vérifie ce
+    qu'elle lit : sa consigne d'aujourd'hui et ce que le script tire des tables du cas (réseaux sans stats, portée des
+    chaînes, demandes sans poste pour y répondre)."""
+    consigne = stratege.consigne_systeme()
+    sortie = {"consigne": consigne, "seance": consigne[consigne.index("Ta séance :"):]}
+    if "maintenant" in entree:
+        maintenant = datetime.fromisoformat(entree["maintenant"])
+        with tempfile.TemporaryDirectory() as tmp:
+            ancien, registre.DOSSIER = registre.DOSSIER, Path(tmp)
+            try:
+                for table in ("diffusions", "stats"):
+                    if entree.get(table):
+                        registre.ajouter(table, entree[table])
+                for nom in ("occasions", "courrier"):
+                    (Path(tmp) / f"{nom}.jsonl").write_text(
+                        "".join(json.dumps(l, ensure_ascii=False) + "\n" for l in entree.get(nom, [])),
+                        encoding="utf-8")
+                stats = registre.lire("stats")
+                sortie |= {"reseaux": stratege.reseaux(maintenant),
+                           "portee": mesures.signaux_portee(stats, maintenant),
+                           "sans_poste": ro.sans_poste(maintenant)}
+            finally:
+                registre.DOSSIER = ancien
+    return sortie
+
+
 ADAPTATEURS = {"chef-operations": _chef_operations, "chercheur-outils": _chercheur_outils,
-               "chef-recherche": _chef_recherche, "direction": _direction}
+               "chef-recherche": _chef_recherche, "direction": _direction, "stratege": _stratege}
 
 
 # --- Vérifications par code ------------------------------------------------------------------------------------
@@ -201,7 +229,8 @@ def defauts(cas):
 
 
 def demande_un_modele(cas):
-    en_direct = "sortie" not in cas and "reponse_modele" not in cas and cas.get("adaptateur") != "direction"
+    en_direct = ("sortie" not in cas and "reponse_modele" not in cas
+                 and cas.get("adaptateur") not in ("direction", "stratege"))   # séances Claude : pas rejouées
     return en_direct or any(c.get("type") == "juge" for c in cas.get("criteres") or [])
 
 
