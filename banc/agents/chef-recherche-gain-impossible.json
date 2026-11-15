@@ -1,0 +1,41 @@
+{
+ "id": "chef-recherche-gain-impossible",
+ "poste": "chef-recherche",
+ "panne": "14/11/2026, à l'essai : le Chef de la Recherche annonce « coût Claude 33,97 $ vers 0 » pour Ling 3.2 Flash, qui n'écrit que le texte (Claude reste nécessaire pour le code des animations), et transmet Halogen, qui demande un GPU que les runners GitHub de l'agence n'ont pas (nightwork/2026-11-13/PLAN.md, journal de la tâche 11). La Direction l'a rattrapé. Réparé : la fiche de l'outil dit la partie remplacée et le matériel requis, un outil qui ne tourne pas chez nous sort des rapports, et les deux champs sont recopiés dans les preuves par le script. La réponse du modèle (reconstituée) propose les deux : seul Ling doit rester, avec sa partie remplacée.",
+ "adaptateur": "chef-recherche",
+ "entree": {
+  "mesures": {"cout_claude_semaine": 33.97},
+  "concepts": [],
+  "outils": [
+   {"date": "2026-11-13T11:00:00+00:00", "par": "chercheur-outils", "etat": "propose", "nom": "Ling 3.2 Flash",
+    "remplace": "auteur", "licence": "MIT", "risque": "Qualité du texte à vérifier", "compte_requis": false,
+    "essai": "Écrire 3 sujets avec le modèle et comparer à ceux de Claude", "economie_usd_semaine": 12.0,
+    "part_remplacee": "L'écriture du texte des sujets. Le code des animations Remotion reste écrit par Claude",
+    "materiel_requis": "Aucun : appel d'API gratuit", "tourne_chez_nous": true,
+    "lien": "https://openrouter.ai/inclusionai/ling-3.2-flash:free"},
+   {"date": "2026-11-13T11:00:00+00:00", "par": "chercheur-outils", "etat": "propose", "nom": "Halogen",
+    "remplace": "auteur", "licence": "Apache-2.0", "risque": "Matériel", "compte_requis": false,
+    "essai": "Lancer le modèle sur un sujet", "economie_usd_semaine": 20.0,
+    "part_remplacee": "L'écriture des sujets et du code",
+    "materiel_requis": "GPU de 24 Go, absent des runners GitHub", "tourne_chez_nous": false,
+    "lien": "https://github.com/exemple/halogen"}
+  ]
+ },
+ "reponse_modele": {
+  "propositions": [
+   {"source": "https://openrouter.ai/inclusionai/ling-3.2-flash:free", "titre": "Ling 3.2 Flash pour le texte",
+    "proposition": "Écrire le texte des sujets avec Ling 3.2 Flash ; Claude garde le code des animations",
+    "preuve": "Appel d'API gratuit, sans matériel, remplace le texte seulement",
+    "mesure": "cout_claude_semaine", "attendu": 22, "echeance_jours": 14},
+   {"source": "https://github.com/exemple/halogen", "titre": "Halogen pour tout l'Auteur",
+    "proposition": "Remplacer l'Auteur par Halogen", "preuve": "20 $ économisés par semaine",
+    "mesure": "cout_claude_semaine", "attendu": 14, "echeance_jours": 14}
+  ]
+ },
+ "criteres": [
+  {"id": "outil-sans-materiel-ecarte", "type": "code", "verif": "sans", "sur": "propositions", "motifs": ["exemple/halogen"]},
+  {"id": "outil-sain-garde", "type": "code", "verif": "avec", "sur": "propositions", "motifs": ["ling-3.2-flash"]},
+  {"id": "partie-remplacee-dite", "type": "code", "verif": "avec", "sur": "propositions", "motifs": ["code des animations Remotion reste écrit par Claude"]},
+  {"id": "gain-pas-a-zero", "type": "code", "verif": "sans", "sur": "propositions", "motifs": ["\"attendu\": 0[,\\s}]"]}
+ ]
+}

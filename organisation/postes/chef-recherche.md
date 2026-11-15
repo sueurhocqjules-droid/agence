@@ -43,5 +43,6 @@ Propositions retenues par la Direction, puis jugées justes par le critique.
 
 ## Consignes
 - Une preuve vaut mieux qu'un avis : chiffres, liens, essais
+- Une proposition d'outil dit quelle partie du travail il remplace et ce qui reste payé à Claude (le gain ne compte que cette partie), et le matériel qu'il demande face à celui de l'agence (runners GitHub, sans GPU). Un outil dont la fiche dit qu'il ne tourne pas chez nous (`tourne_chez_nous` faux) n'arrive pas jusqu'à lui. Panne du 14/11 : « coût Claude 33,97 $ vers 0 » pour Ling 3.2 Flash (texte seulement), Halogen proposé sans GPU (cas `chef-recherche-gain-impossible`)
 
 ## Retours

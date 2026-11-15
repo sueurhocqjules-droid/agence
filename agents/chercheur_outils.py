@@ -220,11 +220,15 @@ def valider(reponse, autorises, postes_connus, deja, refuses=(), besoins_ouverts
             raison = f"poste inconnu : {c.get('remplace')}"
         elif c.get("gratuit") is not True:
             raison = "pas gratuit"
+        elif c.get("tourne_chez_nous") is False:
+            raison = f"matériel que l'agence n'a pas : {str(c.get('materiel_requis', ''))[:80]}"
         elif not all(str(c.get(k, "")).strip() for k in ("nom", "pourquoi", "essai")):
             raison = "nom, pourquoi ou essai manquant"
         else:
             gardes.append({k: propre(c.get(k)) for k in ("nom", "remplace", "pourquoi", "licence", "risque", "compte_requis",
                                                   "essai", "economie_usd_semaine")}
+                          | {k: propre(c[k]) for k in ("part_remplacee", "materiel_requis") if c.get(k)}
+                          | ({"tourne_chez_nous": True} if c.get("tourne_chez_nous") is True else {})
                           | {"lien": lien, "besoin": c.get("besoin") if c.get("besoin") in besoins_ouverts else None})
             continue
         ecartes.append({"nom": c.get("nom"), "lien": lien, "raison": raison})
@@ -252,9 +256,14 @@ def consigne(donnees, postes_connus):
         '{"candidats": [{"nom": "...", "lien": "un lien copié tel quel des données", '
         f'"remplace": "un de {sorted(postes_connus)}", "pourquoi": "ce qu\'il remplace et pourquoi il ferait mieux", '
         '"gratuit": true, "licence": "...", "risque": "...", "compte_requis": false, "besoin": null, '
-        '"essai": "le test concret que la Maintenance doit faire pour le valider", "economie_usd_semaine": 0}]}\n'
+        '"essai": "le test concret que la Maintenance doit faire pour le valider", "economie_usd_semaine": 0, '
+        '"part_remplacee": "la partie précise du travail qu\'il remplace, et ce qui reste à Claude", '
+        '"materiel_requis": "GPU, mémoire, système demandés, ou aucun", "tourne_chez_nous": true}]}\n'
         "En français, sans tiret long. N'invente aucun lien ni aucun chiffre : economie_usd_semaine vaut null si tu ne "
-        "peux pas l'estimer à partir des coûts fournis.\n\n"
+        "peux pas l'estimer à partir des coûts fournis, et ne compte que la partie du travail réellement remplacée "
+        "(un modèle qui n'écrit que le texte ne remplace pas le code des animations : Claude reste payé pour celui-là). "
+        "Matériel : l'agence n'a que des runners GitHub Actions, sans GPU. Un outil qui demande un GPU ou un matériel "
+        "que ces runners n'ont pas ne tourne pas chez nous : tourne_chez_nous vaut false.\n\n"
         f"Ajoute au même objet une seconde liste, \"ameliorations\" : au plus {MAX_AMELIORATIONS} achats payants qui "
         "feraient progresser l'agence (ils ne seront pas achetés : l'Analyste les simule, Jules décide). Seulement des "
         "prix présents dans modeles_payants_openrouter ou prix_boite_a_outils, recopiés tels quels (prix, devise, "
