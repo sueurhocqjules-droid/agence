@@ -93,7 +93,8 @@ def message(texte, pourquoi, si_oui, si_non, par, conseil="", maintenant=None):
         morceaux.append(f"Pour t'aider à choisir : {conseil}")
     non = "ça reste en pause" if si_non == "rien" and si_oui.startswith("reprise:") else en_clair(si_non)
     morceaux.append(f"Oui : {en_clair(si_oui)}.\nNon : {non}.")
-    morceaux.append(f"Ta réponse sera prise au prochain réveil de l'agence (vers {prochain_reveil(maintenant or datetime.now(timezone.utc))}). "
+    morceaux.append(f"Ta réponse sera prise au prochain réveil de l'agence (prévu vers {prochain_reveil(maintenant or datetime.now(timezone.utc))}, "
+                    "mais GitHub peut le retarder de quelques heures). "
                     "D'ici là le bouton ne réagit pas, c'est normal : ce message changera quand ce sera fait.")
     return "\n\n".join(morceaux)
 
@@ -103,6 +104,10 @@ def poser(texte, si_oui, si_non="rien", par="direction", pourquoi="", conseil=""
         raise ValueError("Une question à Jules dit toujours pourquoi elle est posée")
     verifier(si_oui)
     verifier(si_non)
+    if si_oui == "rien" and si_non == "rien":
+        raise ValueError("Un clic doit changer quelque chose : Oui et Non ne peuvent pas valoir tous deux « rien ». "
+                         "Pour un accord sur une clé ou un fichier protégé, dire à Jules quelle PR étiqueter "
+                         "« accord-jules », avec son lien")
     ouvertes = etat_questions(registre.lire("questions"))
     base = datetime.now(timezone.utc).strftime("%m%d-%H%M")
     ident = next(f"{base}-{n}" for n in range(1, 100) if f"{base}-{n}" not in ouvertes)

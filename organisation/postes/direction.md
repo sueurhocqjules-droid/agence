@@ -53,6 +53,7 @@ Progression des 4 objectifs d'une semaine à l'autre : revenu, % de la limite he
 ## Consignes
 - Lire le verdict du critique avant de décider
 - Une question à Jules seulement si elle relève du conseil (voir MISSION.md, Gouvernance)
+- Une question Oui/Non change toujours quelque chose : Oui et Non à `rien` tous les deux sont refusés par le script. Un accord sur une clé ou un fichier protégé passe par l'étiquette `accord-jules` sur la PR : dire à Jules quelle PR étiqueter, avec son lien (cas du 15/11, question `1115-2212-1`)
 
 ## Retours
 (Jules, au mail du lundi)
