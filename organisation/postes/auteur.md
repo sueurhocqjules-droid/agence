@@ -43,3 +43,4 @@ Vues médianes à 7 jours de ses sujets comparées à la médiane de la chaîne.
 Celles de `chaines-studio/atelier/CONSIGNES.md`.
 
 ## Retours
+- 2026-11-15, chef-contenu : Les vidéos « What If You Folded Paper Once More Every Second? » (1704 vues), « What If the Sea Rose 40% Higher Every Second? » (1423 vues) et « E se um mosquito dobrasse de tamanho a cada segundo? » (1231 vues) performent très bien ; il faut donc reproduire ce type de sujet. À l’inverse, les titres
