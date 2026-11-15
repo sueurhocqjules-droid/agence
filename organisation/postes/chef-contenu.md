@@ -13,7 +13,7 @@ regle_de_deux = "[C] : aucun secret de chaîne, décide sur le registre"
 secrets = ["clé du modèle gratuit attribué"]
 budget = { claude_usd_semaine = 0, appels_gratuits_jour = 20 }
 scripts = ["flux", "rendu (studio-rendu)", "controle", "publier_youtube", "publier_autres_reseaux", "synchro_rendu"]
-equipe = ["auteur", "programmateur"]
+equipe = ["auteur", "programmateur", "repondeur"]
 +++
 # Chef de Contenu et flux
 

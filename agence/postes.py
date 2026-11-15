@@ -38,6 +38,9 @@ POSTES = {
     # Courrier (étape 9) : catégorie fermée par mail (objet et extrait), à chaque réveil
     "courrier": [("groq", "openai/gpt-oss-120b", 3000), ("gemini", "gemini-flash-lite-latest", 3000),
                  ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 3000)],
+    # Répondeur : un brouillon court par commentaire ou mail qualifié, en champs fermés, à chaque réveil
+    "repondeur": [("groq", "openai/gpt-oss-120b", 4000), ("gemini", "gemini-flash-lite-latest", 4000),
+                  ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 4000)],
     # Juge du banc des agents (agence/banc_agents.py) : jamais Claude (MISSION.md, « Décider vite »), réponse fermée
     # oui / non / inconnu. Gemini d'abord, parce que la plupart des agents jugés tournent sur gpt-oss-120b. Flash-Lite en
     # tête : il répond en 1 s quand Flash est saturé (503 après 84 s d'attente le 13/11), et les témoins du banc
