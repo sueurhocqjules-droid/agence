@@ -47,3 +47,4 @@ Part des réveils réussis, zéro panne non signalée, coût des scripts, délai
 ## Consignes
 
 ## Retours
+- 2026-11-15, direction : 80 % de réveils réussis, mais 4 pannes sans trace (3 au banc). Une panne doit toujours laisser sa cause au journal : c'est commandé. Suis le délai des 4 besoins ouverts, aucun n'est encore en retard.
