@@ -27,7 +27,8 @@ import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from agence import besoins, consignes, guichet, ingenierie, memoire, mesures, modeles, organisation, postes, registre
+from agence import (besoins, consignes, guichet, ingenierie, memoire, mesures, modeles, organisation, postes, registre,
+                    suivi_ecarts)
 from agents.chef_operations import journaux
 
 POSTE = "responsable-organisation"
@@ -151,9 +152,9 @@ def sans_poste(maintenant):
 
 
 def propositions_du_stratege(fiches, maintenant):
-    """Les postes qui manquent selon le Stratège (registre/ecarts.jsonl, voie poste), pas encore créés."""
-    return [{k: e.get(k) for k in ("id", "source", "promesse", "constat", "preuve", "poste")}
-            for l in registre.lire_jsonl("ecarts", maintenant - FENETRE) for e in l.get("ecarts") or []
+    """Les postes qui manquent selon le Stratège (voie poste), pas encore créés, tant que l'écart est ouvert."""
+    return [{k: e.get(k) for k in ("id", "semaines", "source", "promesse", "constat", "preuve", "poste")}
+            for e in suivi_ecarts.ouverts(maintenant)
             if e.get("voie") == "poste" and (e.get("poste") or {}).get("id") not in fiches]
 
 

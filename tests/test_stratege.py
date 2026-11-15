@@ -8,9 +8,10 @@ import tempfile
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
+from unittest import mock
 
-from agence import registre
-from agents import direction, stratege
+from agence import registre, suivi_ecarts
+from agents import bilan, direction, stratege
 from agents import responsable_organisation as ro
 
 T = datetime(2026, 11, 15, 12, tzinfo=timezone.utc)
@@ -113,8 +114,9 @@ class Valider(unittest.TestCase):
         self.assertIsNone(retenus[0]["mesure"])
         self.assertIsNone(retenus[0]["attendu"])
 
-    def test_au_plus_trois_ecarts(self):
-        self.assertEqual(len(self.valider(*[ecart()] * 5)[1]), stratege.ECARTS_MAX)
+    def test_pas_de_quota_seulement_un_plafond_anti_emballement(self):
+        self.assertEqual(len(self.valider(*[ecart()] * 6)[1]), 6)
+        self.assertEqual(len(self.valider(*[ecart()] * 30)[1]), stratege.ECARTS_MAX)
 
     def test_suivi_d_un_ecart_inconnu_refuse(self):
         _, _, suivi, refus = self.valider(suivi=[{"id": "ecart-1", "etat": "comble", "pourquoi": "fait"},
@@ -166,6 +168,46 @@ class Suivi(Registre):
     def test_sans_suivi_l_ecart_reste_ouvert(self):
         self.jsonl("ecarts", [{"date": "2026-11-08T18:00:00+00:00", "ecarts": [ecart() | {"id": "e1"}]}])
         self.assertEqual(stratege.ecarts_passes(T)[0]["etat"], "ouvert")
+
+
+class Empilement(Registre):
+    """Un écart ouvert depuis 2 semaines s'empile : la Direction y répond, Jules le voit au bilan (Jules, 15/11)."""
+
+    def ligne(self, date, *ids, suivi=()):
+        return {"date": date, "ecarts": [ecart(constat=f"constat {i}") | {"id": i} for i in ids], "suivi": list(suivi)}
+
+    def test_un_ecart_ouvert_ne_sort_jamais_de_la_vue(self):
+        self.jsonl("ecarts", [self.ligne("2026-08-01T18:00:00+00:00", "vieux-ouvert", "vieux-comble"),
+                              self.ligne("2026-08-08T18:00:00+00:00", suivi=[{"id": "vieux-comble", "etat": "comble"}])])
+        self.assertEqual([e["id"] for e in suivi_ecarts.passes(T)], ["vieux-ouvert"])
+        self.assertEqual([e["id"] for e in stratege.ecarts_passes(T)], ["vieux-ouvert"])
+
+    def test_seuil_de_deux_semaines(self):
+        self.jsonl("ecarts", [self.ligne("2026-10-25T18:00:00+00:00", "a"), self.ligne("2026-11-01T18:00:00+00:00", "b"),
+                              self.ligne("2026-11-08T18:00:00+00:00", "c"),
+                              self.ligne("2026-11-14T18:00:00+00:00", suivi=[{"id": "a", "etat": "abandonne"}])])
+        self.assertEqual([(e["id"], e["semaines"]) for e in suivi_ecarts.qui_s_empilent(T)], [("b", 2)])
+
+    def test_le_responsable_de_l_organisation_garde_un_poste_propose_ouvert(self):
+        e = ecart(voie="poste", poste={"id": "repondeur"}) | {"id": "p"}
+        self.jsonl("ecarts", [{"date": "2026-09-01T18:00:00+00:00", "ecarts": [e]}])
+        self.assertEqual([p["id"] for p in ro.propositions_du_stratege(FICHES, T)], ["p"])
+
+    def test_la_direction_doit_repondre(self):
+        self.assertIn("ecarts_qui_s_empilent", direction.consigne_systeme())
+
+    def test_le_bilan_du_lundi_et_le_message_telegram(self):
+        lundi = datetime(2026, 11, 16, 6, 37, tzinfo=timezone.utc)
+        with mock.patch("builtins.print"):
+            texte, resume, _ = bilan.page(lundi, demandes=[], attente=[], fermees=[])
+        self.assertNotIn("Écarts qui s'empilent", texte)
+        self.assertNotIn("Stratège", resume)
+        self.jsonl("ecarts", [self.ligne("2026-10-25T18:00:00+00:00", "a")])
+        with mock.patch("builtins.print"):
+            texte, resume, _ = bilan.page(lundi, demandes=[], attente=[], fermees=[])
+        self.assertIn("### Écarts qui s'empilent", texte)
+        self.assertIn("constat a (ouvert depuis 3 semaines, voie direction)", texte)
+        self.assertIn("1 écart(s) du Stratège", resume)
 
 
 class Branchements(Registre):
