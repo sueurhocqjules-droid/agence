@@ -1,0 +1,24 @@
+{
+ "id": "temoin-stratege-reseaux-sans-stats",
+ "poste": "stratege",
+ "panne": "15/11/2026 : témoin de stratege-reseaux-sans-stats. Un dossier qui ne voit aucun réseau sans stats alors qu'Instagram, Facebook et TikTok diffusent sans stats doit être refusé.",
+ "sortie": {
+  "reseaux": {
+   "reseaux_sans_stats": []
+  }
+ },
+ "attendu": "echec",
+ "criteres": [
+  {
+   "id": "trois-reseaux-sans-stats",
+   "type": "code",
+   "verif": "egal",
+   "sur": "reseaux.reseaux_sans_stats",
+   "valeur": [
+    "facebook",
+    "instagram",
+    "tiktok"
+   ]
+  }
+ ]
+}

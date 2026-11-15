@@ -1,0 +1,131 @@
+{
+ "id": "stratege-chaine-non-diffusee",
+ "poste": "stratege",
+ "panne": "13/11/2026 : la chaîne espagnole faisait quelques vues quand ses sœurs en faisaient des milliers sur les mêmes sujets, et aucun agent ne l'a remonté : Jules l'a vu lui-même. Le Stratège lit les signaux de portée (mesures.signaux_portee) dans son dossier.",
+ "adaptateur": "stratege",
+ "entree": {
+  "maintenant": "2026-11-15T12:00:00+00:00",
+  "stats": [
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "en",
+    "video_id": "en0",
+    "titre": "sujet 0",
+    "statut": "public",
+    "sortie": "2026-11-08T15:00:00+00:00",
+    "vues": 4000,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "en",
+    "video_id": "en1",
+    "titre": "sujet 1",
+    "statut": "public",
+    "sortie": "2026-11-09T15:00:00+00:00",
+    "vues": 4000,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "en",
+    "video_id": "en2",
+    "titre": "sujet 2",
+    "statut": "public",
+    "sortie": "2026-11-10T15:00:00+00:00",
+    "vues": 4000,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "es",
+    "video_id": "es0",
+    "titre": "sujet 0",
+    "statut": "public",
+    "sortie": "2026-11-08T15:00:00+00:00",
+    "vues": 1,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "es",
+    "video_id": "es1",
+    "titre": "sujet 1",
+    "statut": "public",
+    "sortie": "2026-11-09T15:00:00+00:00",
+    "vues": 2,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "es",
+    "video_id": "es2",
+    "titre": "sujet 2",
+    "statut": "public",
+    "sortie": "2026-11-10T15:00:00+00:00",
+    "vues": 2,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "pt",
+    "video_id": "pt0",
+    "titre": "sujet 0",
+    "statut": "public",
+    "sortie": "2026-11-08T15:00:00+00:00",
+    "vues": 500,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "pt",
+    "video_id": "pt1",
+    "titre": "sujet 1",
+    "statut": "public",
+    "sortie": "2026-11-09T15:00:00+00:00",
+    "vues": 500,
+    "likes": 0,
+    "commentaires": 0
+   },
+   {
+    "releve": "2026-11-15T06:00:00+00:00",
+    "chaine": "pt",
+    "video_id": "pt2",
+    "titre": "sujet 2",
+    "statut": "public",
+    "sortie": "2026-11-10T15:00:00+00:00",
+    "vues": 500,
+    "likes": 0,
+    "commentaires": 0
+   }
+  ]
+ },
+ "criteres": [
+  {
+   "id": "panne-es-vue",
+   "type": "code",
+   "verif": "avec",
+   "sur": "portee",
+   "motifs": [
+    "\"chaine\": \"es\"",
+    "\"signal\": \"panne\""
+   ]
+  },
+  {
+   "id": "consigne-lit-la-portee",
+   "type": "code",
+   "verif": "avec",
+   "sur": "seance",
+   "motifs": [
+    "portee_des_chaines"
+   ]
+  }
+ ]
+}

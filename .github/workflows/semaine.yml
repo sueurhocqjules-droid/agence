@@ -150,6 +150,12 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           REVEILS_JSON: ${{ runner.temp }}/reveils.json
         run: python -m agence.lancer chef-operations
+      - name: Stratège
+        if: ${{ !cancelled() }}
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: python -m agence.lancer stratege
       - name: Responsable de l'organisation
         if: ${{ !cancelled() }}
         env:
