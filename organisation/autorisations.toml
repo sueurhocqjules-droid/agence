@@ -19,9 +19,10 @@ YT_TOKEN_ES = ["stats", "flux"]
 YT_TOKEN_PT = ["stats", "flux"]
 # Clé publique YouTube, lecture seule
 YOUTUBE_API_KEY = ["guetteur", "veilleur"]
-# Instagram et Facebook (utilisateur système Meta), TikTok par Buffer
+# Instagram et Facebook (utilisateur système Meta), TikTok par Buffer, Threads (clé des jetons chiffrés du registre)
 META_TOKEN = ["flux"]
 BUFFER_API_KEY = ["flux"]
+THREADS_CLE = ["flux"]
 # Jeton du workflow GitHub (droits fixés par chaque workflow)
 GH_TOKEN = ["flux", "garde_fous", "bilan", "guichet", "contacts", "delais", "chef-contenu", "chercheur-outils", "direction", "ingenierie", "responsable-organisation", "critique"]
 # Bot Telegram : messages à Jules seulement

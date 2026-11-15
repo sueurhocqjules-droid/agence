@@ -10,6 +10,7 @@ Lancement : python -m agents.flux [--essai]
    langue (agence/meta.py), la plus ancienne d'abord, au rythme fixé par le Programmateur (organisation/diffusion.toml).
    Facebook n'accepte pas plus de 90 s : une vidéo plus longue y est notée « hors_format » et sautée.
    TikTok : par Buffer (agence/buffer.py), même règle, même cadence ; une chaîne pas encore branchée sur Buffer est sautée.
+   Threads : agence/threads.py, un jeton par compte (renouvelé ici même) ; un compte pas encore branché est sauté.
 4. Ce qui manque sans rendu (ou dont le rendu a expiré avant sa diffusion) : poussé dans la file de studio-rendu
    (file/attente.txt), dont le rendu part tout seul. Le passage suivant le programme ou le diffuse.
 Coût : 0 jeton. Quota YouTube : ~1 600 unités par envoi. Minutes de rendu : dépôt public, gratuites.
@@ -27,7 +28,7 @@ from datetime import datetime, time, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from agence import buffer, controle, lancer, meta, mesures, registre, youtube
+from agence import buffer, controle, lancer, meta, mesures, registre, threads, youtube
 
 DEPOT_RENDU = "sueurhocqjules-droid/studio-rendu"
 RENDU = Path(os.environ.get("RENDU_DIR") or Path(__file__).resolve().parents[2] / "studio-rendu")
@@ -232,6 +233,90 @@ def diffuser(essai, sujets, etats, pauses, dossier, maintenant, fichiers=None):
                 publiees.append(f"{reseau}:{nom}")
                 restant -= 1
                 print(f"OK {reseau} {nom} : {media_id}")
+    return publiees, erreurs, a_rendre
+
+
+def diffuser_threads(essai, sujets, etats, pauses, dossier, maintenant, fichiers=None):
+    """Vidéos déjà publiques sur YouTube vers Threads (agence/threads.py), au rythme de diffusion.toml. Renouvelle
+    d'abord les jetons des comptes branchés (même si la cadence est à 0, pour ne pas les perdre) ; un problème de
+    jeton est noté au registre des diffusions. Renvoie (publiées, erreurs, à rendre)."""
+    fichiers = {} if fichiers is None else fichiers
+    try:
+        comptes = threads.lire()
+    except threads.ErreurThreads as e:
+        print(f"ERREUR threads : {e}")
+        if not essai:
+            diffusion("threads", "", "", "erreur", note=str(e)[:300])
+        return [], ["threads:jetons"], []
+    if not comptes:
+        print("Diffusion Threads : aucun compte branché (python -m agence.threads brancher), rien envoyé")
+        return [], [], []
+    erreurs = []
+    if not essai:
+        renouveles, problemes = threads.renouveler(comptes, maintenant)
+        if renouveles != comptes:
+            threads.ecrire(renouveles)
+            comptes = renouveles
+        for probleme in problemes:
+            print(f"ERREUR threads {probleme}")
+            diffusion("threads", probleme.split(" ")[0], "", "erreur", note=probleme[:300])
+            erreurs.append(f"threads:{probleme.split(' ')[0]}")
+    par_jour = cadence_diffusion().get("threads", 0)
+    if par_jour <= 0:
+        return [], erreurs, []
+    lignes = registre.lire("diffusions")
+    sautes = {l["nom"] for l in lignes if l["reseau"] == "threads" and l["etat"] == "hors_format"}
+    publiees, a_rendre = [], []
+    for langue in youtube.CHAINES:
+        ligne = lancer.pause_active([f"chaine:{langue}", f"threads:{langue}", "reseau:threads"], pauses)
+        if ligne:
+            print(f"PAUSE threads {langue} ({ligne['par']} : {ligne['raison']}) : aucune diffusion")
+            continue
+        restant = par_jour - publies_aujourdhui(lignes, "threads", langue, maintenant)
+        if restant <= 0:
+            continue
+        if langue not in comptes:
+            print(f"Threads {langue} : @{threads.COMPTES[langue]} pas branché, sauté")
+            continue
+        try:
+            deja = threads.titres(comptes[langue])
+        except threads.ErreurThreads as e:
+            print(f"ERREUR threads {langue} : lecture des posts : {e}")
+            erreurs.append(f"threads:{langue}")
+            continue
+        for sujet in a_diffuser(sujets, etats[langue][2], deja, sautes, langue):
+            if restant <= 0:
+                break
+            nom = f"{sujet}-{langue}"
+            if nom not in fichiers:
+                fichiers[nom] = fichier_controle(nom, dossier)
+            if not fichiers[nom]:
+                if nom not in a_rendre:
+                    a_rendre.append(nom)
+                restant -= 1
+                continue
+            fichier, duree = fichiers[nom]
+            if duree > threads.DUREE_MAX_S:
+                print(f"HORS FORMAT threads {nom} : {duree:.0f} s, plus de {threads.DUREE_MAX_S} s")
+                if not essai:
+                    diffusion("threads", langue, nom, "hors_format", note=f"{duree:.0f} s")
+                continue
+            restant -= 1
+            if essai:
+                print(f"ESSAI diffusion threads {nom}")
+                continue
+            sujet_json, calcul_json = lire_sujet(sujet)
+            try:
+                media_id = threads.publier(comptes[langue], heberger(fichier), sujet_json[langue]["titre"],
+                                           calcul_json["descriptions"][langue])
+            except threads.ErreurThreads as e:
+                print(f"ERREUR threads {nom} : {e}")
+                diffusion("threads", langue, nom, "erreur", note=str(e)[:300])
+                erreurs.append(f"threads:{nom}")
+                break  # limite atteinte ou accès coupé : plus rien sur ce compte pour ce passage
+            diffusion("threads", langue, nom, "publie", media_id)
+            publiees.append(f"threads:{nom}")
+            print(f"OK threads {nom} : {media_id}")
     return publiees, erreurs, a_rendre
 
 
@@ -444,6 +529,8 @@ def passage(essai):
         diffusees, erreurs, pour_diffuser = diffuser(essai, sujets, etats, pauses, dossier, maintenant, fichiers)
         tiktok = diffuser_tiktok(essai, sujets, etats, pauses, dossier, maintenant, fichiers)
         diffusees, erreurs, pour_diffuser = diffusees + tiktok[0], erreurs + tiktok[1], pour_diffuser + tiktok[2]
+        fils = diffuser_threads(essai, sujets, etats, pauses, dossier, maintenant, fichiers)
+        diffusees, erreurs, pour_diffuser = diffusees + fils[0], erreurs + fils[1], pour_diffuser + fils[2]
         a_rendre += [n for n in dict.fromkeys(pour_diffuser) if n not in a_rendre]  # YouTube d'abord, puis la diffusion
 
     a_rendre = a_rendre[:RENDUS_MAX]
