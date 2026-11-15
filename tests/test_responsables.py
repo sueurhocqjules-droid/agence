@@ -110,6 +110,9 @@ class Distances(unittest.TestCase):
         self.assertEqual(len(ecartes), 4)
 
 
+ORIGINE_AUDIENCES = rr.audiences
+
+
 class PassageRevenu(Registre):
     def test_ecrit_regles_besoins_et_decisions(self):
         (self.tmp / "seuils.json").write_text(json.dumps(PHOTO), encoding="utf-8")
@@ -139,6 +142,40 @@ class PassageRevenu(Registre):
         decisions = [d["decision"] for d in registre.decisions()]
         self.assertEqual((len(registre.lire_jsonl("besoins")), len([d for d in decisions if d.startswith("voie")])),
                          avant)
+
+    def test_audience_trop_basse_le_besoin_est_l_audience(self):
+        (self.tmp / "seuils.json").write_text(json.dumps(PHOTO), encoding="utf-8")
+        rr.audiences = lambda maintenant: {"en": 5000, "es": 5, "pt": 300}
+        self.addCleanup(setattr, rr, "audiences", ORIGINE_AUDIENCES)
+        reponse = json.dumps({"ligne": "x", "voies": [
+            {"chaine": "en", "voie": "yt_fans", "pourquoi": "600 abonnés sur 500"},
+            {"chaine": "es", "voie": "affiliation", "pourquoi": "pas de seuil"}]})
+        rr.passage(False, lire=lambda a: "", demander=lambda p, c: (reponse, "faux-modele"))
+        voies = {v["chaine"]: v for v in registre.lire_jsonl("revenu")[-1]["voies"]}
+        self.assertEqual(voies["en"]["voie"], "yt_fans")
+        self.assertEqual((voies["es"]["voie"], voies["es"]["unite"]), ("audience", "vues par semaine"))
+        self.assertEqual(voies["es"]["manque"], rr.AUDIENCE_MIN - 5)
+        self.assertEqual(besoins.etat()["responsable-revenu-es"]["unite"], "vues par semaine")
+        d = {x["decision"]: x for x in registre.decisions()}["voie de revenu de la chaîne es : audience"]
+        self.assertEqual((d["mesure"], d["avant"], d["attendu"]), ("vues_semaine:es", 5, rr.AUDIENCE_MIN))
+        self.assertTrue(d["echeance"])
+        self.assertEqual(d["voie"]["nouvelle"], "audience")
+
+    def test_voie_jugee_fausse_est_defaite_et_interdite(self):
+        (self.tmp / "seuils.json").write_text(json.dumps(PHOTO), encoding="utf-8")
+        rr.audiences = lambda maintenant: {"en": 5000, "es": 5000, "pt": 5000}
+        self.addCleanup(setattr, rr, "audiences", ORIGINE_AUDIENCES)
+        avec = lambda voie: (json.dumps({"voies": [{"chaine": "es", "voie": voie, "pourquoi": "x"}]}), "m")  # noqa: E731
+        rr.passage(False, lire=lambda a: "", demander=lambda p, c: avec("sponsoring"))
+        rr.passage(False, lire=lambda a: "", demander=lambda p, c: avec("affiliation"))
+        ident = [x for x in registre.decisions() if x["decision"].endswith("es : affiliation")][0]
+        self.assertEqual(ident["voie"]["ancienne"], "sponsoring")
+        registre.juger(ident["id"], "fausse", 10, "rien")
+        self.assertIn("remise à sponsoring", rr.defaire(ident, "rien amélioré"))
+        self.assertEqual(rr.derniere_voie()["es"], "sponsoring")
+        self.assertEqual(rr.voies_defaites(), {"es": {"affiliation"}})
+        rr.passage(False, lire=lambda a: "", demander=lambda p, c: avec("affiliation"))
+        self.assertNotEqual(rr.derniere_voie()["es"], "affiliation")
 
     def test_essai_n_ecrit_rien(self):
         rr.passage(True, lire=lambda a: "", demander=lambda p, c: (_ for _ in ()).throw(RuntimeError("quota")))

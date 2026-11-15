@@ -23,11 +23,13 @@ Créé le 14/11/2026 (étape 12, sous-étape 14, ajout du 13/11 retenu par Jules
 ## Mission
 Propriétaire de l'objectif 1. Chaque semaine, relire les règles de monétisation de chaque plateforme à leur source officielle, puis dire pour chaque chaîne la voie de revenu la plus proche (programmes des plateformes, affiliation, produit, sponsoring) et la transformer en besoin chiffré, que la Recherche traite en priorité.
 
+Le critère de choix est la voie qui rapporte le plus tôt vers les 50 € par mois, compte tenu de l'audience réelle de la chaîne (vues gagnées sur 7 jours, `agence/mesures.py`), pas la voie « la plus proche » des seuils. Sous `AUDIENCE_MIN` (1 000 vues par semaine, hypothèse de départ à corriger au premier euro), aucune voie ne peut rapporter : le script retient la voie `audience` et le besoin de la chaîne est l'audience à atteindre, pas une voie de revenu. Chaque changement de voie est une décision du journal d'audit avec sa prédiction (mesure `vues_semaine:<chaîne>`, valeur avant, valeur attendue, échéance 14 jours) : le Critique la juge, et si elle est fausse il la défait (`defaire`, voie d'avant remise au registre). Une voie jugée fausse n'est pas reprise sur cette chaîne.
+
 ## Entrées
 Les pages officielles des plateformes (liste `REGLES` du module, lecture publique sans clé), la photo des seuils du Guetteur (`registre/seuils.json`), les signaux de diffusion des chaînes (`registre/stats.csv`). `organisation/MEMOIRE.md` quand elle existe, avant toute réorientation.
 
 ## Sorties
-`registre/regles-plateformes.md` (chaque règle, sa source officielle, sa date de confirmation, et la voie de chaque chaîne), son état dans `registre/regles-plateformes.json`, `registre/revenu.jsonl` (voie par chaîne et pourquoi), un besoin chiffré par chaîne (`besoins.exprimer`, identifiant `responsable-revenu-<chaîne>`), une décision au journal d'audit quand une voie change ou qu'une règle est à relire. La Direction lit la dernière ligne de `revenu.jsonl` dans son dossier.
+`registre/regles-plateformes.md` (chaque règle, sa source officielle, sa date de confirmation, et la voie de chaque chaîne), son état dans `registre/regles-plateformes.json`, `registre/revenu.jsonl` (voie par chaîne et pourquoi), un besoin chiffré par chaîne (`besoins.exprimer`, identifiant `responsable-revenu-<chaîne>`), une décision au journal d'audit, avec prédiction et échéance, quand une voie change, ou qu'une règle est à relire. La Direction lit la dernière ligne de `revenu.jsonl` dans son dossier.
 
 ## Outils
 Module `agents/responsable_revenu.py` (`--essai` : lit les pages et montre, n'écrit rien). Script `regles` : les repères de chaque règle cherchés par code dans la page officielle (tous présents : confirmée ; un absent : à relire ; page illisible : la dernière confirmation reste ; sans repère : à vérifier, aucun chiffre n'en est tiré).
@@ -44,6 +46,8 @@ Le revenu en € (objectif 1). En attendant : chaque chaîne a sa voie et son be
 ## Consignes
 - Aucun chiffre tiré d'une règle qui n'est pas « confirmée »
 - Une page officielle qui change rend la règle « à relire » : le dire, ne pas deviner la nouvelle règle
+- Ne jamais choisir la voie `audience` : le script seul la retient, sous l'audience minimale
+- Ne pas reprendre une voie que le Critique a jugée fausse (`defaites` dans les données)
 - Une voie qui crée du service client ou des pertes passe après les autres
 
 ## Retours

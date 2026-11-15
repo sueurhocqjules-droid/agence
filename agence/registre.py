@@ -61,7 +61,7 @@ def refuses():
 
 
 def decider(auteur, decision, pourquoi, prediction=None, mesure=None, echeance=None, avant=None, attendu=None,
-            changement=None, organisation=None):
+            changement=None, organisation=None, voie=None):
     """Note une décision au journal d'audit, avec sa raison, et renvoie son identifiant.
 
     Avec une mesure (liste fermée de agence/mesures.py), sa valeur avant, la valeur attendue et l'échéance,
@@ -77,6 +77,8 @@ def decider(auteur, decision, pourquoi, prediction=None, mesure=None, echeance=N
         entree["changement"] = changement
     if organisation:
         entree["organisation"] = organisation
+    if voie:   # changement de voie de revenu (chaine, ancienne, nouvelle), défait par le critique s'il ne rapporte rien
+        entree["voie"] = voie
     with open(DOSSIER / "decisions.jsonl", "a", encoding="utf-8") as f:
         f.write(json.dumps(entree, ensure_ascii=False) + "\n")
     return ident

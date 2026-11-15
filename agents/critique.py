@@ -24,7 +24,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 
 from agence import consignes, essais, ingenierie, lancer, memoire, mesures, organisation, postes, registre
-from agents import surete
+from agents import responsable_revenu, surete
 
 POSTE = "critique"
 
@@ -132,6 +132,8 @@ def juger_decisions(maintenant, essai, annuler_un_poste=annuler_poste):
                 rendu["annule"] = "ancien texte remis"
         if d.get("organisation") and ameliore is False:
             rendu["annule"] = ", ".join(annuler_un_poste(d, raison))
+        if d.get("voie") and ameliore is False:
+            rendu["annule"] = responsable_revenu.defaire(d, raison)
         if rendu["annule"]:
             print(f"ANNULÉ {d['id']} : {rendu['annule']}")
     return rendus
