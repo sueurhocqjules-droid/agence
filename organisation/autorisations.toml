@@ -28,6 +28,8 @@ GH_TOKEN = ["flux", "garde_fous", "bilan", "guichet", "contacts", "delais", "che
 TELEGRAM_BOT_TOKEN = ["reponses", "garde_fous", "bilan", "guichet", "courrier", "guetteur", "direction"]
 # Boîte boite-chaines : lecture et filtres, rien d'autre
 GMAIL_TOKEN = ["courrier"]
+# Boîte boite-chaines : envoi seul (gmail.send), messages validés par Jules. Accordé le 15/11/2026 (guichet #13)
+GMAIL_SEND_TOKEN = ["contacts"]
 # Modèles gratuits
 GROQ_API_KEY = ["chef-operations", "chef-contenu", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "critique", "programmateur", "responsable-organisation", "responsable-revenu"]
 GEMINI_API_KEY = ["chef-operations", "chef-contenu", "chercheur-outils", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "critique", "programmateur", "responsable-organisation", "responsable-revenu"]

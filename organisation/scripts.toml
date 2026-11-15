@@ -38,7 +38,7 @@ description = "le récapitulatif quotidien des demandes du guichet et des contac
 secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
 
 # Les contacts (agence/contacts.py) : envoie les messages validés par Jules. GMAIL_SEND_TOKEN (droit gmail.send seul)
-# n'est pas encore accordé dans autorisations.toml : tant qu'il manque, rien ne part et le script le demande au guichet.
+# accordé le 15/11/2026 dans autorisations.toml (guichet #13).
 [contacts]
 proprietaire = "chef-operations"
 module = "agence.contacts"
