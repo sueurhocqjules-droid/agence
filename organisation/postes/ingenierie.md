@@ -51,3 +51,4 @@ Part des demandes fusionnées seules, délai entre la demande et la fusion (cibl
 - Français simple dans les fiches, les messages et les commentaires, comme le reste du dépôt
 
 ## Retours
+- 2026-11-15, direction : 5 échecs sur 13 passages, dont deux en code 1 le 15/11 sans cause écrite. Avant tout le reste : la lecture des demandes de Jules, puis le diagnostic de la chaîne es. Les PR #22 et #23 attendent Jules, c'est normal.
