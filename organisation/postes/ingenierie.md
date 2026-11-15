@@ -11,7 +11,7 @@ moteur = "Claude Sonnet par Claude Code (CLI en version figée), une séance par
 reveil = "à l'événement : une issue étiquetée ingenierie (workflow ingenierie.yml), jamais à date fixe"
 regle_de_deux = "[B][C] pour le script (jeton GitHub du workflow : pousse une branche, ouvre et fusionne la PR), [C] seulement pour la séance Claude, qui n'a que son propre jeton et la commande des tests. Pas de [A] : une demande ne compte qu'écrite par Jules ou par l'agence"
 secrets = ["CLAUDE_CODE_OAUTH_TOKEN (la séance)", "GH_TOKEN (le script autour : branche, PR, fusion)"]
-budget = { claude_usd_semaine = 9, appels_gratuits_jour = 0 }
+budget = { claude_usd_semaine = 15, appels_gratuits_jour = 0 }   # 9 $ relevés à 15 $ par Jules le 15/11 (semaine de lancement), à revoir au point du 22/11
 scripts = []
 equipe = []
 +++
