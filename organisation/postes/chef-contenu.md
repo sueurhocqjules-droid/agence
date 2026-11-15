@@ -12,7 +12,7 @@ reveil = "une fois par semaine, et sur issue equipe:contenu"
 regle_de_deux = "[C] : aucun secret de chaîne, décide sur le registre"
 secrets = ["clé du modèle gratuit attribué"]
 budget = { claude_usd_semaine = 0, appels_gratuits_jour = 20 }
-scripts = ["flux", "rendu (studio-rendu)", "controle", "publier_youtube", "publier_autres_reseaux", "synchro_rendu"]
+scripts = ["flux", "rendu (studio-rendu)", "controle", "publier_youtube", "publier_autres_reseaux", "synchro_rendu", "diagnostic_chaine"]
 equipe = ["auteur", "programmateur"]
 +++
 # Chef de Contenu et flux
@@ -34,6 +34,9 @@ Lecture du registre, écriture des fiches de son équipe (Consignes, Retours).
 
 ## Secrets et permissions
 Aucun jeton de chaîne : ses scripts reçoivent leurs propres secrets à leur étape.
+
+## Diagnostic es contre pt
+`agence/diagnostic_chaine.py` (demande #33), lancé à la fin de chaque passage du flux avec les jetons YouTube du flux. Il compare la chaîne et les 14 dernières vidéos de es et de pt (public enfants, statut, licence, intégration, classification, restriction de pays, langues, catégorie) et écrit chaque différence dans `registre/diagnostic-chaines.json`. Il corrige seul deux cas, notés au journal d'audit : « public enfants » à vrai sur es alors que pt est à faux, et vidéo es privée ou non répertoriée alors que sa jumelle pt est publique. Tout le reste (une correction refusée par YouTube, une différence sans explication, ou aucune différence trouvée) devient un bloquant de ce poste dans son journal. Les langues et le pays de chaque chaîne ont le droit de différer. Le jeton du flux n'a peut-être pas le droit d'écriture sur les vidéos (portée `youtube.upload` seule) : une correction refusée le dit dans le bloquant.
 
 ## Mesure de réussite
 Vues et abonnés gagnés par semaine sur toutes les chaînes, rapportés au coût de la semaine. Aucun trou dans le calendrier de publication.

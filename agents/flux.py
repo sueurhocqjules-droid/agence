@@ -28,7 +28,7 @@ from datetime import datetime, time, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from agence import buffer, controle, lancer, meta, mesures, registre, threads, youtube
+from agence import buffer, controle, diagnostic_chaine, lancer, meta, mesures, registre, threads, youtube
 
 DEPOT_RENDU = "sueurhocqjules-droid/studio-rendu"
 RENDU = Path(os.environ.get("RENDU_DIR") or Path(__file__).resolve().parents[2] / "studio-rendu")
@@ -556,6 +556,10 @@ def main():
         info["resultat"] = (f"ok : {len(programmees)} programmées, {len(rejetees)} rejetées, {len(a_rendre)} en rendu, "
                             f"{len(diffusees)} diffusées, {len(erreurs)} erreurs de diffusion")
         print(info["resultat"])
+    try:   # diagnostic es / pt : une panne ici ne doit pas faire échouer le flux
+        print(f"diagnostic es / pt : {diagnostic_chaine.main()['corrections'] or 'aucune correction'}")
+    except Exception as erreur:
+        print(f"diagnostic es / pt : échec ({erreur})")
     if rejetees or erreurs:
         sys.exit(1)  # le réveil passe au rouge : un défaut demande un regard
 
