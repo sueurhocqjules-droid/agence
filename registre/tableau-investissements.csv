@@ -1,0 +1,2 @@
+date,cas,poche,cout_mois,devise,palier,vues_6m_p10,vues_6m_p50,vues_6m_p90,gain_vues_p50,gain_eur_p10,gain_eur_p50,gain_eur_p90,roi_6_mois,delai_retour_mois,pessimiste_perd,sujets_semaine
+2026-11-15T22:06:00+00:00,reference,eur,0,,0,56381.53,202045.04,804615.68,0.0,0.0,0.0,0.0,,,False,8.0

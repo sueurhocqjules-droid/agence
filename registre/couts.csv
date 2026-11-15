@@ -185,3 +185,16 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-15T21:45:48+00:00,delais,0,0,0,0,"ok : aucun départ en essai, 0 besoin(s) en retard sur leur cible"
 2026-11-15T21:45:48+00:00,contacts,0,0,0,0,ok : aucun message validé à envoyer
 2026-11-15T21:45:50+00:00,guichet,0,0,0,0,"ok : 0 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : rien"
+2026-11-15T22:03:25+00:00,expert-modeles,46,0,0,5,ok : 5/5 modèles répondent
+2026-11-15T22:04:11+00:00,critique,0,0,0,0,"ok : 0 décision(s) jugée(s), 0 annulation(s), 0 essai(s) jugé(s), 7 leçon(s) en mémoire"
+2026-11-15T22:04:12+00:00,programmateur,2,0,0,1,ok : proposition refusée : prédiction invalide : 200 vues attendues pour 5 avant
+2026-11-15T22:04:14+00:00,chef-contenu,3,0,0,1,ok : 8 sujets pour la semaine du 2026-11-16 (openai/gpt-oss-120b) : Pour garantir le stock de 7 jours tout en respectant le budget de 30 $ et maximiser les vues.
+2026-11-15T22:04:18+00:00,responsable-revenu,4,0,0,1,"ok : 4 règle(s) confirmée(s) sur 6, 0 à relire, 3 voie(s) de revenu écrite(s)"
+2026-11-15T22:04:22+00:00,chercheur-outils,97,0,0,1,"ok : 3 candidat(s), 2 écarté(s), 0 amélioration(s) payante(s), 1 besoin(s) sur 4 avec une réponse, 127 liens collectés"
+2026-11-15T22:06:00+00:00,analyste,0,0,0,0,"ok : Référence « ne rien acheter » : 202 045 vues sur 6 mois (p10 56 382, p90 804 616), revenu 0.00 €, 8.0 sujets/semaine"
+2026-11-15T22:06:04+00:00,veilleur,35,0,0,1,"ok : 11 fiche(s) concept, 0 écartée(s), 28 outliers"
+2026-11-15T22:06:39+00:00,chef-recherche,47,0,0,1,"ok : 3 proposition(s), 0 écartée(s), sur 18 rapport(s)"
+2026-11-15T22:07:25+00:00,chef-operations,27,0,0,1,"ok : 80 % de réveils réussis, 0 retour(s), 3 réparation(s)"
+2026-11-15T22:07:52+00:00,stratege,60,34398,0.3517,0,"ok : 9 écart(s), 0 suivi(s), 0 refusé(s), 0.35 $"
+2026-11-15T22:08:53+00:00,responsable-organisation,112,0,0,1,"ok : 20 postes relus, 6 signal(aux), changement : creer"
+2026-11-15T22:10:45+00:00,direction,124,62791,0.627,0,"ok : 26 appliqué(s), 0 refusé(s), 0.63 $"
