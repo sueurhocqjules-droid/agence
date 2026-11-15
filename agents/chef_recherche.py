@@ -23,7 +23,8 @@ from agents import surete
 MAX_PROPOSITIONS = 3
 PREUVES = {"concept": ("titre", "chaine", "vues", "mediane_chaine", "ratio", "effort", "faisable", "cout_estime_usd",
                        "propose_par", "destination"),
-           "outil": ("nom", "remplace", "economie_usd_semaine", "licence", "risque", "compte_requis", "essai")}
+           "outil": ("nom", "remplace", "economie_usd_semaine", "licence", "risque", "compte_requis", "essai",
+                     "part_remplacee", "materiel_requis", "tourne_chez_nous")}
 
 
 def notre_mediane(stats):
@@ -39,6 +40,7 @@ def notre_mediane(stats):
 def indexer(concepts, outils, refuses=()):
     """Rapports à l'état « propose », indexés par lien : (type, fiche). Un lien refusé (registre/refus.jsonl) n'y est
     plus : le modèle ne le voit pas, et une proposition qui le citerait est écartée comme source absente."""
+    outils = [c for c in outils if c.get("tourne_chez_nous") is not False]   # matériel que l'agence n'a pas
     gardes = {**{c["lien"]: ("outil", c) for c in outils}, **{c["lien"]: ("concept", c) for c in concepts}}
     return {lien: v for lien, v in gardes.items() if v[1].get("etat") == "propose" and lien not in refuses}
 
@@ -100,6 +102,10 @@ def consigne(donnees):
         f"Choisis au plus {MAX_PROPOSITIONS} propositions, les mieux prouvées (une preuve vaut mieux qu'un avis : chiffres, "
         "liens, essais). Un concept vaut s'il bat nettement la médiane de nos chaînes et reste faisable ; un outil vaut "
         "s'il économise des dollars Claude sans perte de qualité. Aucune proposition vaut mieux qu'une proposition faible. "
+        "Pour un outil, la proposition dit précisément quelle partie du travail il remplace (part_remplacee) et ce qui "
+        "reste payé à Claude, et le matériel qu'il demande (materiel_requis) face à celui de l'agence : des runners GitHub "
+        "sans GPU. Le gain attendu ne compte que la partie remplacée : jamais « coût Claude vers 0 » pour un outil qui "
+        "n'écrit que le texte quand Claude code encore les animations. "
         "Les besoins passent d'abord : besoins_ouverts (s'il y en a) liste ce que les agents ont dit manquer, en chiffres, "
         "et un rapport qui porte le champ besoin y répond. À preuve égale, propose d'abord ce qui comble un besoin. "
         "Réponds par un seul objet JSON, sans texte autour :\n"
