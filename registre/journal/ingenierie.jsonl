@@ -24,3 +24,5 @@
 {"date": "2026-11-15T22:18:09+00:00", "quoi": "conclure", "resultat": "echec", "bloquant": "ouverte : PR #42 non fusionnée (GitHub refuse la fusion, sans doute un conflit avec une PR fusionnée entre-temps : à reconstruire sur main (GraphQL: Pull Request has merge conflicts (mergePullRequest)))"}
 {"date": "2026-11-15T22:14:41+00:00", "quoi": "ingenierie", "resultat": "ok", "code": 0, "duree_s": 93, "sortie": "ok : PR #41 pour la demande #35, 0.38 $ (4 fichier(s))"}
 {"date": "2026-11-15T22:18:21+00:00", "quoi": "conclure", "resultat": "echec", "bloquant": "attend Jules : PR #41 touche un fichier protégé (demande #35)"}
+{"date": "2026-11-15T22:15:55+00:00", "quoi": "ingenierie", "resultat": "ok", "code": 0, "duree_s": 161, "sortie": "ok : PR #43 pour la demande #36, 0.55 $ (6 fichier(s))"}
+{"date": "2026-11-15T22:19:13+00:00", "quoi": "conclure", "resultat": "echec", "bloquant": "attend Jules : PR #43 touche un fichier protégé (demande #36)"}
