@@ -1,7 +1,8 @@
 # Reels par jour et par compte sur les autres réseaux, à partir des vidéos déjà publiques sur YouTube (la plus ancienne d'abord).
 # Propriétaire : le Programmateur, de 1 à 5, un seul changement à la fois. Limites des plateformes : Instagram 100 posts
 # par 24 h et par compte, Reels des Pages Facebook 30 par 24 h (docs Meta lues le 13/11/2026). TikTok par Buffer (offre
-# Free) : 25 posts TikTok par 24 h, 10 posts en file par chaîne.
+# Free) : 25 posts TikTok par 24 h, 10 posts en file par chaîne. Threads : 250 posts par 24 h et par compte, vidéo de
+# 5 min au plus (docs Meta lues le 15/11/2026).
 
 [instagram]
 par_jour = 2
@@ -10,4 +11,7 @@ par_jour = 2
 par_jour = 2
 
 [tiktok]
+par_jour = 2
+
+[threads]
 par_jour = 2

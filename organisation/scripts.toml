@@ -10,8 +10,8 @@ secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT"]
 [flux]
 proprietaire = "chef-contenu"
 module = "agents.flux"
-description = "le rendu, le contrôle, la programmation des vidéos et leur diffusion sur Instagram, Facebook et TikTok"
-secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT", "GH_TOKEN", "META_TOKEN", "BUFFER_API_KEY"]
+description = "le rendu, le contrôle, la programmation des vidéos et leur diffusion sur Instagram, Facebook, TikTok et Threads"
+secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT", "GH_TOKEN", "META_TOKEN", "BUFFER_API_KEY", "THREADS_CLE"]
 
 # hors_pause : seule une pause à son propre nom l'arrête (ni « tout », ni ses supérieurs), pour que la Sûreté
 # continue de surveiller et que Jules puisse toujours lever une pause par Telegram.
