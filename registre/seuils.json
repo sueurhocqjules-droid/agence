@@ -1,14 +1,14 @@
 {
- "date": "2026-11-15T12:42:34+00:00",
+ "date": "2026-11-15T21:45:48+00:00",
  "plus_proche": {
   "chaine": "en",
   "palier": "yt_fans",
   "nom": "YouTube, palier fans (dons, Shopping)",
   "progression": 0.0055,
   "critere": "vues_shorts_90j",
-  "valeur": 16368,
+  "valeur": 16503,
   "cible": 3000000,
-  "texte": "Every Second (en) : 16 368 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
+  "texte": "Every Second (en) : 16 503 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
  },
  "paliers": [
   {
@@ -23,12 +23,12 @@
     },
     {
      "critere": "videos_90j",
-     "valeur": 16,
+     "valeur": 17,
      "cible": 3
     },
     {
      "critere": "vues_shorts_90j",
-     "valeur": 16368,
+     "valeur": 16503,
      "cible": 3000000
     }
    ],
@@ -48,11 +48,11 @@
     },
     {
      "critere": "vues_shorts_90j",
-     "valeur": 16368,
+     "valeur": 16503,
      "cible": 10000000
     }
    ],
-   "progression": 0.0016,
+   "progression": 0.0017,
    "atteint": false,
    "inconnu": []
   },
@@ -68,7 +68,7 @@
     },
     {
      "critere": "videos_90j",
-     "valeur": 16,
+     "valeur": 17,
      "cible": 3
     },
     {
@@ -113,16 +113,16 @@
     },
     {
      "critere": "videos_90j",
-     "valeur": 16,
+     "valeur": 17,
      "cible": 3
     },
     {
      "critere": "vues_shorts_90j",
-     "valeur": 4026,
+     "valeur": 4132,
      "cible": 3000000
     }
    ],
-   "progression": 0.0013,
+   "progression": 0.0014,
    "atteint": false,
    "inconnu": []
   },
@@ -138,7 +138,7 @@
     },
     {
      "critere": "vues_shorts_90j",
-     "valeur": 4026,
+     "valeur": 4132,
      "cible": 10000000
     }
    ],
