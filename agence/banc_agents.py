@@ -63,6 +63,9 @@ def _chef_recherche(entree, repondre):
     texte = repondre("chef-recherche", chef_recherche.consigne(
         {"rapports": [{"type": t, **f} for t, f in par_lien.values()], "mesures_maintenant": avant}))
     gardes, ecartes = chef_recherche.valider(modeles.extraire_json(texte) or {}, par_lien, avant)
+    if entree.get("controle"):   # les cas d'avant le contrôle par script (15/11) n'en dépendent pas
+        gardes, refus = chef_recherche.controler(gardes, par_lien)
+        ecartes += refus
     return {"propositions": gardes, "ecartees": ecartes}
 
 
