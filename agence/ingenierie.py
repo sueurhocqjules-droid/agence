@@ -48,7 +48,9 @@ PERMIS = "Read,Edit,Write,Glob,Grep,Bash(python -m unittest),Bash(python -m unit
 # Mêmes chemins que banc.yml : une PR qui les touche passe le banc avant fusion (règle 8)
 BANC_SUR = ("agents/", "agence/", "organisation/postes/", "organisation/MISSION.md", "banc/agents/",
             "registre/refus.jsonl")
-DEMANDES_MAX = 5                      # demandes qu'un agent peut écrire en un passage (2 → 5 le 15/11, semaine de lancement, Jules)
+# Demandes qu'un agent peut écrire en un passage. Plafond anti-emballement, pas une limite de travail (Jules, 15/11) :
+# le volume est à la Direction, le budget de la semaine (fiche) est la seule limite.
+DEMANDES_MAX = 20
 
 
 def travail():
@@ -319,11 +321,17 @@ def conclure(pr, env=os.environ):
                                                        "VERDICT", "SHA", "ISSUE")}
     choix, raisons = decision(lu["TESTS"], lu["BANC"], lu["BANC_DEMANDE"] == "true", lu["CONTROLE"], lu["PROTEGE"],
                               lu["VERDICT"])
-    liste = "\n".join(f"- {r}" for r in raisons)
     lien = f"https://github.com/{DEPOT}/pull/{pr}"
     if choix == "fusion":
-        # --match-head-commit : on fusionne le commit qui a été contrôlé, pas un commit poussé entre-temps
-        _gh("pr", "merge", str(pr), "-R", DEPOT, "--squash", "--delete-branch", "--match-head-commit", lu["SHA"])
+        # --match-head-commit : on fusionne le commit qui a été contrôlé, pas un commit poussé entre-temps.
+        # Plusieurs demandes tournent en parallèle : une PR fusionnée avant celle-ci peut la mettre en conflit.
+        try:
+            _gh("pr", "merge", str(pr), "-R", DEPOT, "--squash", "--delete-branch", "--match-head-commit", lu["SHA"])
+        except subprocess.CalledProcessError as e:
+            choix, raisons = "ouverte", [f"GitHub refuse la fusion, sans doute un conflit avec une PR fusionnée "
+                                         f"entre-temps : à reconstruire sur main ({(e.stderr or '').strip()[:200]})"]
+    liste = "\n".join(f"- {r}" for r in raisons)
+    if choix == "fusion":
         resultat = f"ok : PR #{pr} fusionnée seule (demande #{lu['ISSUE']})"
         registre.decider(POSTE, f"fusion de la PR #{pr} (demande #{lu['ISSUE']})",
                          "tests verts, banc vert ou non concerné, aucun fichier protégé, relecture ok")

@@ -288,7 +288,8 @@ en discute ensuite : rien ne change sans lui.
 Tu rends ta réponse au format imposé, appliquée telle quelle par un script :
 - decisions : ce que tu décides, chacune avec sa raison. Quand elle a un effet mesurable, nomme la mesure (liste fermée)
   et la valeur attendue à l'échéance ; le critique la jugera sur les vrais chiffres. Une décision sans mesure reste notée.
-- ingenierie : au plus {ingenierie.DEMANDES_MAX} demandes de code à l'Ingénierie, les plus utiles aux 4 objectifs. Chacune devient
+- ingenierie : les demandes de code à l'Ingénierie, autant que les 4 objectifs en demandent (plafond de sécurité :
+  {ingenierie.DEMANDES_MAX}), la plus utile d'abord. Ta seule limite est le budget de l'Ingénierie. Chacune devient
   une issue puis une PR, fusionnée seule si tout est vert. Écris quoi assez précisément pour être codé sans autre
   contexte. Rien de ce qui touche aux workflows, aux secrets, aux tests existants ou à la mission : ces PR-là
   attendent Jules. Pas de code à écrire cette semaine : liste vide.
