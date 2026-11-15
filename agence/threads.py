@@ -4,6 +4,7 @@ Branchement, en local, une fois par compte (le compte doit avoir accepté l'invi
 « Every Second Publisher » : profil Threads > Paramètres > Autorisations de sites web > Invitations) :
     python -m agence.threads lien es                          # adresse à ouvrir, connecté au compte Threads de la chaîne
     python -m agence.threads brancher es "<adresse de retour>"  # l'adresse où Threads renvoie, ou son seul code
+    Get-Clipboard | python -m agence.threads brancher es       # même chose, l'adresse copiée (PowerShell)
     python -m agence.threads etat                             # comptes branchés et fin de validité, sans les jetons
 Plus simple, sans secret : le générateur de jetons de l'appli (Threads API > Settings > User Token Generator,
 compte public seulement), puis le jeton par l'entrée standard :
@@ -232,8 +233,14 @@ def main():
     action, *reste = sys.argv[1:] or ["etat"]
     if action == "lien" and reste and reste[0] in COMPTES:
         print(lien(reste[0]))
-    elif action == "brancher" and len(reste) == 2 and reste[0] in COMPTES:
-        fiche = brancher(reste[0], reste[1])
+    elif action == "brancher" and len(reste) in (1, 2) and reste[0] in COMPTES:
+        texte = reste[1] if len(reste) == 2 else sys.stdin.read()   # Get-Clipboard | ... : rien à coller à la main
+        try:
+            fiche = brancher(reste[0], texte)
+        except ErreurThreads as e:
+            if "oauth/access_token" in str(e):
+                sys.exit(f"{e}\nLe code ne sert qu'une fois et expire en 1 h : rouvre le lien (lien {reste[0]}) et relance aussitôt.")
+            raise
         print(f"@{fiche['nom']} branché (id {fiche['id']}), jeton valable jusqu'au {fiche['expire'][:10]}")
     elif action == "poser" and len(reste) == 1 and reste[0] in COMPTES:
         fiche = poser(reste[0], sys.stdin.read())   # jeton par l'entrée standard : jamais dans l'historique
