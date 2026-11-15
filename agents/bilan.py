@@ -19,7 +19,7 @@ from agents import analyste, guetteur, surete
 
 DEPOT = "sueurhocqjules-droid/agence"
 PARIS = ZoneInfo("Europe/Paris")
-NOMS = {"en": "Every Second (anglais)", "es": "Cada Segundo (espagnol)", "pt": "A Cada Segundo (portugais)"}
+NOMS = questions.NOMS_CHAINES
 
 
 def periode(maintenant):
