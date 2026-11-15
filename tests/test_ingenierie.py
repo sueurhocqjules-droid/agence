@@ -175,12 +175,18 @@ class Decision(unittest.TestCase):
         self.assertEqual(ingenierie.decision(**sans_accord)[0], "jules")
         self.assertEqual(ingenierie.decision(**avec_accord)[0], "jules")
 
-    def conclure(self, **env):
+    def conclure(self, refuser_fusion=False, **env):
         appels = []
         env = {f"INGENIERIE_{k.upper()}": v for k, v in
                (dict(tests="success", banc="skipped", banc_demande="false", controle="success", protege="false",
                      verdict="ok", sha="abc", issue="12") | env).items()}
-        with mock.patch.object(ingenierie, "_gh", lambda *a, entree=None: appels.append(a) or ""), \
+
+        def gh(*a, entree=None):
+            appels.append(a)
+            if refuser_fusion and a[:2] == ("pr", "merge"):
+                raise ingenierie.subprocess.CalledProcessError(1, "gh", stderr="Pull request is not mergeable")
+            return ""
+        with mock.patch.object(ingenierie, "_gh", gh), \
                 mock.patch.object(ingenierie.subprocess, "run", lambda *a, **k: appels.append(tuple(a[0][1:]))), \
                 mock.patch.object(ingenierie.registre, "decider", lambda *a, **k: appels.append(("decision", *a))), \
                 mock.patch.object(ingenierie.lancer, "noter_journal", lambda *a: appels.append(("journal", *a))), \
@@ -195,6 +201,13 @@ class Decision(unittest.TestCase):
         self.assertEqual(fusion[fusion.index("--match-head-commit") + 1], "abc")
         self.assertTrue([a for a in appels if a[:3] == ("issue", "close", "12")])
         self.assertTrue([a for a in appels if a[0] == "decision"])
+
+    def test_une_fusion_refusee_par_github_laisse_la_pr_ouverte_et_le_note(self):
+        choix, appels = self.conclure(refuser_fusion=True)
+        self.assertEqual(choix, "ouverte")
+        self.assertFalse([a for a in appels if a[:3] == ("issue", "close", "12")])
+        self.assertFalse([a for a in appels if a[0] == "decision"])
+        self.assertTrue([a for a in appels if a[0] == "journal" and "conflit" in a[2].get("bloquant", "")])
 
     def test_sans_vert_rien_n_est_fusionne_et_le_blocage_est_note(self):
         for env in ({"tests": "failure"}, {"verdict": "inconnu"}, {"protege": "true", "controle": "failure"}):
