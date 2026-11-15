@@ -155,3 +155,4 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-15T02:41:31+00:00,guichet,0,0,0,0,"ok : 1 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : rien"
 2026-11-15T10:34:50+00:00,ingenierie,38,240858,0.1557,0,"ok : demande #17, 3 fichier(s), 0.16 $"
 2026-11-15T10:34:50+00:00,ingenierie,80,559990,0.373,0,"ok : demande #18, 7 fichier(s), 0.37 $"
+2026-11-15T10:34:55+00:00,ingenierie,144,1076303,0.6276,0,"ok : demande #19, 6 fichier(s), 0.63 $"
