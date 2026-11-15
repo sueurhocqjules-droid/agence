@@ -14,7 +14,8 @@ import sys
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from agence import contacts, delais, guichet, lancer, mesures, questions, registre, telegram, youtube
+from agence import (contacts, delais, guichet, lancer, mesures, questions, registre, suivi_ecarts, telegram,
+                    youtube)
 from agents import analyste, guetteur, surete
 
 DEPOT = "sueurhocqjules-droid/agence"
@@ -144,6 +145,15 @@ def page(maintenant, demandes=None, attente=None, fermees=None):
             f"- {p['texte'][0].upper() + p['texte'][1:]}."
             + (" Solutions de la Direction : voir son mot plus haut." if p["semaines"] >= mesures.SEMAINES_AVANT_JULES
                else "") for p in signaux] + [""]
+    # Écrit par script aussi : un écart du Stratège ouvert depuis 2 semaines figure au bilan, que la Direction en ait
+    # parlé ou non (Jules, 15/11 : être prévenu quand les problèmes s'empilent)
+    empiles = suivi_ecarts.qui_s_empilent(fin)
+    if empiles:
+        lignes += ["### Écarts qui s'empilent", "",
+                   f"Ce que la mission promet et que l'agence ne fait toujours pas, trouvé par le Stratège. La Direction "
+                   f"doit y répondre chaque semaine ; ses solutions, s'il te faut agir, sont dans son mot plus haut.", ""] + [
+            f"- {e['constat'].rstrip('.')} (ouvert depuis {e['semaines']} semaines, voie {e['voie']}). "
+            f"Remède proposé : {e['remede'].rstrip('.')}." for e in empiles] + [""]
 
     lignes += ["### Chaînes", "", "| Chaîne | Vidéos sorties | Vues gagnées | Vues au total | Meilleure de la semaine |",
                "|---|---|---|---|---|"]
@@ -207,7 +217,9 @@ def page(maintenant, demandes=None, attente=None, fermees=None):
     a_faire = [f"{n} {nom}" for n, nom in ((len(ouvertes), "à valider"), (len(attente or []), "contact(s) en attente"),
                                              (len(demandes or []), "demande(s) au guichet")) if n]
     resume = (f"Bilan de la semaine : +{total} vues, {prog} vidéos programmées, {c['dollars']:.2f} $ Claude, "
-              f"{', '.join(a_faire) or 'rien à faire'}.")
+              f"{', '.join(a_faire) or 'rien à faire'}."
+              + (f" {len(empiles)} écart(s) du Stratège s'empile(nt) depuis 2 semaines ou plus : voir la page."
+                 if empiles else ""))
     return "\n".join(lignes) + "\n", resume, debut
 
 

@@ -17,7 +17,7 @@ import tomllib
 from datetime import datetime, timedelta, timezone
 
 from agence import (besoins, catalogue, consignes, demandes, essais, guichet, ingenierie, lancer, memoire, mesures,
-                    organisation, questions, registre)
+                    organisation, questions, registre, suivi_ecarts)
 from agents import analyste, surete
 
 MODELE = "claude-opus-5-5"
@@ -219,6 +219,8 @@ def dossier(maintenant):
         "rapport_des_operations": (registre.lire_jsonl("operations", depuis) or [None])[-1],
         "rapport_de_l_organisation": (registre.lire_jsonl("organisation", depuis) or [None])[-1],
         "ecarts_du_stratege": (registre.lire_jsonl("ecarts", depuis) or [None])[-1],
+        "ecarts_qui_s_empilent": [{k: e.get(k) for k in ("id", "semaines", "voie", "constat", "remede", "suivi")}
+                                  for e in suivi_ecarts.qui_s_empilent(maintenant)],
         "decisions_7j": [{k: d.get(k) for k in ("auteur", "decision", "pourquoi", "prediction", "echeance")}
                          for d in toutes if mesures.quand(d["date"]) >= depuis][-40:],
         "predictions_ouvertes": [{k: d.get(k) for k in ("id", "auteur", "decision", "mesure", "avant", "attendu", "echeance")}
@@ -287,6 +289,10 @@ ecarts_du_stratege : ce que la mission promet et que l'agence ne fait pas, trouv
 preuve et son remède. Un écart de voie direction attend ta décision : retiens son remède par le champ qui lui va
 (ingenierie, essais, chaines, outils, decisions, questions si c'est du conseil), ou dis dans ton analyse pourquoi tu
 l'écartes. Ceux de voie poste vont au Responsable de l'organisation, ceux de voie besoin à la Recherche.
+ecarts_qui_s_empilent : les écarts du Stratège encore ouverts depuis {mesures.SEMAINES_AVANT_JULES} semaines ou plus,
+quelle que soit leur voie. Chacun reçoit ta réponse cette semaine : un remède retenu (demande à l'Ingénierie, essai, outil, décision),
+ou pourquoi tu l'écartes. S'il bute sur ce que seul Jules peut faire (argent, compte, choix qui lui revient), ton
+analyse lui propose 2 ou 3 solutions concrètes, comme pour une chaîne en panne : Jules les voit au bilan du lundi.
 derogation_comptes (présent une seule semaine, celle du bilan prévu) : dis dans ton analyse, en trois lignes au plus,
 ce que l'agence pourrait traiter seule dans la création des comptes, avec les demandes traitées comme preuve. Jules
 en discute ensuite : rien ne change sans lui.
