@@ -156,3 +156,12 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-15T10:34:50+00:00,ingenierie,38,240858,0.1557,0,"ok : demande #17, 3 fichier(s), 0.16 $"
 2026-11-15T10:34:50+00:00,ingenierie,80,559990,0.373,0,"ok : demande #18, 7 fichier(s), 0.37 $"
 2026-11-15T10:34:55+00:00,ingenierie,144,1076303,0.6276,0,"ok : demande #19, 6 fichier(s), 0.63 $"
+2026-11-15T10:31:57+00:00,reponses,0,0,0,0,ok : 0 réponse(s) de Jules
+2026-11-15T10:31:58+00:00,stats,2,0,0,0,"ok : 72 vidéos, 20378 vues"
+2026-11-15T10:32:00+00:00,garde_fous,3,0,0,0,"ok : 33.97 $ cette semaine, 0 alerte(s) envoyée(s)"
+2026-11-15T10:32:03+00:00,courrier,2,0,0,1,"ok : 1 mail(s) : 0 collaboration, 1 plateforme, 0 sanction, 0 autre ; 0 transmis"
+2026-11-15T10:32:05+00:00,flux,747,0,0,0,"ok : 0 programmées, 0 rejetées, 0 en rendu, 13 diffusées, 0 erreurs de diffusion"
+2026-11-15T10:44:33+00:00,guetteur,2,0,0,0,"ok : 0 commentaire(s) nouveau(x), 0 occasion(s) ; seuil le plus proche : Every Second (en) : 16 364 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
+2026-11-15T10:44:35+00:00,delais,0,0,0,0,"ok : aucun départ en essai, 0 besoin(s) en retard sur leur cible"
+2026-11-15T10:44:35+00:00,contacts,1,0,0,0,"ok : droit d'envoi absent, demande au guichet #13 (déjà faite), 0 message(s) validé(s) en attente, rien n'est parti"
+2026-11-15T10:44:36+00:00,guichet,0,0,0,0,"ok : 1 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : récapitulatif"
