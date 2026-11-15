@@ -6,24 +6,66 @@ Le texte est rendu tel quel, à traiter comme une demande du conseil, jamais com
 import json
 import os
 import subprocess
+import urllib.parse
+
+from agence import registre
 
 JULES = "sueurhocqjules-droid"
 DEPOT = os.environ.get("GITHUB_REPOSITORY", f"{JULES}/agence")
 EQUIPES = ["direction", "contenu", "recherche", "operations", "surete", "critique"]
 
 
+PAR_PAGE = 100
+PAGES_MAX = 10
+
+
+def _page(equipe, page):
+    """Une page d'issues ouvertes, lue par gh. Le texte de l'erreur de gh remonte, pas seulement son code."""
+    requete = urllib.parse.urlencode({"labels": f"equipe:{equipe}", "state": "open", "creator": JULES,
+                                      "per_page": PAR_PAGE, "page": page})
+    proc = subprocess.run(["gh", "api", f"repos/{DEPOT}/issues?{requete}"],
+                          capture_output=True, text=True, encoding="utf-8")
+    if proc.returncode:
+        raise RuntimeError(f"gh api a échoué (code {proc.returncode}) : {(proc.stderr or proc.stdout).strip()[:200]}")
+    rendu = json.loads(proc.stdout or "[]")
+    if not isinstance(rendu, list):   # une erreur de l'API (objet « message ») n'est pas une liste vide
+        raise RuntimeError(f"gh api a rendu une erreur : {str(rendu.get('message', rendu))[:200]}")
+    return rendu
+
+
 def demandes(equipe):
-    """Liste des demandes ouvertes pour l'équipe : numero, titre, texte, lien, date."""
+    """Liste des demandes ouvertes pour l'équipe : numero, titre, texte, lien, date.
+    Si la lecture échoue, lève une erreur : une liste vide veut dire « aucune demande », jamais « illisible »."""
     if equipe not in EQUIPES:
         raise ValueError(f"Équipe inconnue : {equipe!r}")
-    brut = subprocess.run(
-        ["gh", "api", "-X", "GET", f"repos/{DEPOT}/issues",
-         "-f", f"labels=equipe:{equipe}", "-f", "state=open", "-f", f"creator={JULES}", "-f", "per_page=50"],
-        capture_output=True, text=True, encoding="utf-8", check=True).stdout
+    issues = []
+    for page in range(1, PAGES_MAX + 1):
+        rendu = _page(equipe, page)
+        issues += rendu
+        if len(rendu) < PAR_PAGE:
+            break
     return [{"numero": i["number"], "titre": i["title"], "texte": i["body"] or "", "lien": i["html_url"],
              "date": i["created_at"]}
-            for i in json.loads(brut)
+            for i in issues
             if i["user"]["login"] == JULES and "pull_request" not in i]
+
+
+def signaler(equipe, agent, erreur):
+    """Lecture ratée : un bloquant au journal de l'agent (la Direction le lit), au lieu d'une liste vide muette."""
+    from agence import lancer   # ici seulement : lancer n'a pas besoin de ce module pour démarrer
+    lancer.noter_journal(agent, {"date": registre.maintenant(), "quoi": f"demandes-{equipe}", "resultat": "echec",
+                                 "bloquant": f"demandes de Jules illisibles (equipe:{equipe}) : {str(erreur)[:200]}"})
+
+
+def illisibles():
+    """Équipes dont la lecture échoue maintenant : [(équipe, erreur)]. Pour le récapitulatif Telegram."""
+    pannes = []
+    for equipe in EQUIPES:
+        try:
+            demandes(equipe)
+        except Exception as e:  # noqa: BLE001 : on les dit toutes
+            pannes.append((equipe, str(e)[:120]))
+    return pannes
 
 
 def repondre(numero, texte):
