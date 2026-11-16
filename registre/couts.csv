@@ -278,3 +278,15 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-16T20:43:48+00:00,ingenierie,103,936182,0.4312,0,"ok : demande #79, 3 fichier(s), 0.43 $"
 2026-11-16T20:43:57+00:00,ingenierie,131,784016,0.5068,0,"ok : demande #81, 14 fichier(s), 0.51 $"
 2026-11-16T20:44:06+00:00,ingenierie,46,409204,0.2598,0,"ok : demande #84, 5 fichier(s), 0.26 $"
+2026-11-16T21:48:23+00:00,critique,0,0,0,0,"ok : 0 décision(s) jugée(s), 0 annulation(s), 0 essai(s) jugé(s), 9 leçon(s) en mémoire"
+2026-11-16T21:48:23+00:00,programmateur,2,0,0,1,ok : pas d'essai cette semaine
+2026-11-16T21:48:26+00:00,chef-contenu,7,0,0,1,ok : 2 sujets pour la semaine du 2026-11-23 (openai/gpt-oss-120b) : Deux sujets supplémentaires permettent d'atteindre le stock minimal de 7 jours tout en restant dans le budget de 30 $.
+2026-11-16T21:48:33+00:00,responsable-revenu,10,0,0,1,"ok : 4 règle(s) confirmée(s) sur 6, 0 à relire, 3 voie(s) de revenu écrite(s)"
+2026-11-16T21:48:44+00:00,chercheur-outils,116,0,0,1,echec : AttributeError: 'list' object has no attribute 'get'
+2026-11-16T21:50:42+00:00,analyste,0,0,0,0,"ok : Référence « ne rien acheter » : 182 417 vues sur 6 mois (p10 51 135, p90 640 237), revenu 0.00 €, 7.0 sujets/semaine"
+2026-11-16T21:50:47+00:00,veilleur,27,0,0,1,"ok : 5 fiche(s) concept, 0 écartée(s), 28 outliers"
+2026-11-16T21:51:14+00:00,chef-recherche,110,0,0,1,"ok : 0 proposition(s), 0 écartée(s), sur 49 rapport(s)"
+2026-11-16T21:53:04+00:00,chef-operations,3,0,0,1,"ok : 79 % de réveils réussis, 1 retour(s), 1 réparation(s)"
+2026-11-16T21:53:07+00:00,stratege,1,0,0,0,echec : RuntimeError: claude a échoué (code 1) : Error: --json-schema is not a valid JSON Schema: data/properties/suivi/items/properties/id/enum must NOT have duplicate items (items ## 7 and 8 are ide
+2026-11-16T21:53:08+00:00,responsable-organisation,24,0,0,1,"ok : 21 postes relus, 7 signal(aux), aucun changement"
+2026-11-16T21:53:32+00:00,direction,104,80809,0.7573,0,"ok : 33 appliqué(s), 0 refusé(s), 0.76 $"
