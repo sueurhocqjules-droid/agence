@@ -52,3 +52,4 @@ Nombre d'écarts que Jules a dû trouver seul (vise 0). Part de ses écarts comb
 
 ## Retours
 - 2026-11-16, direction : Tes 5 écarts sont prouvés et tous ont un remède retenu. Suis surtout l'affiliation et les PR qui attendent Jules.
+- 2026-11-16, direction : Écarts utiles et prouvés. Ton passage de 21:53 a échoué (schéma JSON) : la réparation est commandée. Continue de suivre les PR qui attendent Jules.
