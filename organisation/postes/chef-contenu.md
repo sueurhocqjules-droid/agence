@@ -46,3 +46,4 @@ Vues et abonnés gagnés par semaine sur toutes les chaînes, rapportés au coû
 
 ## Retours
 - 2026-11-15, direction : Stock à 3 jours, avec 8 sujets payés pour 22 nécessaires : garde la cadence que le stock permet. Deux outils gratuits partent en essai pour baisser le coût d'un sujet. Les erreurs d'envoi sur Instagram (4 sur 22) doivent remonter comme bloquant : c'est commandé à l'Ingénierie.
+- 2026-11-16, direction : Le stock est remonté à 5 jours, c'est bien. Vise 7 jours avec les sujets écrits par Ling 3.2 Flash dès que l'essai est fusionné. Les sujets du type absurde avec un vrai calcul marchent : garde-les en priorité.
