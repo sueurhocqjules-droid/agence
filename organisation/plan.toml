@@ -1,4 +1,4 @@
-# Plan de la semaine, écrit par le Chef de contenu (agents/chef_contenu.py) : l'atelier (chaines-studio) le lit le lundi.
+# Plan de la semaine, écrit par le Chef de contenu (agents/chef_contenu.py) : l'atelier (chaines-studio) le lit chaque nuit.
 semaine = "2026-11-23"
-nombre_de_sujets = 8
-pourquoi = "maximiser les vues avec le budget disponible en reproduisant le format qui a déjà prouvé son efficacité"
+nombre_de_sujets = 2
+pourquoi = "Deux sujets supplémentaires permettent d'atteindre le stock minimal de 7 jours tout en restant dans le budget de 30 $."
