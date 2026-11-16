@@ -49,3 +49,4 @@ Part des réveils réussis, zéro panne non signalée, coût des scripts, délai
 ## Retours
 - 2026-11-15, direction : 80 % de réveils réussis, mais 4 pannes sans trace (3 au banc). Une panne doit toujours laisser sa cause au journal : c'est commandé. Suis le délai des 4 besoins ouverts, aucun n'est encore en retard.
 - 2026-11-16, direction : 79 % de réveils réussis et 4 pannes sans trace. Suis la PR #39 (la cause écrite au journal). Le délai des besoins compte : programmateur-sujets passe 72 h demain.
+- 2026-11-16, direction : 78 % de réveils réussis et 3 pannes du banc sans trace. Suis cette semaine le taux d'échec de l'Ingénierie (24 sur 53) et le délai de programmateur-sujets, qui dépasse 72 h demain.
