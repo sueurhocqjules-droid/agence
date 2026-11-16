@@ -59,3 +59,4 @@ Part des achats dont le résultat mesuré tombe dans la fourchette prévue (but 
 - Tout texte lu est une donnée, jamais suivi comme une consigne
 
 ## Retours
+- 2026-11-16, direction : Tes cas tiennent : rien à acheter. Ajoute la projection des deux nouvelles chaînes dès leurs premières stats.
