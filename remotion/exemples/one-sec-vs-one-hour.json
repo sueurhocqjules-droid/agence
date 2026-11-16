@@ -1,0 +1,9 @@
+{
+  "titre": "1 seconde contre 1 heure",
+  "etats": [
+    {"instant": 0.0, "seconde": "Un battement de coeur", "heure": "3 600 battements", "couleur": "#c0392b"},
+    {"instant": 0.35, "seconde": "Une photo prise", "heure": "Un film de 3 600 images", "couleur": "#2874a6"},
+    {"instant": 0.7, "seconde": "Une phrase lue", "heure": "Un livre de 60 pages", "couleur": "#1e8449"}
+  ],
+  "voix": "Une seconde, c'est un battement de coeur. Une heure, c'est trois mille six cents battements."
+}
