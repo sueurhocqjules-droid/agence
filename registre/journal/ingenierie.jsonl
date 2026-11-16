@@ -39,3 +39,5 @@
 {"date": "2026-11-16T19:23:39+00:00", "quoi": "conclure", "resultat": "ok", "sortie": "ok : PR #67 fusionnée seule (demande #58)"}
 {"date": "2026-11-16T19:17:29+00:00", "quoi": "ingenierie", "resultat": "ok", "code": 0, "duree_s": 57, "sortie": "ok : PR #66 pour la demande #60, 0.28 $ (3 fichier(s))"}
 {"date": "2026-11-16T19:24:04+00:00", "quoi": "conclure", "resultat": "echec", "bloquant": "ouverte : PR #66 non fusionnée (GitHub refuse la fusion, sans doute un conflit avec une PR fusionnée entre-temps : à reconstruire sur main (GraphQL: Base branch was modified. Review and try the merge again. (mergePullRequest)))"}
+{"date": "2026-11-16T19:17:26+00:00", "quoi": "ingenierie", "resultat": "ok", "code": 0, "duree_s": 69, "sortie": "ok : PR #65 pour la demande #56, 0.33 $ (3 fichier(s))"}
+{"date": "2026-11-16T19:24:07+00:00", "quoi": "conclure", "resultat": "ok", "sortie": "ok : PR #65 fusionnée seule (demande #56)"}
