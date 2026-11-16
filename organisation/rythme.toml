@@ -7,5 +7,9 @@
 # seances_par_jour : 0 = le dimanche seulement ; 1 = chaque jour (créneau de 18h17) ; 2 = 6h17 et 18h17 ;
 #                    3 = 6h17, 12h17 et 18h17 ; 4 = les 4 créneaux du réveil.
 
+# Demande #55 (issue #50 de Jules, point 1) : une séance par jour jusqu'au 2026-11-29 inclus, pour tenir le 18/12.
+# Le 2026-11-30, remettre seances_par_jour à 0 (une par semaine, le dimanche) ; la Direction revoit alors ce rythme.
+# Rien ne le remet à 0 tout seul : le réveil ne lit pas de date (reveil.yml est protégé).
+
 [direction]
-seances_par_jour = 0
+seances_par_jour = 1
