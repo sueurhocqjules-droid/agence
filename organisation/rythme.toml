@@ -1,0 +1,11 @@
+# Rythme des séances de la Direction, fixé par la Direction elle-même (MISSION.md, « Lancement », Jules le 16/11).
+# Fichier non protégé : la Direction le change par une demande à l'Ingénierie (classe 1).
+# Le réveil (reveil.yml, 4 créneaux par jour) relance la boucle de la semaine (semaine.yml) aux créneaux choisis,
+# en plus de celle du dimanche soir. Coût d'une boucle relevé le 15/11 : environ 1 $ (Direction 0,63 $, Stratège 0,35 $,
+# le reste en modèles gratuits), hors demandes à l'Ingénierie qu'elle lance.
+#
+# seances_par_jour : 0 = le dimanche seulement ; 1 = chaque jour (créneau de 18h17) ; 2 = 6h17 et 18h17 ;
+#                    3 = 6h17, 12h17 et 18h17 ; 4 = les 4 créneaux du réveil.
+
+[direction]
+seances_par_jour = 0

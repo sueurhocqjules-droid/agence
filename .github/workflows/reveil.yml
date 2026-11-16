@@ -157,6 +157,35 @@ jobs:
           GH_TOKEN: ${{ github.token }}   # lecture des issues `guichet` et `contact`
           PYTHONUTF8: "1"
         run: python -m agence.lancer guichet recap
+      # Séances de la Direction en semaine, au rythme qu'elle choisit elle-même (organisation/rythme.toml,
+      # MISSION « Lancement », Jules le 16/11). La boucle relancée attend la fin de ce réveil (même groupe de concurrence).
+      # Seulement sur un réveil programmé, pour qu'aucune relance à la main ne déclenche de boucle en chaîne
+      - name: Séance de la Direction (rythme choisi)
+        if: ${{ !cancelled() && github.event_name == 'schedule' }}
+        timeout-minutes: 2
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PYTHONUTF8: "1"
+        run: |
+          n=$(python -c "import tomllib; print(int(tomllib.load(open('organisation/rythme.toml','rb'))['direction']['seances_par_jour']))" || echo 0)
+          h=$((10#$(date -u +%H)))
+          if   [ $h -ge 5 ]  && [ $h -lt 11 ]; then creneau=matin
+          elif [ $h -ge 11 ] && [ $h -lt 17 ]; then creneau=midi
+          elif [ $h -ge 17 ] && [ $h -lt 23 ]; then creneau=soir
+          else creneau=nuit; fi
+          case "$n" in
+            1) creneaux="soir" ;;
+            2) creneaux="matin soir" ;;
+            3) creneaux="matin midi soir" ;;
+            4) creneaux="matin midi soir nuit" ;;
+            *) creneaux="" ;;
+          esac
+          # Dimanche soir : la boucle est déjà programmée par semaine.yml
+          if [ "$(date -u +%u)" = 7 ] && [ "$creneau" = soir ]; then creneaux=""; fi
+          case " $creneaux " in
+            *" $creneau "*) gh workflow run semaine.yml -f essai=false && echo "Boucle de la semaine relancée ($creneau, $n séance(s) par jour)" ;;
+            *) echo "Pas de séance à ce créneau ($creneau, $n séance(s) par jour)" ;;
+          esac
       - name: Commiter le registre
         if: always()
         env:
