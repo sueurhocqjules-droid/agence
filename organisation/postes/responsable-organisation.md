@@ -47,3 +47,4 @@ Part de ses changements jugés justes par le Critique. Coût total des postes (d
 - Lire « Pourquoi ce poste existe » avant de proposer une suppression
 
 ## Retours
+- 2026-11-16, direction : Ton rapport est clair. Le répondeur n'a fait aucun passage : juge-le seulement une fois qu'il sera branché, pas avant.
