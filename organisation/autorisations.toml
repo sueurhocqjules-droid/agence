@@ -24,9 +24,9 @@ META_TOKEN = ["flux"]
 BUFFER_API_KEY = ["flux"]
 THREADS_CLE = ["flux"]
 # Jeton du workflow GitHub (droits fixés par chaque workflow)
-GH_TOKEN = ["flux", "garde_fous", "bilan", "guichet", "contacts", "delais", "chef-contenu", "chercheur-outils", "direction", "ingenierie", "responsable-organisation", "critique"]
+GH_TOKEN = ["accords", "flux", "garde_fous", "bilan", "guichet", "contacts", "delais", "chef-contenu", "chercheur-outils", "direction", "ingenierie", "responsable-organisation", "critique"]
 # Bot Telegram : messages à Jules seulement
-TELEGRAM_BOT_TOKEN = ["reponses", "garde_fous", "bilan", "guichet", "courrier", "guetteur", "direction"]
+TELEGRAM_BOT_TOKEN = ["accords", "reponses", "garde_fous", "bilan", "guichet", "courrier", "guetteur", "direction"]
 # Boîte boite-chaines : lecture et filtres, rien d'autre
 GMAIL_TOKEN = ["courrier"]
 # Boîte boite-chaines : envoi seul (gmail.send), messages validés par Jules. Accordé le 15/11/2026 (guichet #13)
@@ -35,5 +35,8 @@ GMAIL_SEND_TOKEN = ["contacts"]
 GROQ_API_KEY = ["chef-operations", "chef-contenu", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "critique", "programmateur", "responsable-organisation", "responsable-revenu"]
 GEMINI_API_KEY = ["chef-operations", "chef-contenu", "chercheur-outils", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "critique", "programmateur", "responsable-organisation", "responsable-revenu"]
 OPENROUTER_API_KEY = ["chercheur-outils", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "responsable-organisation", "responsable-revenu"]
+# Jeton GitHub de Jules (dépôt agence seul) : pose son étiquette accord-jules et fusionne une PR protégée après son
+# Oui sur Telegram (agence/accords.py), ferme la PR après son Non. Accordé le 16/11/2026
+FUSION_TOKEN = ["reponses"]
 # Abonnement Claude de Jules
 CLAUDE_CODE_OAUTH_TOKEN = ["direction", "ingenierie", "stratege"]
