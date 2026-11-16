@@ -43,6 +43,7 @@ MAX_FICHES = MONTRES_AU_MODELE
 # Où va un concept : sur une de nos chaînes s'il prolonge sa ligne, sinon sur une chaîne à ouvrir. Une chaîne qui
 # marche n'est pas réorientée brutalement (sa ligne est tenue par registre/essais.jsonl)
 DESTINATIONS = ("chaîne existante", "nouvelle chaîne")
+ARGENT = ("viral", "affiliation", "autre")  # voie de revenu la plus probable, tranchée ensuite par la Direction
 EFFORTS = {"comme nos sujets": 1, "nouveau type de scène": 2, "hors de portée": None}  # multiple du coût d'un sujet
 NOS_CHAINES = {identifiant for _, identifiant in youtube.CHAINES.values()}
 ID_VIDEO = re.compile(r"(?:youtu\.be/|youtube\.com/(?:shorts/|watch\?v=|live/))([A-Za-z0-9_-]{11})")
@@ -178,6 +179,8 @@ def valider(reponse, montres, cout_sujet, deja):
                            **{k: modeles.propre(str(f[k]))[:400] for k in ("concept", "pourquoi_ca_marche", "adaptation")},
                            "effort": f["effort"], "langues": langues, "faisable": multiple is not None,
                            "destination": f["destination"] if f.get("destination") in DESTINATIONS else DESTINATIONS[0],
+                           "argent": f["argent"] if f.get("argent") in ARGENT else "autre",
+                           "piste_argent": modeles.propre(str(f.get("piste_argent") or ""))[:400],
                            "cout_estime_usd": round(multiple * cout_sujet, 2) if multiple and cout_sujet else None})
             continue
         ecartes.append({"lien": lien, "raison": raison})
@@ -200,7 +203,10 @@ def consigne(montres):
         '"pourquoi_ca_marche": "accroche, rythme, émotion, ce qui fait regarder jusqu\'au bout", '
         '"adaptation": "comment nous le ferions en animation codée", '
         f'"effort": "un de {list(EFFORTS)}", "langues": ["en", "es", "pt"], '
-        f'"destination": "un de {list(DESTINATIONS)}"}}]}}\n'
+        f'"destination": "un de {list(DESTINATIONS)}", "argent": "un de {list(ARGENT)}", '
+        '"piste_argent": "comment ce concept rapporterait de l\'argent"}]}\n'
+        "argent : « viral » si ses vues seules paieraient (revenus des plateformes), « affiliation » s'il est moins "
+        "viral mais propice à des liens vers des produits, « autre » pour une autre voie, que piste_argent décrit. "
         "« chaîne existante » : le concept prolonge la ligne de nos chaînes. « nouvelle chaîne » : il s'en écarte, et "
         "se lance à côté plutôt que de réorienter une chaîne qui marche. "
         "« comme nos sujets » : une scène du même genre que les nôtres. « nouveau type de scène » : faisable en code, "

@@ -20,7 +20,7 @@ from datetime import datetime, timedelta, timezone
 from agence import besoins, mesures, modeles, postes, registre
 from agents import surete
 
-MAX_PROPOSITIONS = 3
+MAX_PROPOSITIONS = 15
 PREUVES = {"concept": ("titre", "chaine", "vues", "mediane_chaine", "ratio", "effort", "faisable", "cout_estime_usd",
                        "propose_par", "destination"),
            "outil": ("nom", "remplace", "economie_usd_semaine", "licence", "risque", "compte_requis", "essai",
@@ -101,7 +101,9 @@ def consigne(donnees):
         + json.dumps(donnees, ensure_ascii=False, default=str) + "\n\n"
         f"Choisis au plus {MAX_PROPOSITIONS} propositions, les mieux prouvées (une preuve vaut mieux qu'un avis : chiffres, "
         "liens, essais). Un concept vaut s'il bat nettement la médiane de nos chaînes et reste faisable ; un outil vaut "
-        "s'il économise des dollars Claude sans perte de qualité. Aucune proposition vaut mieux qu'une proposition faible. "
+        "s'il économise des dollars Claude sans perte de qualité, ou s'il ouvre des vues, une chaîne ou un revenu. Propose tout "
+        "ce qui peut servir les objectifs, payant compris (proposé avec son prix, jamais acheté) : une preuve faible se dit "
+        "comme telle, elle n'écarte pas la proposition. "
         "Pour un outil, la proposition dit précisément quelle partie du travail il remplace (part_remplacee) et ce qui "
         "reste payé à Claude, et le matériel qu'il demande (materiel_requis) face à celui de l'agence : des runners GitHub "
         "sans GPU. Le gain attendu ne compte que la partie remplacée : jamais « coût Claude vers 0 » pour un outil qui "
