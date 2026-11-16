@@ -243,3 +243,4 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-16T19:14:08+00:00,direction,125,70316,0.6728,0,"ok : 26 appliqué(s), 0 refusé(s), 0.67 $"
 2026-11-16T19:16:03+00:00,ingenierie,17,138059,0.1588,0,echec : la séance n'a rien changé dans le dépôt
 2026-11-16T19:16:10+00:00,ingenierie,14,88894,0.0743,0,echec : la séance n'a rien changé dans le dépôt
+2026-11-16T19:16:37+00:00,ingenierie,37,261248,0.1972,0,"ok : demande #52, 1 fichier(s), 0.20 $"
