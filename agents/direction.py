@@ -16,7 +16,7 @@ import sys
 import tomllib
 from datetime import datetime, timedelta, timezone
 
-from agence import (besoins, catalogue, consignes, demandes, essais, guichet, ingenierie, lancer, memoire, mesures,
+from agence import (besoins, catalogue, concepts, consignes, demandes, essais, guichet, ingenierie, lancer, memoire, mesures,
                     organisation, questions, registre, suivi_ecarts)
 from agents import analyste, surete
 
@@ -33,7 +33,7 @@ def equipe_en_service(postes):
     return [p for p in postes["direction"]["equipe"] if postes.get(p, {}).get("statut") == "en_service"]
 
 
-def schema(equipe, cas_simules=(), outils=()):
+def schema(equipe, cas_simules=(), outils=(), concepts_ouverts=()):
     """`cas_simules` : identifiants des améliorations simulées par l'Analyste, seuls achats qu'elle peut proposer.
     `outils` : liens des candidats gratuits du dossier, seuls outils qu'elle peut retenir."""
     mesure = {"type": ["string", "null"], "enum": [*mesures.MESURES, None]}
@@ -47,8 +47,17 @@ def schema(equipe, cas_simules=(), outils=()):
     return {
         "type": "object", "additionalProperties": False,
         "required": ["analyse", "decisions", "retours", "consignes", "questions", "investissements", "ingenierie",
-                     "outils", "essais", "lecons", "chaines"],
+                     "outils", "essais", "lecons", "chaines", "reponses_concepts"],
         "properties": {
+            "reponses_concepts": {"type": "array", "maxItems": len(concepts_ouverts), "items": {
+                "type": "object", "additionalProperties": False,
+                "required": ["id", "reponse", "raison", "potentiel", "limite"],
+                "properties": {"id": {"type": "string", "enum": sorted(concepts_ouverts)},
+                               "reponse": {"type": "string", "enum": concepts.REPONSES},
+                               "raison": texte,
+                               "potentiel": {"type": "string", "enum": concepts.POTENTIELS},
+                               "limite": {"type": "string",
+                                          "description": "vide, sauf si tu t'arrêtes faute de moyens : lesquels"}}}},
             "outils": retenus,
             "chaines": {"type": "array", "maxItems": CHAINES_MAX, "items": {
                 "type": "object", "additionalProperties": False, "required": ["nom", "concept", "reseaux", "pourquoi"],
@@ -213,6 +222,7 @@ def dossier(maintenant):
         "plan_du_chef_de_contenu": tomllib.loads(plan.read_text(encoding="utf-8")) if plan.exists() else None,
         "heures_de_sortie": donnees["heures"],
         "besoins": besoins.dossier(maintenant, cas_analyste),
+        "concepts": concepts.ouverts(),
         "outils_candidats": [{k: c.get(k) for k in ("lien", "nom", "remplace", "pourquoi", "voie", "besoin", "risque",
                                                     "licence", "economie_usd_semaine", "date")}
                              for c in catalogue.candidats_ouverts(maintenant)],
@@ -286,6 +296,10 @@ un nouvel essai. Une refonte totale d'une chaîne reste une question à Jules (G
 Concepts et chaînes : aucune limite au nombre de concepts ni de chaînes par concept, tant que ça sert les objectifs. Un
 concept du Veilleur dont la destination est « nouvelle chaîne » ne réoriente pas une chaîne qui marche : il s'ouvre
 à côté, par chaines.
+concepts : les concepts du Veilleur encore au stade propose (id, titre, source, vues, ratio, effort, cout_estime_usd,
+destination). Réponds à chacun dans reponses_concepts : lancer_chaine_existante, nouvelle_chaine ou ecarte, avec la raison
+et le potentiel (viral, affiliation ou autre). Si tu t'arrêtes faute de moyens (budget, comptes, cadence), dis lesquels
+dans limite : le concept garde alors son stade. Une réponse nouvelle_chaine n'ouvre pas la chaîne : pour cela, remplis chaines.
 ecarts_du_stratege : ce que la mission promet et que l'agence ne fait pas, trouvé par le Stratège, chacun avec sa
 preuve et son remède. Un écart de voie direction attend ta décision : retiens son remède par le champ qui lui va
 (ingenierie, essais, chaines, outils, decisions, questions si c'est du conseil), ou dis dans ton analyse pourquoi tu
@@ -333,7 +347,8 @@ def seance(donnees_dossier, reste):
     """Lance Claude sans outil. Renvoie (réponse structurée, coût en dollars, jetons)."""
     commande = ["claude", "-p", "--model", MODELE, "--output-format", "json",
                 "--json-schema", json.dumps(schema(equipe_en_service(organisation.fiches()),
-                                                   ids_simules(donnees_dossier), liens_outils(donnees_dossier))),
+                                                   ids_simules(donnees_dossier), liens_outils(donnees_dossier),
+                                                   ids_concepts(donnees_dossier))),
                 "--tools", "", "--strict-mcp-config", "--setting-sources", "", "--no-session-persistence",
                 "--max-budget-usd", f"{reste:.2f}", "--system-prompt", consigne_systeme()]
     proc = subprocess.run(commande, input=json.dumps(donnees_dossier, ensure_ascii=False, indent=1, default=str),
@@ -351,6 +366,10 @@ def seance(donnees_dossier, reste):
 
 def ids_simules(donnees_dossier):
     return (donnees_dossier.get("investissements", {}).get("business_cases") or {}).get("ids", [])
+
+
+def ids_concepts(donnees_dossier):
+    return [c["id"] for c in donnees_dossier.get("concepts") or []]
 
 
 def liens_outils(donnees_dossier):
@@ -414,6 +433,9 @@ def appliquer(reponse, maintenant, avant, cas_simules=()):
         registre.decider("direction", f"nouvelle chaîne : {str(c['nom'])[:60]} ({', '.join(c['reseaux'])}), comptes "
                          "demandés au guichet" + (f" (#{numero})" if numero else ""), str(c["pourquoi"])[:600])
         faits.append(f"nouvelle chaîne : {str(c['nom'])[:60]} (comptes demandés au guichet)")
+    faits_c, refus_c = concepts.appliquer(reponse.get("reponses_concepts", []))
+    faits += faits_c
+    refus += refus_c
     for l in reponse.get("lecons", [])[:LECONS_MAX]:
         raison = memoire.refus(l.get("fait"), l.get("preuve"), l.get("change"), memoire.lire())
         if raison:
