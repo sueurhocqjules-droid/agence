@@ -32,11 +32,11 @@ RACINE = Path(__file__).resolve().parent.parent
 BOITE = RACINE / "ressources" / "boite-a-outils-jarvis.md"
 CATALOGUE = RACINE / "ressources" / "catalogue.md"
 CANDIDATS = registre.DOSSIER / "candidats.jsonl"
-MAX_CANDIDATS = 5
+MAX_CANDIDATS = 15
 GITHUB = ["remotion", "text to speech", "free llm api", "video generation", "youtube shorts automation", "local llm"]
 HACKER_NEWS = ["free LLM API", "open source TTS", "Remotion", "local LLM", "AI video generation", "free tier API"]
 AUTRES_POSTES = {"rendu", "son", "jules"}  # tâches sans fiche : rendu des vidéos, sons, travail manuel de Jules
-MAX_AMELIORATIONS = 5
+MAX_AMELIORATIONS = 15
 JETONS_SUJET = (300_000, 30_000)  # hypothèse : jetons d'entrée et de sortie pour écrire et coder un sujet
 
 

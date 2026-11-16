@@ -1,7 +1,7 @@
 """Chercheur d'outils : liens tirés des seules données collectées, choix fermés.  python -m unittest discover tests"""
 import unittest
 
-from agents.chercheur_outils import liens, normaliser, valider
+from agents.chercheur_outils import MAX_CANDIDATS, liens, normaliser, valider
 
 BON = {"nom": "Outil", "lien": "https://github.com/a/b", "remplace": "auteur", "gratuit": True,
        "pourquoi": "écrit les sujets", "essai": "un sujet de test"}
@@ -28,8 +28,8 @@ class Recherche(unittest.TestCase):
     def test_deja_propose_et_plafond(self):
         _, ecartes = valider({"candidats": [BON]}, {"https://github.com/a/b"}, {"auteur"}, {"https://github.com/a/b"})
         self.assertEqual(ecartes[0]["raison"], "déjà proposé une semaine précédente")
-        gardes, _ = valider({"candidats": [BON] * 9}, {"https://github.com/a/b"}, {"auteur"}, set())
-        self.assertEqual(len(gardes), 5)
+        gardes, _ = valider({"candidats": [BON] * (MAX_CANDIDATS + 4)}, {"https://github.com/a/b"}, {"auteur"}, set())
+        self.assertEqual(len(gardes), MAX_CANDIDATS)
 
     def test_reponse_illisible(self):
         self.assertEqual(valider({}, set(), set(), set()), ([], []))
