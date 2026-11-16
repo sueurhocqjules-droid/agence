@@ -1,1 +1,2 @@
 {"date": "2026-11-15T22:04:11+00:00", "quoi": "expert-modeles", "resultat": "ok", "code": 0, "duree_s": 46, "sortie": "ok : 5/5 modèles répondent"}
+{"date": "2026-11-16T19:08:18+00:00", "quoi": "expert-modeles", "resultat": "ok", "code": 0, "duree_s": 76, "sortie": "EN PANNE gemini-flash-latest : HTTP 503 : [{\n  \"error\": {\n    \"code\": 503,\n    \"message\": \"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try\nok : 4/5 modèles répondent"}
