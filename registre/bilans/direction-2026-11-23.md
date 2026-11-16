@@ -1,9 +1,9 @@
-Cette séance lance deux nouvelles chaînes en anglais, tirées des concepts du Veilleur. « Scale of Everything » fait des comparaisons de taille (de la fourmi à l'univers, de l'atome au trou noir : 1,7 à 22 M de vues). « 1 Second vs 1 Hour » compare des cuissons et des défis (13 à 38 M de vues). Les deux formats se prêtent à des gabarits : un modèle gratuit écrit les chiffres, sans entamer le budget de l'Auteur.
-Les 35 concepts ont chacun une réponse. 8 vont aux deux nouvelles chaînes, 2 rejoignent Every Second (escargot, glace), 7 restent à creuser (explications d'ingénierie, ambiance « cocooning », devinettes d'affiliation) et 18 sont écartés : vraie vidéo filmée, publicité de marque, contenu pour enfants, armes.
-Pour le revenu, les comptes d'affiliation Amazon (US pour en, Brésil pour pt) doivent partir au guichet cette semaine. Je fais vérifier que la demande est bien partie.
-La chaîne es fait toujours 5 vues. Son diagnostic réglage par réglage a été recommandé à l'Ingénierie. Les sujets et la cadence ne changent pas jusqu'au 29/11.
-L'Ingénierie échoue près d'une fois sur deux. Je lui demande d'abord d'écrire la vraie cause de chaque échec, de remettre chaque PR à jour avant de la fusionner et de prévenir Jules elle-même dès qu'une PR l'attend.
-Ce que j'attends de toi, Jules :
-1. Étiquette accord-jules sur la PR #63, qui permet de lire tes issues : https://github.com/sueurhocqjules-droid/agence/pull/63
-2. Étiquette accord-jules sur la PR #68, qui écrit la cause des échecs : https://github.com/sueurhocqjules-droid/agence/pull/68
-3. Crée les comptes des deux nouvelles chaînes et les deux comptes Amazon Partenaires, à leur arrivée au guichet.
+Ce soir : 13 concepts tranchés. 3 deviennent des sujets : le barrage (l'eau qui passe chaque seconde), le personnage de film chiffré, le duel en écran partagé pour 1 Second vs 1 Hour. 8 attendent un outil, 2 sont écartés (une publicité, un ratio trop faible).
+Revenu : 0 €, et nous sommes en retard sur le chemin le plus court. Les comptes d'affiliation en et pt ne sont toujours pas demandés, car la demande dépend de la PR #88, qui touche un fichier protégé. Je demande à l'Ingénierie de passer par le guichet sans PR protégée.
+Chaîne es : 5 vues en 7 jours. J'essaie une heure de sortie adaptée à l'Amérique latine (18 h UTC au lieu de 2 h). Le diagnostic des réglages reste prioritaire. Si rien ne bouge le 23/11, je te proposerai des solutions.
+Pannes à l'Ingénierie : le Stratège (schéma JSON invalide), le Chercheur d'outils (erreur de liste) et 2 runs du banc sans cause écrite.
+Coût Claude : 8,2 % de la limite, sous les 20 %. Rien à acheter, ni en €, ni en $.
+Ce que j'attends de toi :
+1. Étiqueter accord-jules sur les PR qui t'attendent, dans la liste « à valider » ci-dessus. En tête : #88 (affiliation) et #87 (erreurs Instagram).
+2. Créer les comptes des deux nouvelles chaînes (guichet #75 et #76).
+3. À venir : une PR qui branche les stats Instagram, Facebook et TikTok en lecture seule. Elle touche aux secrets, elle t'attendra aussi.
