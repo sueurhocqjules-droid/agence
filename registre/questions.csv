@@ -2,3 +2,4 @@ date,id,par,texte,si_oui,si_non,etat,reponse,message_id
 2026-11-11T20:56:33+00:00,1111-2056-1,surete,"Test étape 6 : le flux est en pause (posée par la Sûreté), et la pause l'a bien bloqué. Je la lève ?",reprise:flux,rien,ouverte,,5
 2026-11-11T21:02:47+00:00,1111-2056-1,surete,"Test étape 6 : le flux est en pause (posée par la Sûreté), et la pause l'a bien bloqué. Je la lève ?",reprise:flux,rien,repondue,oui,5
 2026-11-15T22:12:30+00:00,1115-2212-1,direction,"Le script des stats peut-il lire META_TOKEN et BUFFER_API_KEY (déjà accordés au flux) pour relever les vues Instagram, Facebook et TikTok ? Lecture seule, aucune publication.",rien,rien,ouverte,,14
+2026-11-16T09:38:24+00:00,1115-2212-1,direction,"Le script des stats peut-il lire META_TOKEN et BUFFER_API_KEY (déjà accordés au flux) pour relever les vues Instagram, Facebook et TikTok ? Lecture seule, aucune publication.",rien,rien,close,,14
