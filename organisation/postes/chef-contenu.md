@@ -43,6 +43,8 @@ Vues et abonnés gagnés par semaine sur toutes les chaînes, rapportés au coû
 
 ## Consignes
 - Stock minimal : 7 jours de publications programmées d'avance
+- Priorité au plan : les sujets absurdes avec un vrai calcul, dont l'escargot qui double sa vitesse et la glace qui refroidit toutes les deux secondes
+- Les sujets des nouvelles chaînes Scale of Everything et 1 Second vs 1 Hour passent par leur gabarit et un modèle gratuit, jamais par le budget de l'Auteur
 
 ## Retours
 - 2026-11-15, direction : Stock à 3 jours, avec 8 sujets payés pour 22 nécessaires : garde la cadence que le stock permet. Deux outils gratuits partent en essai pour baisser le coût d'un sujet. Les erreurs d'envoi sur Instagram (4 sur 22) doivent remonter comme bloquant : c'est commandé à l'Ingénierie.
