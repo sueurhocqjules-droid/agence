@@ -51,3 +51,4 @@ Nombre d'écarts que Jules a dû trouver seul (vise 0). Part de ses écarts comb
 - Ne pas reproposer un écart encore ouvert sans fait nouveau : le suivre
 
 ## Retours
+- 2026-11-16, direction : Tes 5 écarts sont prouvés et tous ont un remède retenu. Suis surtout l'affiliation et les PR qui attendent Jules.
