@@ -20,7 +20,7 @@ from datetime import datetime, timedelta, timezone
 from agence import consignes, delais, mesures, modeles, organisation, postes, registre
 from agents.direction import bloquants
 
-MAX_REPARATIONS = 3
+MAX_REPARATIONS = 10
 TRACE = timedelta(minutes=90)  # un réveil qui a lancé un agent laisse une entrée de journal dans ce délai
 # Contrôles dont le rouge est un refus voulu (une PR qui touche un fichier protégé), pas une panne de l'agence
 CONTROLES = {"Fichiers protégés"}

@@ -21,21 +21,26 @@ from agence import (besoins, catalogue, consignes, demandes, essais, guichet, in
 from agents import analyste, surete
 
 MODELE = "claude-opus-5-5"
-RETOURS_MAX, CONSIGNES_MAX, QUESTIONS_MAX = 5, 2, 2   # une question par semaine vise l'objectif 3 (autonomie)
+# Plus de plafond de travail (décision de Jules du 16/11) : ces bornes ne servent qu'à arrêter une réponse emballée
+RETOURS_MAX, CONSIGNES_MAX, QUESTIONS_MAX = 20, 20, 10
 RECOMMANDATIONS = ["ne_rien_acheter", "proposer_a_jules"]   # Jules tranche chaque achat, dans Jarvis
-OUTILS_MAX = 2   # outils retenus par séance : chacun devient une demande à l'Ingénierie ou au guichet
+OUTILS_MAX = 20   # outils retenus par séance : chacun devient une demande à l'Ingénierie ou au guichet
 ESSAIS_MAX = len(essais.chaines())   # un essai par chaîne au plus (registre/essais.jsonl)
-LECONS_MAX = 2   # leçons proposées à la mémoire par séance : le Critique les relit
-CHAINES_MAX = 1  # nouvelle chaîne ouverte par séance (aucune limite au total) : ses comptes partent au guichet en un message
+LECONS_MAX = 10   # leçons proposées à la mémoire par séance : le Critique les relit
+CHAINES_MAX = 10  # nouvelles chaînes par séance : leurs comptes partent au guichet, une demande par chaîne
+CONCEPTS_MAX = 60  # verdicts par séance : tous les concepts en attente (borne contre une réponse emballée)
+VERDICTS = ("nouvelle_chaine", "chaine_existante", "a_creuser", "ecarte")
+ARGENT = ("viral", "affiliation", "autre")
 
 
 def equipe_en_service(postes):
     return [p for p in postes["direction"]["equipe"] if postes.get(p, {}).get("statut") == "en_service"]
 
 
-def schema(equipe, cas_simules=(), outils=()):
+def schema(equipe, cas_simules=(), outils=(), concepts=()):
     """`cas_simules` : identifiants des améliorations simulées par l'Analyste, seuls achats qu'elle peut proposer.
-    `outils` : liens des candidats gratuits du dossier, seuls outils qu'elle peut retenir."""
+    `outils` : liens des candidats gratuits du dossier, seuls outils qu'elle peut retenir.
+    `concepts` : liens des concepts en attente de verdict, chacun doit en recevoir un."""
     mesure = {"type": ["string", "null"], "enum": [*mesures.MESURES, None]}
     texte = {"type": "string", "minLength": 1}
     cas = ({"type": "array", "maxItems": 5, "items": {"type": "string", "enum": sorted(cas_simules)}} if cas_simules
@@ -44,12 +49,20 @@ def schema(equipe, cas_simules=(), outils=()):
         "type": "object", "additionalProperties": False, "required": ["lien", "pourquoi"],
         "properties": {"lien": {"type": "string", "enum": sorted(outils)}, "pourquoi": texte}}} if outils
         else {"type": "array", "maxItems": 0})
+    verdicts = ({"type": "array", "maxItems": min(len(concepts), CONCEPTS_MAX), "items": {
+        "type": "object", "additionalProperties": False, "required": ["lien", "verdict", "argent", "piste", "pourquoi"],
+        "properties": {"lien": {"type": "string", "enum": sorted(concepts)},
+                       "verdict": {"type": "string", "enum": list(VERDICTS)},
+                       "argent": {"type": "string", "enum": list(ARGENT)},
+                       "piste": texte, "pourquoi": texte}}} if concepts
+        else {"type": "array", "maxItems": 0})
     return {
         "type": "object", "additionalProperties": False,
         "required": ["analyse", "decisions", "retours", "consignes", "questions", "investissements", "ingenierie",
-                     "outils", "essais", "lecons", "chaines"],
+                     "outils", "essais", "lecons", "chaines", "concepts"],
         "properties": {
             "outils": retenus,
+            "concepts": verdicts,
             "chaines": {"type": "array", "maxItems": CHAINES_MAX, "items": {
                 "type": "object", "additionalProperties": False, "required": ["nom", "concept", "reseaux", "pourquoi"],
                 "properties": {"nom": {"type": "string", "minLength": 1,
@@ -87,7 +100,7 @@ def schema(equipe, cas_simules=(), outils=()):
                                "recommandation": {"type": "string", "enum": RECOMMANDATIONS},
                                "cas": cas, "pourquoi": texte}}},
             "analyse": {"type": "string", "description": "ta section du mail du lundi pour Jules, 12 lignes au plus, en français"},
-            "decisions": {"type": "array", "maxItems": 6, "items": {
+            "decisions": {"type": "array", "maxItems": 30, "items": {
                 "type": "object", "additionalProperties": False,
                 "required": ["decision", "pourquoi", "mesure", "attendu", "echeance_jours"],
                 "properties": {"decision": texte, "pourquoi": texte, "mesure": mesure,
@@ -138,6 +151,45 @@ def recherche(depuis):
         return propositions
     return {"note": "le Chef de la Recherche n'a rien transmis : rapports bruts de son équipe",
             "outils": registre.lire_jsonl("candidats", depuis), "concepts": registre.lire_jsonl("concepts", depuis)}
+
+
+def concepts_a_trancher():
+    """Concepts du Veilleur sans verdict définitif de la Direction (registre/verdicts_concepts.jsonl). Un concept
+    « a_creuser » revient, avec son dernier verdict, jusqu'à ce qu'il soit lancé ou écarté."""
+    derniers = {v["lien"]: v for v in registre.lire_jsonl("verdicts_concepts")}
+    resultat = []
+    for c in registre.lire_jsonl("concepts"):
+        v = derniers.get(c["lien"])
+        if v and v["verdict"] != "a_creuser":
+            continue
+        resultat.append({k: c.get(k) for k in ("lien", "concept", "pourquoi_ca_marche", "adaptation", "effort", "faisable",
+                                               "destination", "langues", "vues", "ratio", "cout_estime_usd", "argent",
+                                               "piste_argent", "propose_par")}
+                        | ({"dernier_verdict": {k: v[k] for k in ("date", "piste", "pourquoi")}} if v else {}))
+    return resultat[-CONCEPTS_MAX:]
+
+
+def trancher_concepts(verdicts, ouverts):
+    """Note chaque verdict de la Direction, lien relu dans les concepts en attente. Renvoie (faits, refus)."""
+    faits, refus, lignes = [], [], []
+    for v in verdicts[:CONCEPTS_MAX]:
+        if v.get("lien") not in ouverts or v.get("verdict") not in VERDICTS or v.get("argent") not in ARGENT:
+            refus.append(f"verdict de concept {str(v.get('lien'))[:80]} : lien, verdict ou argent hors liste")
+            continue
+        lignes.append({"date": registre.maintenant(), "lien": v["lien"], "verdict": v["verdict"], "argent": v["argent"],
+                       "piste": str(v["piste"])[:400], "pourquoi": str(v["pourquoi"])[:600]})
+        faits.append(f"concept {v['verdict']} ({v['argent']}) : {str(ouverts[v['lien']])[:60]}")
+    if lignes:
+        with open(registre.DOSSIER / "verdicts_concepts.jsonl", "a", encoding="utf-8", newline="\n") as f:
+            for l in lignes:
+                f.write(json.dumps(l, ensure_ascii=False) + "\n")
+        registre.decider("direction", f"{len(lignes)} concept(s) tranché(s) : "
+                         + ", ".join(f"{l['verdict']}" for l in lignes)[:250],
+                         "verdicts dans registre/verdicts_concepts.jsonl, avec la voie d'argent de chacun")
+    sans = [l for l in ouverts if l not in {x["lien"] for x in lignes}]
+    if sans:
+        refus.append(f"{len(sans)} concept(s) sans verdict cette séance")
+    return faits, refus
 
 
 def voies_de_revenu():
@@ -217,6 +269,7 @@ def dossier(maintenant):
                                                     "licence", "economie_usd_semaine", "date")}
                              for c in catalogue.candidats_ouverts(maintenant)],
         "propositions_de_la_recherche": recherche(depuis),
+        "concepts_a_trancher": concepts_a_trancher(),
         "rapport_des_operations": (registre.lire_jsonl("operations", depuis) or [None])[-1],
         "rapport_de_l_organisation": (registre.lire_jsonl("organisation", depuis) or [None])[-1],
         "ecarts_du_stratege": (registre.lire_jsonl("ecarts", depuis) or [None])[-1],
@@ -264,8 +317,8 @@ sa mesure et sa valeur attendue (ou la tienne), et dis dans le pourquoi qu'elle 
 Le rapport des opérations dit si l'agence tourne. Une réparation ou une construction qui demande d'écrire du code ne
 se remonte pas à Jules : elle va à l'Ingénierie (Gouvernance). Écris-la dans ingenierie, avec ce qu'il faut réparer ou
 construire et la panne ou le chiffre qui le montre : l'Ingénierie ouvre une PR le soir même.
-besoins : ce que les agents ont dit manquer, en chiffres, avec les options trouvées par la Recherche (3 au plus, les
-gratuites d'abord). Un besoin passe avant une idée nouvelle. Pour chacun, choisis : une option gratuite se retient dans
+besoins : ce que les agents ont dit manquer, en chiffres, avec les options trouvées par la Recherche (les
+gratuites d'abord). Un besoin passe avant une idée nouvelle, sans l'empêcher. Pour chacun, choisis : une option gratuite se retient dans
 outils (voie essai : l'Ingénierie l'essaie par une PR, sans secret, et sa fusion vaut entrée au catalogue, sans Jules ;
 voie guichet : un compte est à créer, la demande part au guichet) ; une option payante (voie capital) ne se retient que
 par investissements, avec son business case ; sans option, ou si un peu de code suffit, écris la demande dans ingenierie.
@@ -305,22 +358,28 @@ Tu rends ta réponse au format imposé, appliquée telle quelle par un script :
   une issue puis une PR, fusionnée seule si tout est vert. Écris quoi assez précisément pour être codé sans autre
   contexte. Rien de ce qui touche aux workflows, aux secrets, aux tests existants ou à la mission : ces PR-là
   attendent Jules. Pas de code à écrire cette semaine : liste vide.
-- outils : au plus {OUTILS_MAX} outils gratuits de outils_candidats à retenir, par leur lien, les plus utiles à un besoin
-  ou aux 4 objectifs. Le script les envoie sur leur voie (essai par l'Ingénierie, ou guichet). Rien à retenir : liste vide.
+- outils : les outils gratuits de outils_candidats à retenir, par leur lien, tous ceux qui servent un besoin ou les
+  4 objectifs. Le script les envoie sur leur voie (essai par l'Ingénierie, ou guichet). Rien à retenir : liste vide.
 - essais : au plus un par chaîne (ou « toutes » pour un format commun) : la ligne suivie, la durée minimale en jours
   ({essais.DUREE_MIN} à {essais.DUREE_MAX}) et pourquoi cette durée suffit. Le script cite lui-même le résultat de l'essai
   précédent. Rien à ouvrir : liste vide.
-- chaines : au plus {CHAINES_MAX} nouvelle chaîne par séance, quand un concept du dossier la justifie par ses chiffres : son nom,
-  son concept, ses réseaux. Le script demande ses comptes à Jules en un seul message au guichet (chaque chaîne sur une
-  adresse distincte) ; l'agence fait tout le reste. Le plus souvent : liste vide.
-- lecons : au plus {LECONS_MAX} leçons à proposer à la mémoire, chacune avec le fait, sa preuve (un fichier du registre, un
+- chaines : chaque nouvelle chaîne que tu lances, dès qu'un concept la justifie (ses chiffres, ou un essai à faire pour
+  en avoir) : son nom, son concept, ses réseaux. Le script demande ses comptes à Jules au guichet (chaque chaîne sur une
+  adresse distincte) ; l'agence fait tout le reste. Jules est le frein, pas toi : une chaîne qui échoue se ferme.
+- concepts : un verdict pour CHAQUE concept de concepts_a_trancher, par son lien, sans exception : nouvelle_chaine
+  (et la chaîne dans chaines), chaine_existante (il devient un sujet d'une de nos chaînes), a_creuser (il revient à
+  la séance suivante, avec la recherche à lancer dans piste) ou ecarte (la raison dans pourquoi). argent : sa voie de
+  revenu la plus probable, viral (revenus des plateformes), affiliation (moins viral mais propice à des liens), autre
+  (piste dit laquelle). piste : comment il rapporterait, ou la recherche à faire. Un concept prometteur arrêté par un
+  manque de moyens (stock, budget, outil) n'est pas écarté : a_creuser, avec ce qui lèverait la limite.
+- lecons : les leçons à proposer à la mémoire, chacune avec le fait, sa preuve (un fichier du registre, un
   identifiant de décision, un commit, un run ou une issue du dossier) et ce qu'elle change. Seulement ce qui
-  changera une décision future. Le plus souvent : liste vide.
+  changera une décision future.
 - retours : trois lignes au plus par membre de ton équipe en service, sur sa mesure de réussite.
 - consignes : la nouvelle liste complète des consignes d'un membre, avec la mesure qu'elle doit améliorer. Un seul changement
-  en attente par membre (refusé s'il en a déjà un), deux au plus par semaine : on doit savoir ce qui a joué.
+  en attente par membre (refusé s'il en a déjà un) : on doit savoir ce qui a joué.
 - questions : seulement ce qui relève du conseil (Gouvernance). si_oui et si_non valent rien, pause:<cible> ou reprise:<cible>
-  avec une cible de cibles_des_questions. Le plus souvent : aucune question.
+  avec une cible de cibles_des_questions. Les comptes passent par chaines ou outils, les achats par investissements.
 - investissements : une recommandation par poche (eur, claude_usd, jamais additionnées), tirée des business cases de
   l'Analyste : ne_rien_acheter (cas vide) ou proposer_a_jules (cas simulés seulement). Jamais un achat : Jules tranche
   dans Jarvis. Tant que l'agence ne gagne rien, la règle est 0 € ; une exception se signale comme telle dans le pourquoi.
@@ -333,7 +392,8 @@ def seance(donnees_dossier, reste):
     """Lance Claude sans outil. Renvoie (réponse structurée, coût en dollars, jetons)."""
     commande = ["claude", "-p", "--model", MODELE, "--output-format", "json",
                 "--json-schema", json.dumps(schema(equipe_en_service(organisation.fiches()),
-                                                   ids_simules(donnees_dossier), liens_outils(donnees_dossier))),
+                                                   ids_simules(donnees_dossier), liens_outils(donnees_dossier),
+                                                   [c["lien"] for c in donnees_dossier.get("concepts_a_trancher") or []])),
                 "--tools", "", "--strict-mcp-config", "--setting-sources", "", "--no-session-persistence",
                 "--max-budget-usd", f"{reste:.2f}", "--system-prompt", consigne_systeme()]
     proc = subprocess.run(commande, input=json.dumps(donnees_dossier, ensure_ascii=False, indent=1, default=str),
@@ -380,9 +440,14 @@ def retenir_outils(choisis, maintenant, retenir=None):
     return faits, refus
 
 
-def appliquer(reponse, maintenant, avant, cas_simules=()):
+def appliquer(reponse, maintenant, avant, cas_simules=(), concepts_ouverts=None):
     """Applique la réponse, élément par élément : un élément refusé est noté, il n'arrête pas les autres."""
     faits, refus = retenir_outils(reponse.get("outils", []), maintenant)
+    if "concepts" in reponse:
+        if concepts_ouverts is None:
+            concepts_ouverts = {c["lien"]: c.get("concept") for c in concepts_a_trancher()}
+        f_c, r_c = trancher_concepts(reponse["concepts"], concepts_ouverts)
+        faits, refus = faits + f_c, refus + r_c
     for i in reponse.get("investissements", []):
         # Une recommandation, jamais un achat : notée au registre et dans le bilan, Jules tranche dans Jarvis
         inconnus = [c for c in i["cas"] if c not in cas_simules]
