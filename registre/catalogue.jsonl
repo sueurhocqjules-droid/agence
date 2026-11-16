@@ -2,3 +2,5 @@
 {"date": "2026-11-15T22:12:30+00:00", "lien": "https://github.com/mromidev/claude-animated-shorts", "nom": "mromidev/claude-animated-shorts", "voie": "essai", "par": "la Direction", "issue": 31, "besoin": null}
 {"date": "2026-11-16T19:15:36+00:00", "lien": "https://openrouter.ai/inclusionai/ling-3.2-flash:free", "nom": "inclusionai/ling-3.2-flash:free", "voie": "essai", "par": "la Direction", "issue": 51, "besoin": "programmateur-sujets"}
 {"date": "2026-11-16T19:15:39+00:00", "lien": "https://openrouter.ai/cohere/north-mini-code:free", "nom": "cohere/north-mini-code:free", "voie": "essai", "par": "la Direction", "issue": 52, "besoin": "programmateur-sujets"}
+{"date": "2026-11-16T20:43:06+00:00", "lien": "https://github.com/Vincentwei1021/anything2explainer", "nom": "Vincentwei1021/anything2explainer", "voie": "essai", "par": "la Direction", "issue": 73, "besoin": null}
+{"date": "2026-11-16T20:43:09+00:00", "lien": "https://openrouter.ai/baidu/ernie-5.5-flash-preview:free", "nom": "baidu/ernie-5.5-flash-preview:free", "voie": "essai", "par": "la Direction", "issue": 74, "besoin": null}
