@@ -48,3 +48,4 @@ Part de ses changements jugés justes par le Critique. Coût total des postes (d
 
 ## Retours
 - 2026-11-16, direction : Ton rapport est clair. Le répondeur n'a fait aucun passage : juge-le seulement une fois qu'il sera branché, pas avant.
+- 2026-11-16, direction : Rapport clair. Ne juge pas l'Ingénierie sur ses blocages « attend Jules » : ce ne sont pas des pannes du poste.
