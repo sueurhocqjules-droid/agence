@@ -228,3 +228,16 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-16T13:49:38+00:00,contacts,0,0,0,0,ok : aucun message validé à envoyer
 2026-11-16T13:49:41+00:00,guichet,1,0,0,0,"ok : 0 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : récapitulatif"
 2026-11-16T16:19:29+00:00,bilan,1,0,0,0,ok : https://github.com/sueurhocqjules-droid/agence/issues/48
+2026-11-16T19:07:02+00:00,expert-modeles,76,0,0,5,ok : 4/5 modèles répondent
+2026-11-16T19:08:18+00:00,critique,0,0,0,0,"ok : 0 décision(s) jugée(s), 0 annulation(s), 0 essai(s) jugé(s), 8 leçon(s) en mémoire"
+2026-11-16T19:08:18+00:00,programmateur,0,0,0,0,"ok : cadence réduite faute de budget : {'en': [18], 'es': [2], 'pt': [16]}"
+2026-11-16T19:08:19+00:00,chef-contenu,9,0,0,1,ok : 8 sujets pour la semaine du 2026-11-23 (openai/gpt-oss-120b) : maximiser les vues tout en respectant le budget de 30 $ et garantir un stock de plus de 7 jours
+2026-11-16T19:08:28+00:00,responsable-revenu,4,0,0,1,"ok : 4 règle(s) confirmée(s) sur 6, 0 à relire, 3 voie(s) de revenu écrite(s)"
+2026-11-16T19:08:32+00:00,chercheur-outils,92,0,0,1,"ok : 2 candidat(s), 3 écarté(s), 5 amélioration(s) payante(s), 1 besoin(s) sur 4 avec une réponse, 124 liens collectés"
+2026-11-16T19:10:07+00:00,analyste,0,0,0,0,"ok : Référence « ne rien acheter » : 182 417 vues sur 6 mois (p10 51 135, p90 640 237), revenu 0.00 €, 7.0 sujets/semaine"
+2026-11-16T19:10:12+00:00,veilleur,33,0,0,1,"ok : 15 fiche(s) concept, 0 écartée(s), 27 outliers"
+2026-11-16T19:10:45+00:00,chef-recherche,104,0,0,1,"ok : 0 proposition(s), 0 écartée(s), sur 35 rapport(s)"
+2026-11-16T19:12:29+00:00,chef-operations,3,0,0,1,"ok : 79 % de réveils réussis, 1 retour(s), 3 réparation(s)"
+2026-11-16T19:12:32+00:00,stratege,45,39690,0.3734,0,"ok : 2 écart(s), 9 suivi(s), 0 refusé(s), 0.37 $"
+2026-11-16T19:13:18+00:00,responsable-organisation,50,0,0,1,"ok : 21 postes relus, 6 signal(aux), aucun changement"
+2026-11-16T19:14:08+00:00,direction,125,70316,0.6728,0,"ok : 26 appliqué(s), 0 refusé(s), 0.67 $"
