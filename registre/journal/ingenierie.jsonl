@@ -43,3 +43,5 @@
 {"date": "2026-11-16T19:24:07+00:00", "quoi": "conclure", "resultat": "ok", "sortie": "ok : PR #65 fusionnée seule (demande #56)"}
 {"date": "2026-11-16T19:17:34+00:00", "quoi": "ingenierie", "resultat": "ok", "code": 0, "duree_s": 84, "sortie": "ok : PR #69 pour la demande #54, 0.32 $ (4 fichier(s))"}
 {"date": "2026-11-16T19:24:33+00:00", "quoi": "conclure", "resultat": "echec", "bloquant": "ouverte : PR #69 non fusionnée (les tests de la PR ne sont pas verts)"}
+{"date": "2026-11-16T19:17:42+00:00", "quoi": "ingenierie", "resultat": "ok", "code": 0, "duree_s": 83, "sortie": "ok : PR #70 pour la demande #57, 0.41 $ (4 fichier(s))"}
+{"date": "2026-11-16T19:24:39+00:00", "quoi": "conclure", "resultat": "echec", "bloquant": "ouverte : PR #70 non fusionnée (le banc des agents n'est pas vert)"}
