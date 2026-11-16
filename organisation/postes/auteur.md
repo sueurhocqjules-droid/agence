@@ -37,7 +37,7 @@ Aucun secret lisible. Le contrôle (lint, fichiers requis) passe avant le commit
 Vues médianes à 7 jours de ses sujets comparées à la médiane de la chaîne. Part de ses prédictions justes. Coût par sujet (2,03 $ équivalent à la première séance, 11/11). Zéro sujet refusé au contrôle.
 
 ## Journal
-`chaines-studio/atelier/JOURNAL.md`
+`chaines-studio/atelier/JOURNAL.md` (prédictions). Côté agence, `registre/journal/auteur.jsonl` : la Sûreté (`agents/surete.py`, `journaliser_atelier`) y note à chaque réveil une ligne par séance lue dans `atelier/couts.csv` (début, fin, état, coût en $, sujets livrés), une seule fois par séance.
 
 ## Consignes
 Celles de `chaines-studio/atelier/CONSIGNES.md`.

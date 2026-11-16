@@ -52,7 +52,28 @@ def couts_atelier():
         return None
     with open(chemin, newline="", encoding="utf-8") as f:
         return [{"debut": l["date"], "agent": "auteur", "dollars_equiv": l["cout_usd_equivalent"], "appels_gratuits": "0",
-                 "sujets": l.get("sujets") or "", "reserve_usd": l.get("reserve_usd") or "0"} for l in csv.DictReader(f)]
+                 "fin": l.get("fin") or "", "sujets": l.get("sujets") or "", "reserve_usd": l.get("reserve_usd") or "0"} for l in csv.DictReader(f)]
+
+
+def journaliser_atelier(atelier, dossier=None):
+    """Une ligne par séance de l'atelier dans registre/journal/auteur.jsonl, au format du lanceur (début, fin, état,
+    coût en $, sujets livrés). Une séance déjà notée (même début) ne l'est pas deux fois. Renvoie le nombre ajouté."""
+    chemin = (dossier or registre.DOSSIER / "journal") / "auteur.jsonl"
+    deja = set()
+    if chemin.exists():
+        deja = {json.loads(l).get("debut") for l in chemin.read_text(encoding="utf-8").splitlines() if l.strip()}
+    nouvelles = [l for l in atelier or [] if l["debut"] not in deja]
+    if nouvelles:
+        chemin.parent.mkdir(exist_ok=True)
+        with open(chemin, "a", encoding="utf-8") as f:
+            for l in nouvelles:
+                sujets = int(float(l.get("sujets") or 0))
+                f.write(json.dumps({"date": l.get("fin") or l["debut"], "quoi": "atelier", "debut": l["debut"],
+                                    "fin": l.get("fin") or l["debut"], "resultat": "ok" if sujets else "vide",
+                                    "etat": "livre" if sujets else "rien livre",
+                                    "dollars_equiv": float(l["dollars_equiv"] or 0), "sujets": sujets},
+                                   ensure_ascii=False) + "\n")
+    return len(nouvelles)
 
 
 def compteur(maintenant, couts, atelier, reglages, fin=None):
@@ -187,7 +208,10 @@ def alerter_portee(s, stats, maintenant):
 def passage(essai):
     reglages, maintenant, s = seuils(), datetime.now(timezone.utc), Surete(essai)
 
-    c = compteur(maintenant, registre.lire("couts"), couts_atelier(), reglages)
+    atelier = couts_atelier()
+    if not essai and (ajoutees := journaliser_atelier(atelier)):
+        print(f"Journal de l'Auteur : {ajoutees} séance(s) de l'atelier notée(s)")
+    c = compteur(maintenant, registre.lire("couts"), atelier, reglages)
     part = f", {c['pourcent']:.1f} % de ta limite" if c["pourcent"] is not None else ""
     detail = ", ".join(f"{a} {v['dollars']:.2f} $" for a, v in sorted(c["par_agent"].items()) if v["dollars"])
     print(f"Semaine du {c['semaine']} : {c['dollars']:.2f} $ équivalent Claude{part} ({detail or 'aucun'}), "
