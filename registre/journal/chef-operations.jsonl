@@ -51,3 +51,7 @@
 {"date": "2026-11-16T02:47:17+00:00", "quoi": "delais", "resultat": "ok", "code": 0, "duree_s": 0, "sortie": "ok : aucun départ en essai, 0 besoin(s) en retard sur leur cible"}
 {"date": "2026-11-16T02:47:17+00:00", "quoi": "contacts", "resultat": "ok", "code": 0, "duree_s": 0, "sortie": "ok : aucun message validé à envoyer"}
 {"date": "2026-11-16T02:47:21+00:00", "quoi": "guichet", "resultat": "ok", "code": 0, "duree_s": 3, "sortie": "ok : 0 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : rien"}
+{"date": "2026-11-16T13:36:30+00:00", "quoi": "stats", "resultat": "ok", "code": 0, "duree_s": 3, "sortie": "ok : 72 vidéos, 21915 vues"}
+{"date": "2026-11-16T13:49:38+00:00", "quoi": "delais", "resultat": "ok", "code": 0, "duree_s": 0, "sortie": "ok : aucun départ en essai, 0 besoin(s) en retard sur leur cible"}
+{"date": "2026-11-16T13:49:39+00:00", "quoi": "contacts", "resultat": "ok", "code": 0, "duree_s": 0, "sortie": "ok : aucun message validé à envoyer"}
+{"date": "2026-11-16T13:49:42+00:00", "quoi": "guichet", "resultat": "ok", "code": 0, "duree_s": 3, "sortie": "ok : 0 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : récapitulatif"}
