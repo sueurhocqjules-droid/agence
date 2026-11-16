@@ -1,9 +1,9 @@
-Semaine du 16/11 : 21 915 vues (en 17 684, pt 4 226, es 5), 0 €, 5,6 % de la limite Claude selon le compteur de la semaine, 1 intervention de Jules.
-Ta consigne #50 est reçue. Mon rythme passe à une séance par jour jusqu'au 29/11 (environ 7 $ par semaine), puis on choisira un rythme de croisière sur les chiffres.
-La Recherche passe au rythme quotidien et à 15 candidats par semaine, et l'Ingénierie relève les plafonds des fiches. Rien ne bouge sur la règle de deux, les fichiers protégés et le 0 €.
-Les 11 concepts du Veilleur ne sont pas dans mon dossier, donc je ne peux pas y répondre aujourd'hui. L'Ingénierie les ajoute, et chacun aura sa réponse (lancé ou écarté, avec son potentiel d'argent) dans les 48 h.
-Revenu : en et pt passent à l'affiliation. Le script déposera au guichet les comptes Amazon Partenaires (US pour en, Brésil pour pt), une adresse par chaîne. Jules, merci de les créer dès qu'ils arrivent.
-Les sujets coûtent trop cher : deux modèles gratuits partent en essai. Ling 3.2 Flash écrit les sujets, North Mini Code écrit le code Remotion.
-Chaîne es : la PR #42 (le diagnostic) bloquait sur un conflit, pas sur toi. Je la fais reconstruire.
-À valider par toi : les PR #39, #41 et #43, puis la PR qui ajoute GH_TOKEN aux workflows (sans elle, aucune issue de Jules n'est lue). Les PR qui permettent de relever les stats Instagram, Facebook et TikTok porteront l'étiquette accord-jules.
-Le bilan disait « rien à valider » parce que la liste venait de mon dossier et était périmée. Elle sera désormais lue en direct sur GitHub.
+Cette séance lance deux nouvelles chaînes en anglais, tirées des concepts du Veilleur. « Scale of Everything » fait des comparaisons de taille (de la fourmi à l'univers, de l'atome au trou noir : 1,7 à 22 M de vues). « 1 Second vs 1 Hour » compare des cuissons et des défis (13 à 38 M de vues). Les deux formats se prêtent à des gabarits : un modèle gratuit écrit les chiffres, sans entamer le budget de l'Auteur.
+Les 35 concepts ont chacun une réponse. 8 vont aux deux nouvelles chaînes, 2 rejoignent Every Second (escargot, glace), 7 restent à creuser (explications d'ingénierie, ambiance « cocooning », devinettes d'affiliation) et 18 sont écartés : vraie vidéo filmée, publicité de marque, contenu pour enfants, armes.
+Pour le revenu, les comptes d'affiliation Amazon (US pour en, Brésil pour pt) doivent partir au guichet cette semaine. Je fais vérifier que la demande est bien partie.
+La chaîne es fait toujours 5 vues. Son diagnostic réglage par réglage a été recommandé à l'Ingénierie. Les sujets et la cadence ne changent pas jusqu'au 29/11.
+L'Ingénierie échoue près d'une fois sur deux. Je lui demande d'abord d'écrire la vraie cause de chaque échec, de remettre chaque PR à jour avant de la fusionner et de prévenir Jules elle-même dès qu'une PR l'attend.
+Ce que j'attends de toi, Jules :
+1. Étiquette accord-jules sur la PR #63, qui permet de lire tes issues : https://github.com/sueurhocqjules-droid/agence/pull/63
+2. Étiquette accord-jules sur la PR #68, qui écrit la cause des échecs : https://github.com/sueurhocqjules-droid/agence/pull/68
+3. Crée les comptes des deux nouvelles chaînes et les deux comptes Amazon Partenaires, à leur arrivée au guichet.

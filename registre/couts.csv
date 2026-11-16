@@ -255,3 +255,16 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-16T19:16:30+00:00,ingenierie,60,612681,0.2826,0,"ok : demande #59, 4 fichier(s), 0.28 $"
 2026-11-16T19:26:30+00:00,ingenierie,79,690771,0.3392,0,echec : la séance n'a rien changé dans le dépôt
 2026-11-16T19:26:34+00:00,ingenierie,130,1011013,0.5594,0,"ok : demande #62, 8 fichier(s), 0.56 $"
+2026-11-16T20:29:28+00:00,expert-modeles,276,0,0,5,ok : 4/5 modèles répondent
+2026-11-16T20:34:04+00:00,critique,0,0,0,0,"ok : 0 décision(s) jugée(s), 0 annulation(s), 0 essai(s) jugé(s), 9 leçon(s) en mémoire"
+2026-11-16T20:34:04+00:00,programmateur,1,0,0,1,ok : pas d'essai cette semaine
+2026-11-16T20:34:05+00:00,chef-contenu,3,0,0,1,ok : 8 sujets pour la semaine du 2026-11-23 (openai/gpt-oss-120b) : maximiser les vues avec le budget disponible en reproduisant le format qui a déjà prouvé son efficacité
+2026-11-16T20:34:09+00:00,responsable-revenu,5,0,0,1,"ok : 4 règle(s) confirmée(s) sur 6, 0 à relire, 3 voie(s) de revenu écrite(s)"
+2026-11-16T20:34:14+00:00,chercheur-outils,143,0,0,1,"ok : 0 candidat(s), 0 écarté(s), 0 amélioration(s) payante(s), 0 besoin(s) sur 4 avec une réponse, 129 liens collectés"
+2026-11-16T20:36:40+00:00,analyste,0,0,0,0,"ok : Référence « ne rien acheter » : 182 417 vues sur 6 mois (p10 51 135, p90 640 237), revenu 0.00 €, 7.0 sujets/semaine"
+2026-11-16T20:36:45+00:00,veilleur,31,0,0,1,"ok : 9 fiche(s) concept, 0 écartée(s), 30 outliers"
+2026-11-16T20:37:17+00:00,chef-recherche,75,0,0,1,"ok : 0 proposition(s), 0 écartée(s), sur 44 rapport(s)"
+2026-11-16T20:38:32+00:00,chef-operations,3,0,0,1,"ok : 78 % de réveils réussis, 1 retour(s), 6 réparation(s)"
+2026-11-16T20:38:36+00:00,stratege,62,44220,0.432,0,"ok : 5 écart(s), 8 suivi(s), 0 refusé(s), 0.43 $"
+2026-11-16T20:39:38+00:00,responsable-organisation,46,0,0,1,"ok : 21 postes relus, 6 signal(aux), aucun changement"
+2026-11-16T20:40:25+00:00,direction,193,94033,0.9461,0,"ok : 65 appliqué(s), 1 refusé(s), 0.95 $"
