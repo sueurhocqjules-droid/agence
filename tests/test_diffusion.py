@@ -77,6 +77,18 @@ class Diffuser(unittest.TestCase):
         self.assertEqual(erreurs, ["instagram:volt-en"])  # un seul essai, pas de deuxième vidéo sur ce compte
         self.assertEqual(notes[0][:4], ("instagram", "en", "volt-en", "erreur"))
 
+    def test_refus_instagram_ecrit_la_reponse_complete_en_bloquant(self):
+        reponse = {"message": "Media upload has failed", "type": "OAuthException", "code": 2207026,
+                   "error_subcode": 2207026, "fbtrace_id": "AbC123"}
+        with mock.patch.object(flux.lancer, "noter_journal") as noter:
+            self.lancer(publics=SUJETS, cadence={"instagram": 2, "facebook": 0},
+                        echec=meta.ErreurMeta("POST ig1/media : Media upload has failed", 2207026, reponse))
+        noter.assert_called_once()
+        agent, entree = noter.call_args[0]
+        self.assertEqual(agent, "chef-contenu")
+        for morceau in ("volt-en", "2207026", "AbC123", "OAuthException"):
+            self.assertIn(morceau, entree["bloquant"])
+
     def test_sans_jeton_rien_ne_part(self):
         with mock.patch.object(meta, "jeton", return_value=None):
             self.assertEqual(flux.diffuser(False, SUJETS, {}, [], "/tmp", MAINTENANT), ([], [], []))
