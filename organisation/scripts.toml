@@ -47,6 +47,12 @@ secrets = ["GMAIL_SEND_TOKEN", "GH_TOKEN"]
 
 # Les délais (agence/delais.py) : « Décider vite » appliqué par le code. Un besoin écrit depuis plus de 48 h fait partir
 # en essai, chez l'Ingénierie, sa première option gratuite et sans compte ; le délai besoin → mise en service est mesuré.
+[diagnostic_es]
+proprietaire = "chef-contenu"
+module = "agents.diagnostic_es"
+description = "la comparaison des réglages YouTube de es et de pt, et la correction de es (demande #54)"
+secrets = ["YT_TOKEN_ES", "YT_TOKEN_PT"]
+
 [delais]
 proprietaire = "chef-operations"
 module = "agence.delais"

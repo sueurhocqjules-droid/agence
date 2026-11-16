@@ -12,7 +12,7 @@ reveil = "une fois par semaine, et sur issue equipe:contenu"
 regle_de_deux = "[C] : aucun secret de chaîne, décide sur le registre"
 secrets = ["clé du modèle gratuit attribué"]
 budget = { claude_usd_semaine = 0, appels_gratuits_jour = 20 }
-scripts = ["flux", "rendu (studio-rendu)", "controle", "publier_youtube", "publier_autres_reseaux", "synchro_rendu"]
+scripts = ["flux", "rendu (studio-rendu)", "controle", "publier_youtube", "publier_autres_reseaux", "synchro_rendu", "diagnostic_es"]
 equipe = ["auteur", "programmateur", "repondeur"]
 +++
 # Chef de Contenu et flux
@@ -31,6 +31,7 @@ Le nombre de sujets à écrire la semaine suivante (dans le budget), les retours
 
 ## Outils
 Lecture du registre, écriture des fiches de son équipe (Consignes, Retours).
+- `diagnostic_es` (`agents/diagnostic_es.py`, demande #54, reprend la PR #42) : compare les réglages YouTube de es et de pt (public enfants, langue, pays, visibilité et statut des vidéos, restrictions, catégorie, licence) et écrit les écarts dans sa sortie. Avec `corriger`, met les vidéos de es aux réglages de pt (catégorie, langue, licence, public enfants, intégration), sans jamais changer la visibilité. Les réglages de la chaîne (pays, langue) restent dans le rapport : les jetons n'ont pas le droit de les écrire. Les clés `YT_TOKEN_ES` et `YT_TOKEN_PT` ne sont pas encore accordées à ce script (`organisation/autorisations.toml`, Jules)
 
 ## Secrets et permissions
 Aucun jeton de chaîne : ses scripts reçoivent leurs propres secrets à leur étape.
