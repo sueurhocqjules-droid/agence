@@ -9,13 +9,14 @@ Envoi : une issue du dépôt agence qui mentionne Jules (la mention déclenche l
 et une copie dans registre/bilans/. En tête, les sections écrites le dimanche par la Direction et le critique.
 """
 import json
+import re
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from agence import (contacts, delais, guichet, lancer, mesures, questions, registre, suivi_ecarts, telegram,
-                    youtube)
+from agence import (contacts, delais, guichet, lancer, mesures, protege, questions, registre, suivi_ecarts,
+                    telegram, youtube)
 from agents import analyste, guetteur, surete
 
 DEPOT = "sueurhocqjules-droid/agence"
@@ -64,6 +65,34 @@ def _lire_github(lecture, quoi):
         return None
 
 
+def prs_a_valider(gh=None):
+    """Les PR ouvertes du dépôt qui attendent Jules, lues sur GitHub à l'instant (aucune liste gardée ailleurs) :
+    elles touchent un fichier protégé (l'accord de Jules, puis sa fusion) ou sont en conflit. Chacune a son lien
+    et sa demande d'origine (« Demande #N » dans son texte)."""
+    gh = gh or guichet._gh
+    lues = json.loads(gh("api", "-X", "GET", f"repos/{DEPOT}/pulls", "-f", "state=open", "-f", "per_page=100") or "[]")
+    attend = []
+    for p in lues:
+        n = p["number"]
+        fichiers = json.loads(gh("api", "-X", "GET", f"repos/{DEPOT}/pulls/{n}/files", "-f", "per_page=100") or "[]")
+        raisons = []
+        protegees = protege.refus([(f["filename"], f["status"], f.get("previous_filename") or "") for f in fichiers])
+        if protegees:
+            evenements = json.loads(gh("api", "-X", "GET", f"repos/{DEPOT}/issues/{n}/events", "-f", "per_page=100") or "[]")
+            donne = protege.accord([(e["event"], e["label"]["name"], e["actor"]["login"]) for e in evenements
+                                    if e["event"] in ("labeled", "unlabeled")])
+            raisons.append("touche un fichier protégé, " + ("accord donné, à fusionner par toi" if donne
+                                                            else f"étiquette `{protege.ACCORD}` absente"))
+        detail = json.loads(gh("api", f"repos/{DEPOT}/pulls/{n}") or "{}")
+        if detail.get("mergeable_state") == "dirty" or detail.get("mergeable") is False:
+            raisons.append("en conflit")
+        if raisons:
+            d = re.search(r"Demande #(\d+)", p.get("body") or "")
+            attend.append({"numero": n, "titre": p["title"], "lien": p["html_url"], "raisons": raisons,
+                           "demande": int(d.group(1)) if d else None})
+    return attend
+
+
 def _sous_section(lignes):
     """Un bloc écrit avec un titre « ## » passe en « ### » sous l'une des six parties."""
     return [("#" + l) if l.startswith("## ") else l for l in lignes]
@@ -92,9 +121,10 @@ def organisation_faite(decisions, debut, fin):
     return lignes
 
 
-def page(maintenant, demandes=None, attente=None, fermees=None):
-    """La page du lundi, dans l'ordre fixé par la Gouvernance (ORDRE). `demandes` (guichet), `attente` (contacts)
-    et `fermees` (demandes du guichet closes) sont lues sur GitHub si elles ne sont pas données."""
+def page(maintenant, demandes=None, attente=None, fermees=None, prs=None):
+    """La page du lundi, dans l'ordre fixé par la Gouvernance (ORDRE). `demandes` (guichet), `attente` (contacts),
+    `fermees` (demandes du guichet closes) et `prs` (PR ouvertes qui attendent Jules) sont lues sur GitHub
+    si elles ne sont pas données."""
     debut, fin = periode(maintenant)
     reglages = surete.seuils()
     c = surete.compteur(fin - timedelta(seconds=1), registre.lire("couts"), surete.couts_atelier(), reglages, fin=fin)
@@ -107,6 +137,8 @@ def page(maintenant, demandes=None, attente=None, fermees=None):
     if fermees is None:
         fermees = [d for d in _lire_github(guichet.toutes, "demandes fermées") or []
                    if d["ferme"] and debut <= quand(d["ferme"].replace("Z", "+00:00")) < fin]
+    if prs is None:
+        prs = _lire_github(prs_a_valider, "PR ouvertes")
     toutes_questions = questions.etat_questions(registre.lire("questions")).values()
     ouvertes = [q for q in toutes_questions if q["etat"] == "ouverte"]
     decisions = registre.decisions()
@@ -114,7 +146,15 @@ def page(maintenant, demandes=None, attente=None, fermees=None):
 
     lignes += [f"## {ORDRE[0]}", ""]
     lignes += [f"- {q['texte']} (Oui : {questions.en_clair(q['si_oui'])}), à trancher par les boutons Telegram"
-               for q in ouvertes] or ["- Rien. Tu n'as rien à trancher cette semaine."]
+               for q in ouvertes]
+    if prs is None:
+        lignes.append("- Liste des PR illisible ce matin : voir les PR ouvertes du dépôt")
+    else:
+        lignes += [f"- PR [#{x['numero']}]({x['lien']}) {x['titre']} : {', '.join(x['raisons'])}"
+                   + (f" (demande d'origine : [#{x['demande']}](https://github.com/{DEPOT}/issues/{x['demande']}))"
+                      if x["demande"] else "") for x in prs]
+    if not ouvertes and prs == []:
+        lignes.append("- Rien. Tu n'as rien à trancher cette semaine.")
     if guichet.derogation(fin):   # Gouvernance, « Dérogation des premières semaines » : une fois, au bilan prévu
         lignes.append("- Création des comptes : jusqu'ici tu les crées tous. La Direction propose dans son mot (partie 4) "
                       "ce que l'agence pourrait traiter seule. À discuter dans Jarvis, rien ne change sans toi")
@@ -214,7 +254,7 @@ def page(maintenant, demandes=None, attente=None, fermees=None):
                f"- Décisions jugées sur les vrais chiffres : {justes} juste(s), {fausses} fausse(s), "
                f"{indeterminees} indéterminée(s)"]
     lignes += ["", "_Chiffres écrits par script, sans modèle. Le mot de la Direction et le critique sont écrits le dimanche soir._"]
-    a_faire = [f"{n} {nom}" for n, nom in ((len(ouvertes), "à valider"), (len(attente or []), "contact(s) en attente"),
+    a_faire = [f"{n} {nom}" for n, nom in ((len(ouvertes) + len(prs or []), "à valider"), (len(attente or []), "contact(s) en attente"),
                                              (len(demandes or []), "demande(s) au guichet")) if n]
     resume = (f"Bilan de la semaine : +{total} vues, {prog} vidéos programmées, {c['dollars']:.2f} $ Claude, "
               f"{', '.join(a_faire) or 'rien à faire'}."

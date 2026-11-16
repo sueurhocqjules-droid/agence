@@ -33,7 +33,7 @@ Décisions au journal d'audit avec leur prédiction. Demandes à l'Ingénierie (
 Lecture du registre et des fiches, écriture des fiches de ses subordonnés (Consignes, Retours), journal d'audit. Ni web, ni publication.
 
 ## Secrets et permissions
-La séance Claude n'a aucun outil (ni web, ni fichiers, ni commandes) : elle ne voit que le dossier et rend une réponse au format fixé. Le script autour applique cette réponse par choix fermés et détient seul les jetons (Telegram pour les questions, GitHub pour lire les demandes). Le mail du lundi part par le script `bilan`.
+La séance Claude n'a aucun outil (ni web, ni fichiers, ni commandes) : elle ne voit que le dossier et rend une réponse au format fixé. Le script autour applique cette réponse par choix fermés et détient seul les jetons (Telegram pour les questions, GitHub pour lire les demandes). Le mail du lundi part par le script `bilan`. Sa partie « à valider » lit en direct, par l'API GitHub au moment de l'envoi, les PR ouvertes qui attendent Jules (fichier protégé touché, ou conflit), avec leur lien et leur demande d'origine, en plus des questions Oui/Non ouvertes : aucune liste n'est reprise d'un dossier de la Direction.
 
 ## Mesure de réussite
 Progression des 4 objectifs d'une semaine à l'autre : revenu, % de la limite hebdomadaire, nombre d'interventions de Jules, part de ses propres prédictions jugées justes par le critique.
