@@ -12,6 +12,7 @@ permissions:
   contents: write
   actions: write      # la Sûreté compte les minutes GitHub du mois ; les délais lancent l'Ingénierie (workflow_dispatch)
   issues: write       # guichet et contacts : demandes écrites par l'agence, commentaire et fermeture d'un contact envoyé
+  pull-requests: read # PR qui attendent l'accord de Jules (agence/accords.py)
 
 concurrency:
   group: registre     # un seul écrivain du registre à la fois
@@ -69,8 +70,17 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FUSION_TOKEN: ${{ secrets.FUSION_TOKEN }}   # Oui de Jules sur une PR protégée : étiquette et fusion en son nom
           PYTHONUTF8: "1"
         run: python -m agence.lancer reponses relever
+      - name: PR qui attendent l'accord de Jules (question Telegram)
+        if: ${{ !cancelled() }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_TOKEN: ${{ github.token }}
+          PYTHONUTF8: "1"
+        run: python -m agence.lancer accords
       - name: Stats des chaînes
         if: ${{ !cancelled() }}
         env:

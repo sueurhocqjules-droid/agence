@@ -5,8 +5,8 @@ superieur = "chef-contenu"
 objectifs = [1, 4]
 statut = "en_service"
 etape = 4
-moteur = "Claude Opus sur GitHub (chaines-studio, atelier.yml), une séance par semaine. Remplaçant gratuit cherché par la Recherche"
-reveil = "lundi 2h"
+moteur = "Claude Opus sur GitHub (chaines-studio, atelier.yml), une séance chaque nuit tant que le plan de la semaine n'est pas atteint et que le budget suit. Remplaçant gratuit cherché par la Recherche"
+reveil = "chaque nuit, 2h"
 regle_de_deux = "[A][C] : lit le web, ses sujets seront publiés. Pas de [B] : lecture des secrets interdite (/proc, .git, dossiers temporaires), jeton du dépôt réservé à l'étape de commit"
 secrets = ["CLAUDE_CODE_OAUTH_TOKEN (pour tourner, illisible par la séance)"]
 budget = { claude_usd_semaine = 30, appels_gratuits_jour = 0 }
