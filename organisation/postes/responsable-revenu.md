@@ -52,3 +52,4 @@ Le revenu en € (objectif 1). En attendant : chaque chaîne a sa voie et son be
 
 ## Retours
 - 2026-11-15, direction : Voies bien chiffrées. Confirme cette semaine à leur source officielle les règles tiktok_recompenses et meta_monetisation. Ajoute pour chaque chaîne la distance aux seuils de ces réseaux dès que leurs stats sont branchées.
+- 2026-11-16, direction : Les voies sont bien chiffrées. Les comptes d'affiliation partent au guichet cette semaine. Confirme tiktok_recompenses et meta_monetisation à leur source, et rappelle que sur un Short, le lien cliquable va dans le profil.
