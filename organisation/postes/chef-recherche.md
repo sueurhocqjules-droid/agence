@@ -47,3 +47,4 @@ Propositions retenues par la Direction, puis jugées justes par le critique.
 
 ## Retours
 - 2026-11-15, direction : 2 propositions sur 3 avaient une preuve qui ne correspondait pas au titre : aucune n'est retenue. Le titre, la source et l'économie doivent venir de preuves_chiffrees. Une publicité de marque n'est pas un concept. Priorité de la semaine : des programmes d'affiliation pour en et pt.
+- 2026-11-16, direction : Les besoins d'affiliation n'ont reçu aucune option en 50 h : c'était la priorité. Tu passes en réveil quotidien. Chaque proposition reprend le titre, la source et les chiffres de preuves_chiffrees, et cherche aussi des plateformes, des comptes et des options payantes à proposer.
