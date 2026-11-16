@@ -5,7 +5,8 @@
                                      [--conseil "<ce qui aide Jules à choisir>"] [--par <agent>]
 
 Une action est `rien`, `pause:<cible>` ou `reprise:<cible>`, avec une cible connue : agent, script, `tout`
-ou `chaine:<langue>`. Rien d'autre ne peut sortir d'un clic. Questions dans registre/questions.csv
+ou `chaine:<langue>`, ou `accord:<n>` / `refus:<n>` pour une PR qui touche un fichier protégé (agence/accords.py).
+Rien d'autre ne peut sortir d'un clic. Questions dans registre/questions.csv
 (la dernière ligne d'une question fait foi), décalage Telegram dans registre/telegram.json.
 """
 import argparse
@@ -36,14 +37,19 @@ def verifier(action):
     if action == "rien":
         return
     genre, _, cible = action.partition(":")
+    if genre in ("accord", "refus") and cible.isdigit():
+        return
     if genre not in ("pause", "reprise") or cible not in cibles_connues():
-        raise ValueError(f"Action refusée : {action!r} (rien, pause:<cible> ou reprise:<cible>)")
+        raise ValueError(f"Action refusée : {action!r} (rien, pause:<cible>, reprise:<cible>, accord:<n> ou refus:<n>)")
 
 
 def appliquer(action, raison):
     verifier(action)
-    if action != "rien":
-        genre, _, cible = action.partition(":")
+    genre, _, cible = action.partition(":")
+    if genre in ("accord", "refus"):
+        from agence import accords   # import tardif : accords importe ce module
+        (accords.accepter if genre == "accord" else accords.refuser)(cible)
+    elif action != "rien":
         registre.pause(cible, "jules", raison, action=genre)
 
 
@@ -73,6 +79,10 @@ def en_clair(action):
     if action == "rien":
         return "rien ne change"
     genre, _, cible = action.partition(":")
+    if genre == "accord":
+        return f"je pose ton étiquette accord-jules sur la PR #{cible} et je la fusionne"
+    if genre == "refus":
+        return f"je ferme la PR #{cible}, l'agence reprend la demande autrement"
     return f"{'je relance' if genre == 'reprise' else 'je mets en pause'} {decrire(cible)}"
 
 
@@ -106,8 +116,8 @@ def poser(texte, si_oui, si_non="rien", par="direction", pourquoi="", conseil=""
     verifier(si_non)
     if si_oui == "rien" and si_non == "rien":
         raise ValueError("Un clic doit changer quelque chose : Oui et Non ne peuvent pas valoir tous deux « rien ». "
-                         "Pour un accord sur une clé ou un fichier protégé, dire à Jules quelle PR étiqueter "
-                         "« accord-jules », avec son lien")
+                         "Pour un accord sur un fichier protégé, la question part seule (agence/accords.py, "
+                         "Oui = étiquette accord-jules et fusion)")
     ouvertes = etat_questions(registre.lire("questions"))
     base = datetime.now(timezone.utc).strftime("%m%d-%H%M")
     ident = next(f"{base}-{n}" for n in range(1, 100) if f"{base}-{n}" not in ouvertes)
@@ -150,7 +160,12 @@ def relever():
             continue
         reponse = trouve.group(2)
         action = question["si_oui"] if reponse == "oui" else question["si_non"]
-        appliquer(action, f"réponse {reponse} de Jules à : {question['texte']}")
+        try:
+            appliquer(action, f"réponse {reponse} de Jules à : {question['texte']}")
+            fait = f"C'est fait : {en_clair(action)}."
+        except RuntimeError as e:  # fusion refusée par GitHub, clé absente : Jules le voit, le clic n'est pas rejoué
+            fait = f"Pas pu le faire ({e})."
+            print(f"Réponse {reponse} à {question['id']} non appliquée : {e}")
         question = {**question, "date": registre.maintenant(), "etat": "repondue", "reponse": reponse}
         registre.ajouter("questions", [question])
         questions[question["id"]] = question
@@ -158,7 +173,7 @@ def relever():
         print(f"Réponse {reponse} à {question['id']} : {action}")
         _accuser(id_clic, f"Bien reçu : {reponse}")
         try:
-            telegram.remplacer(int(id_message), f"{question['texte']}\n\nTa réponse : {reponse.upper()}. C'est fait : {en_clair(action)}.")
+            telegram.remplacer(int(id_message), f"{question['texte']}\n\nTa réponse : {reponse.upper()}. {fait}")
         except RuntimeError as e:
             print(f"Message non mis à jour : {e}")
     DECALAGE.write_text(json.dumps({"decalage": prochain}) + "\n", encoding="utf-8")
