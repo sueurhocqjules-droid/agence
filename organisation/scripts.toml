@@ -20,7 +20,14 @@ secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT", "GH_TOKEN", "META_TOKEN"
 proprietaire = "surete"
 module = "agence.questions"
 description = "la lecture de tes réponses Telegram"
-secrets = ["TELEGRAM_BOT_TOKEN"]
+secrets = ["TELEGRAM_BOT_TOKEN", "FUSION_TOKEN"]
+hors_pause = true
+
+[accords]
+proprietaire = "surete"
+module = "agence.accords"
+description = "les questions Telegram sur les PR qui touchent un fichier protégé"
+secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
 hors_pause = true
 
 [garde_fous]
