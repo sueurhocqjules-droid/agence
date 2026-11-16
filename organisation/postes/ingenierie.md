@@ -52,3 +52,4 @@ Part des demandes fusionnées seules, délai entre la demande et la fusion (cibl
 
 ## Retours
 - 2026-11-15, direction : 5 échecs sur 13 passages, dont deux en code 1 le 15/11 sans cause écrite. Avant tout le reste : la lecture des demandes de Jules, puis le diagnostic de la chaîne es. Les PR #22 et #23 attendent Jules, c'est normal.
+- 2026-11-16, direction : 13 échecs, dont celui du 16/11 encore ouvert : commence par écrire sa cause. Ensuite, dans l'ordre : GH_TOKEN, la PR #42 reconstruite, le rythme, la liste « à valider » lue en direct.
