@@ -1,4 +1,4 @@
 # Plan de la semaine, écrit par le Chef de contenu (agents/chef_contenu.py) : l'atelier (chaines-studio) le lit le lundi.
 semaine = "2026-11-23"
 nombre_de_sujets = 8
-pourquoi = "maximiser les vues tout en respectant le budget de 30 $ et garantir un stock de plus de 7 jours"
+pourquoi = "maximiser les vues avec le budget disponible en reproduisant le format qui a déjà prouvé son efficacité"
