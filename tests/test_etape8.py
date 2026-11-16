@@ -69,8 +69,10 @@ class ChefRecherche(unittest.TestCase):
         for nom, p in cas.items():
             with self.subTest(nom):
                 self.assertEqual([len(x) for x in chef_recherche.valider({"propositions": [p]}, self.SOURCES, {})], [0, 1])
-        gardes, ecartes = chef_recherche.valider({"propositions": [self.BON] * 5}, self.SOURCES, {})
-        self.assertEqual((len(gardes), len(ecartes)), (1, 2))   # 3 lues au plus, une source une fois
+        n = chef_recherche.MAX_PROPOSITIONS + 2
+        gardes, ecartes = chef_recherche.valider({"propositions": [self.BON] * n}, self.SOURCES, {})
+        # MAX_PROPOSITIONS lues au plus, une source une fois
+        self.assertEqual((len(gardes), len(ecartes)), (1, chef_recherche.MAX_PROPOSITIONS - 1))
         self.assertEqual(chef_recherche.valider({}, self.SOURCES, {}), ([], []))
 
     def test_notre_mediane(self):
@@ -98,9 +100,10 @@ class ChefOperations(unittest.TestCase):
         reponse = {"ligne": "tout va — bien", "retours": [{"poste": "maintenance", "texte": "ok"},
                                                           {"poste": "maintenance", "texte": "encore"},
                                                           {"poste": "direction", "texte": "non"}],
-                   "reparations": [{"quoi": "q", "pourquoi": "p"}] * 5 + [{"quoi": ""}]}
+                   "reparations": [{"quoi": "q", "pourquoi": "p"}] * (chef_operations.MAX_REPARATIONS + 2) + [{"quoi": ""}]}
         ligne, retours, reparations, ecartes = chef_operations.valider(reponse, ["maintenance", "expert-modeles"])
-        self.assertEqual((ligne, len(retours), len(reparations), len(ecartes)), ("tout va, bien", 1, 3, 2))
+        self.assertEqual((ligne, len(retours), len(reparations), len(ecartes)),
+                         ("tout va, bien", 1, chef_operations.MAX_REPARATIONS, 2))
 
     def test_retour_seulement_sur_un_probleme(self):
         calcul = {"agents": {"courrier": {"ok": 6, "echec": 0, "refuse": 0}, "maintenance": {"ok": 1, "echec": 0, "refuse": 0}},

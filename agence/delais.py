@@ -21,7 +21,7 @@ from datetime import datetime, timedelta, timezone
 from agence import besoins, catalogue, mesures, registre
 
 CIBLE_H = {1: 72, 2: 168}     # MISSION.md, « Le délai se mesure » : 72 h en classe 1, une semaine en classe 2
-DEPARTS_MAX = 1               # par passage : chaque départ est un lancement de l'Ingénierie, dans son budget
+DEPARTS_MAX = 3               # par passage : chaque départ est un lancement de l'Ingénierie, dans son budget
 JOURS_MESURE = 28
 
 

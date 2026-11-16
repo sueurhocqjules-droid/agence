@@ -8,10 +8,10 @@ module = "agents.direction"
 env = ["CLAUDE_CODE_OAUTH_TOKEN", "TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
 etape = 7
 moteur = "Claude Opus, une séance par semaine"
-reveil = "dimanche soir, après le critique"
+reveil = "selon organisation/rythme.toml (1 à 4 séances par jour, choisi par la Direction), dimanche soir compris"
 regle_de_deux = "[C] seulement : la séance Claude n'a aucun outil et lit des données structurées ; le script qui l'entoure détient le jeton Telegram (questions) et GitHub (issues equipe:direction)"
 secrets = ["CLAUDE_CODE_OAUTH_TOKEN (pour tourner)", "TELEGRAM_BOT_TOKEN et GH_TOKEN (script autour de la séance)"]
-budget = { claude_usd_semaine = 8, appels_gratuits_jour = 0 }
+budget = { claude_usd_semaine = 25, appels_gratuits_jour = 0 }   # 8 $ relevés à 25 $ le 16/11 : jusqu'à 4 séances par jour au lancement (rythme.toml)
 scripts = ["bilan"]
 equipe = ["chef-contenu", "chef-recherche", "chef-operations", "surete", "guetteur", "analyste", "directeur-financier", "ingenierie", "responsable-organisation", "responsable-revenu", "stratege"]
 +++
