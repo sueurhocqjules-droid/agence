@@ -76,8 +76,13 @@ def _git(dossier, *args, auth=False, check=True):
         jeton = base64.b64encode(f"x-access-token:{os.environ['GH_TOKEN']}".encode()).decode()
         env |= {"GIT_CONFIG_COUNT": "1", "GIT_CONFIG_KEY_0": "http.https://github.com/.extraheader",
                 "GIT_CONFIG_VALUE_0": f"AUTHORIZATION: basic {jeton}"}
-    return subprocess.run(["git", "-C", str(dossier), *args], env=env, capture_output=True, text=True,
-                          encoding="utf-8", check=check)
+    try:
+        return subprocess.run(["git", "-C", str(dossier), *args], env=env, capture_output=True, text=True,
+                              encoding="utf-8", check=check)
+    except subprocess.CalledProcessError as e:
+        # git garde sa raison dans stderr, que la trace Python ne montre pas : on la dit, sans le jeton (il n'est que dans l'env)
+        raison = " ".join((e.stderr or "").split())[-300:] or f"code {e.returncode}"
+        sys.exit(f"git {args[0]} a échoué : {raison}")
 
 
 def _sortir(**valeurs):
