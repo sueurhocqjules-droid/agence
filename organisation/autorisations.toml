@@ -24,7 +24,7 @@ META_TOKEN = ["flux"]
 BUFFER_API_KEY = ["flux"]
 THREADS_CLE = ["flux"]
 # Jeton du workflow GitHub (droits fixés par chaque workflow)
-GH_TOKEN = ["flux", "garde_fous", "bilan", "guichet", "contacts", "delais", "chef-contenu", "chercheur-outils", "direction", "ingenierie", "responsable-organisation", "critique"]
+GH_TOKEN = ["flux", "garde_fous", "bilan", "guichet", "contacts", "delais", "chef-contenu", "chercheur-outils", "direction", "ingenierie", "responsable-organisation", "critique", "stratege"]
 # Bot Telegram : messages à Jules seulement
 TELEGRAM_BOT_TOKEN = ["reponses", "garde_fous", "bilan", "guichet", "courrier", "guetteur", "direction"]
 # Boîte prod.hack05 : lecture et filtres, rien d'autre
