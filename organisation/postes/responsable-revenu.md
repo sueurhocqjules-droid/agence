@@ -28,6 +28,8 @@ Le critère de choix est la voie qui rapporte le plus tôt vers les 50 € par m
 ## Entrées
 Les pages officielles des plateformes (liste `REGLES` du module, lecture publique sans clé), la photo des seuils du Guetteur (`registre/seuils.json`), les signaux de diffusion des chaînes (`registre/stats.csv`). `organisation/MEMOIRE.md` quand elle existe, avant toute réorientation.
 
+Quand le besoin d'une chaîne en voie `affiliation` passe le délai de 48 h sans aucune option, le script dépose au guichet (`agence/guichet.py`, format fixe, une seule fois par titre) une demande de compte de programme d'affiliation au nom de la chaîne : Amazon Associates US pour `en`, Amazon Associados Brasil pour `pt` (`PROGRAMMES`). Le rappel d'une adresse distincte par chaîne y est ajouté par le guichet. Une fois le compte créé, Jules donne le lien : il se met dans le champ `lien_affiliation` de la chaîne, dans `chaines-studio` (vide par défaut ; rempli, il ajoute au profil et aux descriptions le lien et la mention de promotion payée).
+
 ## Sorties
 `registre/regles-plateformes.md` (chaque règle, sa source officielle, sa date de confirmation, et la voie de chaque chaîne), son état dans `registre/regles-plateformes.json`, `registre/revenu.jsonl` (voie par chaîne et pourquoi), un besoin chiffré par chaîne (`besoins.exprimer`, identifiant `responsable-revenu-<chaîne>`), une décision au journal d'audit, avec prédiction et échéance, quand une voie change, ou qu'une règle est à relire. La Direction lit la dernière ligne de `revenu.jsonl` dans son dossier.
 
