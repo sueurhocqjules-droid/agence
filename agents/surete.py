@@ -77,6 +77,15 @@ def compteur(maintenant, couts, atelier, reglages, fin=None):
             "pourcent": total / etalon if etalon else None, "atelier_lu": atelier is not None}
 
 
+def part_semaine(maintenant, reglages):
+    """Dollars que l'agence peut dépenser cette semaine. None pendant le lancement (carte blanche : seule la réserve de
+    Jules compte, lue en direct par l'anti-emballement du Pilote)."""
+    cl = reglages["claude"]
+    if maintenant < cl["lancement_jusqu_au"]:
+        return None
+    return float(cl["part_pourcent"]) * float(cl["dollars_par_pourcent"])
+
+
 def minutes_github(maintenant):
     """Minutes du mois des dépôts privés (durée des runs, arrondie à la minute). None si l'API n'est pas joignable."""
     total = 0
@@ -177,9 +186,8 @@ def alerter_portee(s, stats, maintenant):
     """Une alerte par chaîne mal diffusée et par semaine, tant que ça dure ; la suite dit qui s'en occupe."""
     semaine = f"{lancer.debut_semaine(maintenant):%Y-%m-%d}"
     for p in mesures.signaux_portee(stats, maintenant):
-        suite = ("La Direction te propose ses solutions dans le mail de lundi, et te demande de trancher si c'est une "
-                 "refonte ou une fermeture de la chaîne." if p["semaines"] >= mesures.SEMAINES_AVANT_JULES else
-                 "La Direction cherche la cause et décide des remèdes dimanche. Rien à faire pour l'instant.")
+        suite = ("Le Pilote le voit dans le tableau de bord et décide de la suite (refonte, pause ou fermeture)."
+                 if p["semaines"] >= mesures.SEMAINES_AVANT_JULES else "Le Pilote cherche la cause. Rien à faire pour l'instant.")
         s.alerter(f"portee:{p['chaine']}:{p['signal']}:{semaine}", "diffusion",
                   f"{p['texte'][0].upper() + p['texte'][1:]}. {suite}")
 
@@ -201,24 +209,20 @@ def passage(essai):
         if not essai:
             registre.pause(cible, "surete", f"nouvelle semaine ({c['semaine']}) : le compteur repart à zéro", action="reprise")
             questions.clore(f"reprise:{cible}", f"nouvelle semaine, {questions.decrire(cible)} a repris tout seul.")
-    if c["hors_reserve"] >= cl["pause_usd_semaine"]:
+    plafond = part_semaine(maintenant, reglages)
+    if plafond is not None and c["hors_reserve"] >= plafond:
         for cible in cl["pause_cibles"]:
             s.mettre_en_pause(
-                cible, f"{marque} : {c['dollars']:.2f} $ Claude, plafond {cl['pause_usd_semaine']} $",
+                cible, f"{marque} : {c['dollars']:.2f} $ Claude, part de la semaine {plafond:.0f} $",
                 f"Je relance {questions.decrire(cible)} malgré le plafond de la semaine ?",
-                f"depuis lundi, l'agence a dépensé {c['dollars']:.2f} $ équivalent Claude ({detail}). J'arrête à "
-                f"{cl['pause_usd_semaine']} $ pour rester sous 20 % de ta limite hebdomadaire, et il n'y a pas que les "
-                f"chaînes qui s'en servent. Donc j'ai mis en pause {questions.decrire(cible)}, le seul à consommer Claude. "
-                f"Les vidéos déjà rendues continuent de sortir.",
+                f"depuis vendredi 23 h UTC, l'agence a dépensé {c['dollars']:.2f} $ équivalent Claude ({detail}), soit sa "
+                f"part de {cl['part_pourcent']} % de ta limite hebdomadaire. Donc j'ai mis en pause "
+                f"{questions.decrire(cible)}, le seul à consommer Claude. Les vidéos déjà rendues continuent de sortir.",
                 "Oui si tu acceptes de dépasser cette semaine (par exemple si tu n'as pas besoin de Claude pour autre chose). "
-                "Non si tu préfères garder ta marge : la pause se lève toute seule lundi, quand le compteur repart à zéro.")
-    if c["hors_reserve"] >= cl["alerte_usd_semaine"]:
-        s.alerter(f"claude:{c['semaine']}", "budget", f"{c['dollars']:.2f} $ équivalent Claude depuis lundi{part} "
-                  f"({detail}). Je te préviens à {cl['alerte_usd_semaine']} $, j'arrête l'atelier à {cl['pause_usd_semaine']} $. "
-                  f"Rien à faire pour l'instant.")
-    if c["pourcent"] is not None and c["pourcent"] >= cl["limite_pourcent"]:
-        s.alerter(f"limite:{c['semaine']}", "budget", f"L'agence a passé {cl['limite_pourcent']} % de ta limite "
-                  f"hebdomadaire ({c['pourcent']:.1f} %).")
+                "Non si tu préfères garder ta marge : la pause se lève toute seule vendredi soir, quand le compteur repart à zéro.")
+    elif plafond is not None and c["hors_reserve"] >= plafond * cl["alerte_part_pourcent"] / 100:
+        s.alerter(f"claude:{c['semaine']}", "budget", f"{c['dollars']:.2f} $ équivalent Claude depuis vendredi{part} "
+                  f"({detail}), sur une part de {plafond:.0f} $. Rien à faire pour l'instant.")
 
     minutes = minutes_github(maintenant)
     if minutes is not None:

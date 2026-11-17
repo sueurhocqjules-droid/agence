@@ -50,7 +50,7 @@ class Budget(unittest.TestCase):
         self.assertIn("semaine", lancer.budget_atteint("auteur", self.budget, couts, MERCREDI))
 
     def test_semaine_precedente_ignoree(self):
-        couts = [cout("auteur", datetime(2026, 11, 8, 23, tzinfo=timezone.utc), dollars=50)]
+        couts = [cout("auteur", datetime(2026, 11, 6, 22, tzinfo=timezone.utc), dollars=50)]
         self.assertIsNone(lancer.budget_atteint("auteur", self.budget, couts, MERCREDI))
 
     def test_appels_du_jour(self):

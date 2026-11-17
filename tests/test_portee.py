@@ -94,7 +94,7 @@ class AlerteSurete(unittest.TestCase):
 
     def test_ca_continue_solutions_a_jules(self):
         envoyees, _ = self.alertes(2)
-        self.assertIn("te propose ses solutions dans le mail de lundi", envoyees[0][2])
+        self.assertIn("Le Pilote le voit dans le tableau de bord", envoyees[0][2])
 
     def test_deja_envoyee_cette_semaine(self):
         cle = f"portee:es:panne:{surete.lancer.debut_semaine(A):%Y-%m-%d}"

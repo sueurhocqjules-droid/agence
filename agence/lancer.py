@@ -41,12 +41,14 @@ def pause_active(cibles, pauses):
 
 
 def debut_semaine(maintenant):
-    lundi = maintenant - timedelta(days=maintenant.weekday())
-    return lundi.replace(hour=0, minute=0, second=0, microsecond=0)
+    """Début de la semaine de l'abonnement Claude de Jules : le vendredi à 23 h UTC (relevé le 13/11/2026)."""
+    decale = maintenant - timedelta(hours=23)
+    vendredi = decale - timedelta(days=(decale.weekday() - 4) % 7)
+    return vendredi.replace(hour=23, minute=0, second=0, microsecond=0)
 
 
 def budget_atteint(nom, budget, couts, maintenant):
-    """Renvoie la raison si le budget est atteint, sinon None. Semaine = depuis lundi 0h UTC, jour = depuis 0h UTC."""
+    """Renvoie la raison si le budget est atteint, sinon None. Semaine = depuis vendredi 23 h UTC, jour = depuis 0 h UTC."""
     if not budget:
         return None
     semaine, jour = debut_semaine(maintenant), maintenant.replace(hour=0, minute=0, second=0, microsecond=0)

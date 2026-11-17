@@ -21,7 +21,7 @@ def cout(agent, quand, dollars=0, appels=0):
 
 class Compteur(unittest.TestCase):
     def test_semaine_en_cours_seulement(self):
-        couts = [cout("auteur", "2026-11-08T23:00:00+00:00", 50), cout("auteur", "2026-11-10T02:00:00+00:00", 14.2),
+        couts = [cout("auteur", "2026-11-06T22:00:00+00:00", 50), cout("auteur", "2026-11-10T02:00:00+00:00", 14.2),
                  cout("banc", "2026-11-10T21:00:00+00:00", 0, 4)]
         c = surete.compteur(MERCREDI, couts, None, REGLAGES)
         self.assertAlmostEqual(c["dollars"], 14.2)
@@ -37,7 +37,7 @@ class Compteur(unittest.TestCase):
         self.assertAlmostEqual(c["pourcent"], 6)
 
     def test_fin_exclut_la_semaine_suivante(self):
-        couts = [cout("auteur", "2026-11-12T00:00:00+00:00", 3), cout("auteur", "2026-11-16T02:00:00+00:00", 14)]
+        couts = [cout("auteur", "2026-11-14T00:00:00+00:00", 3), cout("auteur", "2026-11-16T02:00:00+00:00", 14)]
         c = surete.compteur(datetime(2026, 11, 15, 23, tzinfo=timezone.utc), couts, None, REGLAGES,
                             fin=datetime(2026, 11, 16, tzinfo=timezone.utc))
         self.assertAlmostEqual(c["dollars"], 3)
