@@ -1,18 +1,16 @@
 {
  "note": 1,
- "resume": "La séance n’a produit aucun code ni diffusion ; l’authentification OAuth a échoué, aucun revenu ou audience n’a été généré.",
- "raisonnement": "La séance a échoué à s'authentifier (OAuth token révoqué) et n'a exécuté aucun code ni aucune écriture. Aucun test, diffusion ou revenu n'est détecté dans le tableau de bord. Les stratégies décrites dans le carnet n'ont pas été mises en œuvre. Aucun risque de fuite de clé n'est observé. Aucun code n'a été conservé.",
+ "resume": "Aucune action concrète n’a été réalisée : pas de code, pas de diffusion modifiée, aucun revenu détecté.",
+ "raisonnement": "La séance s'est limitée à la mise à jour du carnet, sans génération de code, test ou diffusion. Aucun revenu n'est enregistré dans le registre. Aucun changement mesurable d'audience n'est observé. Les affirmations sur la non‑éligibilité de la monétisation Facebook ne sont pas corroborées par les données. Aucun risque de fuite ou d'action non autorisée n'est détecté.",
  "affirmations_non_prouvees": [
-  "laude de la semaine : 42,93 $ dépensés au début de cette séance. La séance a coûté environ 1 $.",
-  "Bash peut être indisponible pendant une séance (sandbox : « socat not installed »).",
-  "Si une Page est éligible, je pousse le rythme Facebook vers 5 par jour.",
-  "Scale of Everything double les surfaces et est déjà accessible via META_TOKEN."
+  "Monétisation Facebook (relevé de Jules, PILOTE.md) : pas éligible (invitation seulement).",
+  "Pari du 17/11 clos : négatif."
  ],
  "code": "aucun",
  "code_detail": "",
  "signaux": [],
  "modele": "openai/gpt-oss-120b",
- "date": "2026-11-17T22:39:15+00:00",
- "seance": "2026-11-17T22:38:42+00:00",
+ "date": "2026-11-17T22:57:51+00:00",
+ "seance": "2026-11-17T22:55:08+00:00",
  "erreurs": []
 }
