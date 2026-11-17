@@ -1,13 +1,32 @@
 """Tests de la diffusion Instagram et Facebook de l'agent flux, sans appel réseau.  python -m unittest discover tests"""
+import tempfile
 import unittest
 from datetime import datetime, timezone
+from pathlib import Path
 from unittest import mock
 
-from agence import meta
+from agence import meta, registre
 from agents import flux
 
 MAINTENANT = datetime(2026, 11, 13, 12, tzinfo=timezone.utc)
 SUJETS = ["volt", "coeur", "pluie"]
+
+
+_DOSSIER = None
+_PATCH = None
+
+
+def setUpModule():
+    """Le journal et le registre de ces tests sont un dossier temporaire, jamais le vrai registre."""
+    global _DOSSIER, _PATCH
+    _DOSSIER = tempfile.TemporaryDirectory()
+    _PATCH = mock.patch.object(registre, "DOSSIER", Path(_DOSSIER.name))
+    _PATCH.start()
+
+
+def tearDownModule():
+    _PATCH.stop()
+    _DOSSIER.cleanup()
 
 
 def sujet(s):
