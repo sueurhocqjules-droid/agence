@@ -82,3 +82,5 @@
 {"date": "2026-11-17T12:38:40+00:00", "quoi": "conclure", "resultat": "echec", "bloquant": "ouverte : PR #113 non fusionnée (le banc des agents n'est pas vert)"}
 {"date": "2026-11-17T12:38:06+00:00", "quoi": "ingenierie", "resultat": "ok", "code": 0, "duree_s": 92, "sortie": "ok : PR #114 pour la demande #109, 0.41 $ (6 fichier(s))"}
 {"date": "2026-11-17T12:39:56+00:00", "quoi": "conclure", "resultat": "echec", "bloquant": "ouverte : PR #114 non fusionnée (GitHub refuse la fusion, sans doute un conflit avec une PR fusionnée entre-temps : à reconstruire sur main (GraphQL: Head branch was modified. Review and try the merge again. (mergePullRequest)))"}
+{"date": "2026-11-17T13:15:46+00:00", "quoi": "ingenierie", "resultat": "ok", "code": 0, "duree_s": 56, "sortie": "ok : PR #119 pour la demande #118, 0.20 $ (4 fichier(s))"}
+{"date": "2026-11-17T13:22:23+00:00", "quoi": "conclure", "resultat": "echec", "bloquant": "attend Jules : PR #119 touche un fichier protégé (demande #118)"}
