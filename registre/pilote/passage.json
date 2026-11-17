@@ -1,0 +1,41 @@
+{
+ "debut": "2026-11-17T14:38:19+00:00",
+ "fin": "2026-11-17T14:40:33+00:00",
+ "cout_usd": 0.7588,
+ "jetons": 546490,
+ "tours": 24,
+ "erreur": null,
+ "resume": "J'ai écrit mon carnet et mon rapport. Bash était hors service pendant toute la séance (sandbox : « socat not installed »), donc je n'ai lancé ni les tests ni le lint, et je n'ai touché ni au code ni au studio.\n\n**Où en est l'objectif**\n- **Revenu encaissé : 0 €.**\n- **Audience :** environ 20 000 vues par semaine en anglais, 5 000 en portugais, presque rien en espagnol. Chaque vidéo anglaise plafonne entre 400 et 1 700 vues, aucune n'a décollé.\n- **YouTube :** l'accès anticipé au Programme Partenaire demande 3 millions de vues Shorts sur 90 jours. C'est hors de portée avant le 18/12, donc le premier euro doit venir d'ailleurs.\n\n**Ce que j'ai décidé**\n- **Une demande urgente à Jules :** lire l'onglet Monétisation des 4 Pages Facebook (Every Second, Cada Segundo, A Cada Segundo, Scale of Everything) et s'inscrire si un programme est proposé. Nos Pages publient déjà 2 Reels par jour. Les sources tierces ne s'accordent pas sur les conditions, et seul Jules peut les voir dans cet onglet. C'est la voie la plus courte que j'aie trouvée.\n- **#76 et #103 fermées :** pas de nouvelle chaîne tant que Scale of Everything n'est pas branchée. Une chaîne de plus, partie de zéro, ne rapporterait rien avant le 18/12.\n- **Affiliation reportée :** d'après des guides tiers que je n'ai pas pu vérifier chez YouTube, les liens ne sont pas cliquables dans le flux Shorts. Elle n'a guère d'intérêt avec cette audience.\n\n**Fichiers écrits**\n- `registre/pilote/carnet.md` : chiffres, stratégie, pari à mesurer le 20/11, plan de la prochaine séance.\n- `registre/pilote/rapport.json` : message à Jules, la demande, les deux fermetures.\n- `organisation/MEMOIRE.md` : deux leçons ajoutées. Le plafond d'audience YouTube, et la conduite à tenir quand Bash est en panne : aucun code dans la séance.\n\n**Prochaine séance**\n- Si Bash fonctionne : brancher Scale of Everything dans le flux. `agents/flux.py` part du principe que chaque sujet existe en anglais, espagnol et portugais, donc elle demande une vraie entrée à part, avec son test.\n- Si une Page Facebook est éligible : passer ses Reels de 2 à 4 par jour.\n- Comprendre pourquoi les meilleurs titres anglais font environ 1 400 à 1 700 vues et les pires moins de 250.\n\nLe rythme reste à 1 séance par jour, de nuit. Cette séance a coûté environ 0,70 $.\n\nSources :\n- [Buffer : How to Make Money on Facebook](https://buffer.com/resources/how-to-make-money-on-facebook/)\n- [SocialPilot : Facebook Professional Mode](https://www.socialpilot.co/blog/facebook-professional-mode)\n- [fluxnote : gagner de l'argent avec les Shorts sans YPP](https://fluxnote.io/guides/make-money-youtube-shorts-without-ypp)\n- [Adobe Stock : le processus de relecture](https://helpx.adobe.com/ie/stock/contributor/help/the-review-process.html)",
+ "message_jules": "Première séance du Pilote. Je n'avais pas de terminal (Bash en panne), donc je n'ai pas touché au code : Scale of Everything sera branchée à la prochaine séance où les tests tournent. Où on en est : 0 € encaissé. En anglais, ~20 000 vues par semaine, mais chaque vidéo plafonne vers 1 500 vues. Le seuil YouTube (3 millions de vues sur 90 jours) est hors de portée avant le 18/12. Le premier euro doit donc venir d'ailleurs. Le plus court : la monétisation des Reels Facebook, que nos Pages publient déjà chaque jour. Seul toi peux voir si elles y ont droit, d'où ma demande ci-dessous (5 minutes). J'ai fermé #76 et #103 : pas de nouvelle chaîne tant que Scale of Everything ne tourne pas.",
+ "demandes": [
+  {
+   "titre": "Lire l'onglet Monétisation des 4 Pages Facebook et s'inscrire si c'est proposé",
+   "quoi": "1) Ouvre https://www.facebook.com/professional_dashboard en agissant en tant que chaque Page : Every Second (1537802816072828), Cada Segundo (1517937254731092), A Cada Segundo (1522397427617458), Scale of Everything (1482225561638585). 2) Ouvre l'onglet « Monétisation » (ou Meta Business Suite > Monétisation). 3) Pour chaque Page, réponds ici en une ligne : éligible / pas éligible (et ce qui manque, avec les chiffres affichés) / invitation reçue. 4) Si « Monétisation du contenu » (ou Reels, ou Stars) propose de s'inscrire, inscris-toi : c'est gratuit.",
+   "pourquoi": "YouTube ne paiera rien avant le 18/12 (il faut 3 M de vues, nous en avons ~25 k par semaine). Facebook paie les Reels à la vue une fois la Page admise, et nos Pages publient déjà 2 Reels par jour. Les conditions changent d'une source à l'autre et ne se lisent que dans cet onglet.",
+   "debloque": "Si une Page est éligible : je passe ses Reels de 2 à 4 ou 5 par jour, et le premier revenu peut arriver avant le 18/12. Sinon : je sais exactement ce qui manque et je vise ce chiffre.",
+   "lien": "https://www.facebook.com/professional_dashboard",
+   "cout": "0 €",
+   "urgent": true
+  }
+ ],
+ "fermer": [
+  {
+   "numero": 76,
+   "raison": "Plus utile : Scale of Everything, créée le 17/11, n'est pas encore branchée. Une chaîne neuve de plus ne rapporterait rien avant le 18/12 et disperserait l'effort."
+  },
+  {
+   "numero": 103,
+   "raison": "Plus utile : même raison. Et l'affiliation ne rapporte rien sans audience ni lien cliquable (non cliquable dans les Shorts, lien de profil TikTok soumis à un seuil d'abonnés). À rouvrir si une chaîne atteint une audience qui le justifie."
+  }
+ ],
+ "trie": true,
+ "proteges_retires": [],
+ "code_retire": [],
+ "tests": "non lancés",
+ "relecture": "aucun code",
+ "gardes": [
+  "organisation/MEMOIRE.md",
+  "registre/pilote/carnet.md"
+ ],
+ "studio": "rien de neuf"
+}
