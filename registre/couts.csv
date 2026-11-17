@@ -305,3 +305,12 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-17T00:51:58+00:00,delais,0,0,0,0,"ok : aucun départ en essai, 0 besoin(s) en retard sur leur cible"
 2026-11-17T00:51:58+00:00,contacts,0,0,0,0,ok : aucun message validé à envoyer
 2026-11-17T00:52:02+00:00,guichet,1,0,0,0,"ok : 14 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : urgent #75, urgent #76"
+2026-11-17T11:23:01+00:00,reponses,1,0,0,0,ok : 0 réponse(s) de Jules
+2026-11-17T11:23:05+00:00,stats,3,0,0,0,"ok : 78 vidéos, 24899 vues"
+2026-11-17T11:23:08+00:00,garde_fous,8,0,0,0,"ok : 40.60 $ cette semaine, 0 alerte(s) envoyée(s)"
+2026-11-17T11:23:16+00:00,courrier,2,0,0,1,"ok : 2 mail(s) : 0 collaboration, 1 plateforme, 0 sanction, 1 autre ; 0 transmis"
+2026-11-17T11:23:18+00:00,flux,104,0,0,0,"ok : 12 programmées, 0 rejetées, 12 en rendu, 0 diffusées, 0 erreurs de diffusion"
+2026-11-17T11:25:02+00:00,guetteur,4,0,0,1,"ok : 1 commentaire(s) nouveau(x), 0 occasion(s) ; seuil le plus proche : Every Second (en) : 19 517 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
+2026-11-17T11:25:06+00:00,delais,0,0,0,0,"ok : aucun départ en essai, 0 besoin(s) en retard sur leur cible"
+2026-11-17T11:25:06+00:00,contacts,0,0,0,0,ok : aucun message validé à envoyer
+2026-11-17T11:25:10+00:00,guichet,3,0,0,0,"ok : 14 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : récapitulatif"
