@@ -7,6 +7,7 @@
 3. Refuse si son budget est atteint : dollars Claude de la semaine, appels gratuits du jour (champ budget de la fiche)
 4. Le lance avec ses seuls secrets : toute variable d'allure secrète qu'il n'a pas déclarée est retirée
 5. Note le passage au journal du responsable (registre/journal/<agent>.jsonl), et tout refus au journal d'audit
+   Un échec (code non nul) met les 20 dernières lignes de la sortie dans le bloquant
 """
 import json
 import os
@@ -89,6 +90,12 @@ def noter_journal(responsable, entree):
         f.write(json.dumps(entree, ensure_ascii=False) + "\n")
 
 
+def bloquant_echec(nom, code, sortie):
+    """Texte du bloquant d'un échec : la cause (les 20 dernières lignes de la sortie, erreurs comprises), pas un renvoi."""
+    fin = "\n".join(sortie[-20:])[-2000:]
+    return f"{nom} a échoué (code {code}) :\n{fin}" if fin.strip() else f"{nom} a échoué (code {code}), sortie vide"
+
+
 def lancer(nom, arguments):
     postes, liste_scripts = organisation.fiches(), organisation.scripts()
     responsable, module, declares, budget = preparer(nom, postes, liste_scripts)
@@ -133,7 +140,7 @@ def lancer(nom, arguments):
     if en_trop:
         entree["secrets_en_trop"] = en_trop
     if proc.returncode:
-        entree["bloquant"] = f"{nom} a échoué (code {proc.returncode}), voir la sortie"
+        entree["bloquant"] = bloquant_echec(nom, proc.returncode, sortie)
     noter_journal(responsable, entree)
     return proc.returncode
 
