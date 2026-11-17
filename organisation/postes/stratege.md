@@ -5,12 +5,12 @@ superieur = "direction"
 objectifs = [1, 2, 3, 4]
 statut = "en_service"
 module = "agents.stratege"
-env = ["CLAUDE_CODE_OAUTH_TOKEN"]
+env = ["CLAUDE_CODE_OAUTH_TOKEN", "GH_TOKEN"]
 etape = 12
 moteur = "Claude Opus, une séance par semaine, sans outil"
 reveil = "dimanche, avant le Responsable de l'organisation et la Direction (semaine.yml)"
-regle_de_deux = "[C] seulement : la séance Claude n'a aucun outil et lit des données structurées tirées du registre ; le script qui l'entoure écrit au registre (écarts, besoins, journal d'audit) et ne détient aucun autre jeton"
-secrets = ["CLAUDE_CODE_OAUTH_TOKEN (pour tourner)"]
+regle_de_deux = "[C] seulement : la séance Claude n'a aucun outil et lit des données structurées tirées du registre ; le script qui l'entoure écrit au registre (écarts, besoins, journal d'audit) et ne détient que le jeton du workflow, pour lire les issues de Jules"
+secrets = ["CLAUDE_CODE_OAUTH_TOKEN (pour tourner)", "GH_TOKEN (le script autour lit les demandes de Jules, issues equipe:direction ; sans lui la lecture échouait)"]
 budget = { claude_usd_semaine = 3, appels_gratuits_jour = 0 }
 scripts = []
 equipe = []
@@ -37,7 +37,7 @@ Chaque écart est aussi noté au journal d'audit avec sa prédiction : le Critiq
 Module `agents/stratege.py` (`--dossier` : ce qu'il lirait, sans séance ; `--essai` : séance réelle, rien écrit). Ni web, ni fichiers, ni commandes pendant la séance.
 
 ## Secrets et permissions
-La séance Claude n'a aucun outil : elle ne voit que le dossier et rend une réponse au format fixé. Le script l'applique par choix fermés. Il ne crée ni ne supprime de poste, n'ouvre ni issue ni compte, et ne touche à aucun fichier protégé : il propose, les postes qui en ont la charge décident.
+La séance Claude n'a aucun outil : elle ne voit que le dossier et rend une réponse au format fixé. Le script l'applique par choix fermés. Le jeton du workflow ne sert qu'à lire les issues de Jules (`agence.demandes`). Il ne crée ni ne supprime de poste, n'ouvre ni issue ni compte, et ne touche à aucun fichier protégé : il propose, les postes qui en ont la charge décident.
 
 ## Mesure de réussite
 Nombre d'écarts que Jules a dû trouver seul (vise 0). Part de ses écarts comblés dans leur échéance, et part de ses prédictions jugées justes par le Critique. Un écart déjà proposé et resté ouvert compte contre lui s'il le répète sans fait nouveau.
