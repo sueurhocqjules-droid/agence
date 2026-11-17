@@ -53,5 +53,9 @@ def accepter(numero):
 
 
 def refuser(numero):
+    jeton = _jeton()
+    pr = json.loads(_gh("pr", "view", str(numero), "-R", guichet.DEPOT, "--json", "state,headRefName", jeton=jeton))
+    if pr.get("state") != "OPEN" or not str(pr.get("headRefName", "")).startswith(BRANCHE):
+        raise RuntimeError(f"fermeture refusée : la PR #{numero} n'est pas une PR ouverte du Pilote")
     _gh("pr", "close", str(numero), "-R", guichet.DEPOT, "--delete-branch", "--comment",
-        "Refusée par Jules (Telegram). Le Pilote le voit à sa séance suivante.", jeton=_jeton())
+        "Refusée par Jules (Telegram). Le Pilote le voit à sa séance suivante.", jeton=jeton)

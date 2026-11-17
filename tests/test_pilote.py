@@ -139,6 +139,30 @@ class Garde(unittest.TestCase):
                 accords.accepter(42)
         self.assertEqual(gh.call_count, 1)
 
+    def test_un_nom_accentue_ou_avec_espace_est_lu_tel_quel(self):
+        with tempfile.TemporaryDirectory() as d:
+            git = self.depot(d)
+            (Path(d) / "a.txt").write_text("a", encoding="utf-8")
+            git("add", ".")
+            git("commit", "-qm", "init")
+            (Path(d) / "equipe").mkdir()
+            (Path(d) / "equipe" / "créneau à voir.py").write_text("x = 1\n", encoding="utf-8")
+            self.assertEqual(pilote.changements(d), ["equipe/créneau à voir.py"])
+
+    def test_refuser_ne_ferme_qu_une_pr_ouverte_du_pilote(self):
+        from agence import accords
+        for vue in ({"state": "OPEN", "headRefName": "main"}, {"state": "MERGED", "headRefName": "pilote/x"}):
+            with mock.patch.dict("os.environ", {"FUSION_TOKEN": "j"}), \
+                    mock.patch.object(accords, "_gh", side_effect=[json.dumps(vue), ""]) as gh:
+                with self.assertRaises(RuntimeError):
+                    accords.refuser(7)
+            self.assertEqual(gh.call_count, 1)
+        ouverte = json.dumps({"state": "OPEN", "headRefName": "pilote/x"})
+        with mock.patch.dict("os.environ", {"FUSION_TOKEN": "j"}), \
+                mock.patch.object(accords, "_gh", side_effect=[ouverte, ""]) as gh:
+            accords.refuser(7)
+        self.assertEqual(gh.call_args_list[1].args[:2], ("pr", "close"))
+
     def test_seules_ces_reponses_telegram_sont_acceptees(self):
         from agence import questions
         questions.verifier("accord:12")
@@ -161,6 +185,14 @@ class Plafonds(unittest.TestCase):
             jours.setdefault(q.date(), []).append(q.hour)
         self.assertTrue(all(len(h) <= flux.SORTIES_JOUR_MAX for h in jours.values()))
         self.assertEqual(flux.SORTIES_JOUR_MAX, 4)
+
+    def test_trop_d_heures_gardees_etalees_sur_la_journee(self):
+        from agents import flux
+        debut = datetime(2026, 11, 18, 0, tzinfo=timezone.utc)
+        jour = [q.hour for q, _ in zip(flux.creneaux([0, 1, 2, 3, 12, 18], set(), debut), range(4))]
+        self.assertEqual(len(jour), 4)
+        self.assertIn(0, jour)
+        self.assertIn(18, jour)
 
     def test_aucune_heure_valide_aucun_creneau(self):
         from agents import flux

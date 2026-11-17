@@ -128,13 +128,15 @@ def _git(dossier, *args, check=True):
 def changements(dossier):
     """Chemins modifiés, ajoutés ou supprimés depuis le dernier commit (fichiers non suivis compris)."""
     _git(dossier, "add", "-A", "--intent-to-add")
-    sortie = _git(dossier, "status", "--porcelain", "--untracked-files=all")
+    morceaux = iter(_git(dossier, "status", "--porcelain", "-z", "--untracked-files=all").split("\0"))
     chemins = []
-    for ligne in sortie.splitlines():
-        for chemin in ligne[3:].split(" -> "):     # un renommage compte pour ses deux chemins
-            chemin = chemin.strip().strip('"')
-            if chemin and chemin not in chemins:
-                chemins.append(chemin)
+    for morceau in morceaux:
+        if not morceau:
+            continue
+        lus = [morceau[3:]]
+        if morceau[0] in "RC":                     # un renommage compte pour ses deux chemins
+            lus.append(next(morceaux, ""))
+        chemins += [c for c in lus if c and c not in chemins]
     return chemins
 
 
@@ -257,7 +259,7 @@ def demandes_ouvertes():
         demandes = guichet.ouvertes()
     except Exception as e:
         return f"illisibles ({type(e).__name__})"
-    return "\n".join(f"#{d['numero']} {'PR de ton code, attend le Oui de Jules : ' if d['pr'] else ''}{d['titre']} "
+    return "\n".join(f"#{d['numero']} {'PR de ton code, attend le Oui de Jules : ' if d.get('pr') else ''}{d['titre']} "
                      f"(depuis le {d['date'][:10]})" for d in demandes) or "aucune"
 
 
@@ -317,7 +319,7 @@ def seance_claude(texte, plafond, veille, ouvrir=subprocess.Popen, horloge=time.
                                                                            "PYTHONUTF8": "1"}
     lignes, arret = queue.Queue(), None
     trace = trace or os.environ.get("PILOTE_TRACE")
-    copie = open(trace, "a", encoding="utf-8") if trace else None
+    copie = open(trace, "a", encoding="utf-8", buffering=1) if trace else None   # ligne par ligne
     with tempfile.TemporaryFile("w+", encoding="utf-8", errors="replace") as erreurs:
         proc = ouvrir(commande, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=erreurs, text=True,
                       encoding="utf-8", errors="replace", cwd=str(RACINE), env=env)
@@ -381,10 +383,17 @@ def seance_claude(texte, plafond, veille, ouvrir=subprocess.Popen, horloge=time.
 
 def tests_verts():
     """Tests du dépôt, sans aucune clé dans l'environnement : ils exécutent le code de la séance."""
-    proc = subprocess.run([sys.executable, "-m", "unittest", "discover", "-q", "tests"], cwd=str(RACINE),
-                          capture_output=True, text=True, encoding="utf-8",
-                          env=lancer.env_cloisonne(os.environ, set()) | {"PYTHONUTF8": "1"})
-    return proc.returncode == 0, (proc.stdout + proc.stderr)[-1500:]
+    sorties = []
+    for dossier in ("tests", "equipe/tests"):          # equipe/tests : tests des membres, libres comme eux
+        if dossier != "tests" and not (RACINE / dossier).is_dir():
+            continue
+        proc = subprocess.run([sys.executable, "-m", "unittest", "discover", "-q", dossier],
+                              cwd=str(RACINE), capture_output=True, text=True, encoding="utf-8",
+                              env=lancer.env_cloisonne(os.environ, set()) | {"PYTHONUTF8": "1"})
+        if proc.returncode:
+            return False, (proc.stdout + proc.stderr)[-1500:]
+        sorties.append(proc.stdout + proc.stderr)
+    return True, "".join(sorties)[-1500:]
 
 
 def trier_agence():
@@ -619,11 +628,14 @@ def _auth_github():
     return "AUTHORIZATION: basic " + base64.b64encode(f"x-access-token:{jeton}".encode()).decode()
 
 
+def _diff_indexe(chemins):
+    return subprocess.run(["git", "-C", str(RACINE), "diff", "--cached", "--binary", "HEAD", "--", *chemins],
+                          capture_output=True, check=True).stdout
+
+
 def mettre_de_cote(chemins, patch):
     """Écrit dans `patch` les changements de ces chemins (indexés par appliquer), puis les remet comme au main."""
-    proc = subprocess.run(["git", "-C", str(RACINE), "diff", "--cached", "--binary", "HEAD", "--", *chemins],
-                          capture_output=True, check=True)
-    Path(patch).write_bytes(proc.stdout)
+    Path(patch).write_bytes(_diff_indexe(chemins))
     defaire(RACINE, chemins)
 
 
@@ -637,11 +649,18 @@ def proposer(patch, chemins, passage, verdict, gh=None, poser=None):
     branche = f"pilote/{datetime.now(timezone.utc):%Y%m%d-%H%M%S}"
     with tempfile.TemporaryDirectory() as d:
         arbre = Path(d) / "pr"
-        _git(RACINE, "worktree", "add", "-q", "-b", branche, str(arbre), "HEAD")
-        try:
+        auth = f"http.https://github.com/.extraheader={_auth_github()}"
+        _git(RACINE, "-c", auth, "fetch", "-q", "origin", "main", check=False)
+        _git(RACINE, "worktree", "add", "-q", "-b", branche, str(arbre), "FETCH_HEAD", check=False)
+        if subprocess.run(["git", "-C", str(arbre), "apply", "--index", "--3way", str(patch)],
+                          capture_output=True).returncode:   # ne s'applique pas sur le main du moment : base de la séance
+            _git(RACINE, "worktree", "remove", "--force", str(arbre), check=False)
+            _git(RACINE, "branch", "-D", branche, check=False)
+            _git(RACINE, "worktree", "add", "-q", "-b", branche, str(arbre), "HEAD")
             _git(arbre, "apply", "--index", str(patch))
+        try:
             _git(arbre, "commit", "-q", "-m", f"Pilote : proposition de la séance du {passage['debut'][:16]}")
-            _git(arbre, "-c", f"http.https://github.com/.extraheader={_auth_github()}", "push", "-q", "origin", branche)
+            _git(arbre, "-c", auth, "push", "-q", "origin", branche)
         finally:
             _git(RACINE, "worktree", "remove", "--force", str(arbre), check=False)
     note = "?" if not verdict or verdict.get("note") is None else verdict["note"]
@@ -655,12 +674,17 @@ def proposer(patch, chemins, passage, verdict, gh=None, poser=None):
              "--body", corps).strip()
     numero = int(url.rstrip("/").rsplit("/", 1)[-1])
     conseil = f"avis du juge {note}/10"
+    ampleur = []
+    for ligne in str(_git(RACINE, "apply", "--numstat", str(patch), check=False) or "").splitlines():
+        ajouts, retraits, chemin = (ligne.split("\t", 2) + ["", "", ""])[:3]
+        if chemin:
+            ampleur.append(f"{chemin} (+{ajouts} -{retraits})")
     if verdict and verdict.get("code") == "a_revoir":
         conseil += f", code à revoir : {str(verdict.get('code_detail', ''))[:300]}"
     poser(f"Je fusionne le code proposé par le Pilote (PR #{numero}, {len(chemins)} fichiers) ? {url}",
           f"accord:{numero}", f"refus:{numero}", par=POSTE,
           pourquoi="Ce code tourne ensuite avec les clés de l'agence (publication, mails) : il lui faut ton accord. "
-                   f"Fichiers : {', '.join(chemins[:6])}" + (" …" if len(chemins) > 6 else ""),
+                   f"Fichiers : {', '.join((ampleur or chemins)[:12])}" + (" …" if len(chemins) > 12 else ""),
           conseil=conseil)
     return numero
 
@@ -678,7 +702,13 @@ def publier(paquet):
         return 1
     proposes = [c for c in changements(RACINE) if sort(c) == "propose"]
     if proposes:
+        lies = [c for c in changements(RACINE) if sort(c) == "libre" and c.endswith(CODE)]
+        ensemble = _diff_indexe(proposes + lies) if lies else b""
         mettre_de_cote(proposes, paquet / "proposition.patch")
+        if lies and not tests_verts()[0]:    # le code libre a besoin du code proposé : il attend le Oui avec lui
+            (paquet / "proposition.patch").write_bytes(ensemble)
+            defaire(RACINE, lies)
+            proposes += lies
     passage = json.loads(PASSAGE.read_text(encoding="utf-8"))
     passage["proteges_retires"] = sorted(set(passage.get("proteges_retires", [])) | set(remis))
     passage["proposes"] = proposes

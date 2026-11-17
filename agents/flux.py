@@ -117,7 +117,10 @@ def pousser_file(noms):
 def creneaux(heures, pris, debut):
     """Créneaux libres d'une chaîne (ses heures de sortie, à Paris) à partir de debut, dans l'ordre. Heures invalides
     ignorées, SORTIES_JOUR_MAX par jour au plus ; aucune heure valide : aucun créneau."""
-    heures = sorted({h for h in heures if type(h) is int and 0 <= h <= 23})[:SORTIES_JOUR_MAX]
+    heures = sorted({h for h in heures if type(h) is int and 0 <= h <= 23})
+    if len(heures) > SORTIES_JOUR_MAX:     # étalées sur la journée, pas les premières heures
+        pas = (len(heures) - 1) / (SORTIES_JOUR_MAX - 1)
+        heures = [heures[round(i * pas)] for i in range(SORTIES_JOUR_MAX)]
     if not heures:
         return
     jour = debut.astimezone(PARIS).date()

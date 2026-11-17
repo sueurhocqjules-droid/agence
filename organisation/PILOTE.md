@@ -69,7 +69,7 @@ un membre de ton équipe : un script Python dans `equipe/`, déclaré dans `orga
 les clés des modèles gratuits (Groq, Gemini, OpenRouter : `agence/postes.py`, ajoute-y une entrée à son nom) et la
 clé YouTube en lecture, rien d'autre. Il écrit dans `registre/equipe/<nom>/` ; son journal est
 `registre/equipe/journal.jsonl`. Ce qui publie ou envoie reste aux scripts du réveil (`flux`, `contacts`) : un membre
-prépare, le flux publie. Un membre est du code : écris son test dans `tests/`.
+prépare, le flux publie. Un membre est du code : écris son test dans `equipe/tests/`, gardé avec lui sans attendre de Oui. Si un membre a besoin d'un changement hors de `equipe/`, il part avec ce changement dans la PR.
 
 Outils déjà repérés par Jules (point de départ, pas une limite) : `ressources/boite-a-outils-jarvis.md` et
 `ressources/catalogue.md`.
@@ -86,10 +86,11 @@ Ton code tourne ensuite avec les clés du réveil : il passe donc par un œil hu
    `registre/pilote/`. Pour en changer un : demande au guichet, avec le changement exact.
 3. **Tout le reste est proposé** (le code des scripts comme `agents/flux.py`, `agence/`, les tests, ce mode d'emploi) :
    il part dans une PR (branche `pilote/…`, étiquette `guichet`) et Jules reçoit un Oui/Non sur Telegram. Oui : la
-   PR est fusionnée et ton code tourne au réveil suivant. Non : elle est fermée. Les PR ouvertes te sont données en
+   PR est fusionnée, ton code tourne au réveil suivant et, en mode continu, une séance repart aussitôt du code
+   fusionné. Non : elle est fermée. Les PR ouvertes te sont données en
    début de séance comme les autres demandes : ne les refais pas, et regroupe ton code dans peu de PR claires.
 
-Avant tout ça, le code (libre ou proposé) n'avance que si `python -m unittest discover tests` passe ; sinon tout le
+Avant tout ça, le code (libre ou proposé) n'avance que si `python -m unittest discover tests` (et `equipe/tests` s'il existe) passe ; sinon tout le
 code de la séance est retiré (le reste est gardé). Lance les tests toi-même avant de finir. Un test se rajoute, il ne
 se retire pas. **Studio** : gardé si les sujets neufs sont complets et si `npm run lint` passe, sinon tout le studio
 est retiré. Le juge lit ce qui est gardé ou proposé et donne son avis (il est joint à la PR). Le studio part vers
