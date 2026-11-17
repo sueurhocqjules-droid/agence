@@ -55,11 +55,6 @@ def lire_jsonl(nom, depuis=None):
     return [l for l in lignes if not depuis or datetime.fromisoformat(l["date"]) >= depuis]
 
 
-def refuses():
-    """Liens des outils, services ou concepts refusés (registre/refus.jsonl) : la Recherche ne les repropose pas."""
-    return {l["lien"] for l in lire_jsonl("refus")}
-
-
 def decider(auteur, decision, pourquoi, prediction=None, mesure=None, echeance=None, avant=None, attendu=None,
             changement=None, organisation=None, voie=None):
     """Note une décision au journal d'audit, avec sa raison, et renvoie son identifiant.
@@ -82,15 +77,6 @@ def decider(auteur, decision, pourquoi, prediction=None, mesure=None, echeance=N
     with open(DOSSIER / "decisions.jsonl", "a", encoding="utf-8") as f:
         f.write(json.dumps(entree, ensure_ascii=False) + "\n")
     return ident
-
-
-def juger(ident, verdict, valeur, commentaire):
-    """Ajoute le verdict du critique sur une décision : une nouvelle ligne, le journal ne se réécrit jamais."""
-    if verdict not in ("juste", "fausse", "indeterminee"):
-        raise ValueError(verdict)
-    with open(DOSSIER / "decisions.jsonl", "a", encoding="utf-8") as f:
-        f.write(json.dumps({"type": "verdict", "id": ident, "date": maintenant(), "verdict": verdict,
-                            "valeur": valeur, "commentaire": commentaire}, ensure_ascii=False) + "\n")
 
 
 def decisions():
