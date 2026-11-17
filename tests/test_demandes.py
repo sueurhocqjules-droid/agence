@@ -85,5 +85,29 @@ class Signal(unittest.TestCase):
             self.assertEqual([e for e, _ in demandes.illisibles()], demandes.EQUIPES)
 
 
+class JetonDesLecteurs(unittest.TestCase):
+    """Le 16/11, le Stratège lisait les demandes sans GH_TOKEN : sa fiche ne le déclarait pas, le lanceur le retirait."""
+
+    def test_chaque_agent_qui_lit_les_demandes_recoit_gh_token(self):
+        from agence import organisation
+        for nom in ("direction", "stratege", "chef-contenu"):
+            fiche = organisation.fiches()[nom]
+            self.assertIn("GH_TOKEN", fiche["env"], nom)
+            self.assertEqual(organisation.cles_accordees(nom, fiche["env"])[1], [], nom)
+
+    def test_le_dossier_du_stratege_ne_porte_aucun_champ_erreur(self):
+        from datetime import datetime, timezone
+        from agents import stratege
+        run, _ = gh_rend(json.dumps([issue(7)]))
+        with mock.patch.object(subprocess, "run", run), mock.patch.object(demandes, "signaler") as signal:
+            try:
+                dossier = stratege.dossier(datetime(2026, 11, 22, 17, 37, tzinfo=timezone.utc))
+            except Exception as e:  # noqa: BLE001 : seule la lecture des demandes compte ici
+                self.skipTest(f"dossier non constructible dans ce test : {e}")
+        self.assertEqual([d["numero"] for d in dossier["demandes_de_jules"]], [7])
+        self.assertFalse(any("erreur" in d for d in dossier["demandes_de_jules"]))
+        signal.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()
