@@ -41,6 +41,7 @@ Chaque panne a au moins un cas qui doit passer et un témoin qui doit échouer. 
 | Des pannes réparées comptées comme ouvertes | `chef-operations-panne-levee-direct`, `direction-blocage-leve` |
 | La Recherche propose le relais DSH | `chercheur-outils-dsh-refuse` et `chef-recherche-dsh-refuse` (enregistrés), `chercheur-outils-relais-direct`, `temoin-chercheur-outils-relais` |
 | La Recherche annonce un gain impossible (texte seulement, « vers 0 ») et un outil qui demande un GPU | `chef-recherche-gain-impossible` (enregistré, reconstitué) |
+| La Recherche propose des preuves qui ne correspondent pas au titre, et une pub de marque (15/11) | `chef-recherche-preuves-pas-reprises` (enregistré, reconstitué) |
 | La Direction croit que le code repasse par Jules | `direction-code-a-l-ingenierie`, `temoin-direction-code-a-jules` |
 | Des réseaux diffusent sans stats, personne ne le voit (15/11) | `stratege-reseaux-sans-stats`, `temoin-stratege-reseaux-sans-stats` |
 | La chaîne espagnole n'est pas diffusée, personne ne le voit (13/11) | `stratege-chaine-non-diffusee`, `temoin-stratege-chaine-non-diffusee` |
