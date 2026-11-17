@@ -69,6 +69,14 @@ module = "agence.gabarits"
 description = "les vidéos des chaînes Scale of Everything et 1 Second vs 1 Hour, sans appel Claude par sujet"
 secrets = []
 
+# L'écriture des sujets (agence/sujets.py) : Ling 3.2 Flash par OpenRouter, gpt-oss-120b en secours, jamais Claude
+# (demande #104). OPENROUTER_API_KEY et GROQ_API_KEY lui sont accordées dans autorisations.toml (fichier protégé).
+[sujets]
+proprietaire = "programmateur"
+module = "agence.sujets"
+description = "l'écriture des sujets (titres, calcul chiffré, étapes) par un modèle gratuit à la place de Claude"
+secrets = ["OPENROUTER_API_KEY", "GROQ_API_KEY"]
+
 [prevu_realise]
 proprietaire = "analyste"
 module = "agents.prevu_realise"

@@ -32,9 +32,9 @@ GMAIL_TOKEN = ["courrier"]
 # Boîte prod.hack05 : envoi seul (gmail.send), messages validés par Jules. Accordé le 15/11/2026 (guichet #13)
 GMAIL_SEND_TOKEN = ["contacts"]
 # Modèles gratuits
-GROQ_API_KEY = ["chef-operations", "chef-contenu", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "critique", "programmateur", "responsable-organisation", "responsable-revenu"]
+GROQ_API_KEY = ["chef-operations", "chef-contenu", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "critique", "programmateur", "sujets", "responsable-organisation", "responsable-revenu"]
 GEMINI_API_KEY = ["chef-operations", "chef-contenu", "chercheur-outils", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "critique", "programmateur", "responsable-organisation", "responsable-revenu"]
-OPENROUTER_API_KEY = ["chercheur-outils", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "responsable-organisation", "responsable-revenu"]
+OPENROUTER_API_KEY = ["chercheur-outils", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "sujets", "responsable-organisation", "responsable-revenu"]
 # Jeton GitHub de Jules (dépôt agence seul) : pose son étiquette accord-jules et fusionne une PR protégée après son
 # Oui sur Telegram (agence/accords.py), ferme la PR après son Non. Accordé le 16/11/2026
 FUSION_TOKEN = ["reponses"]

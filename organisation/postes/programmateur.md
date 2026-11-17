@@ -12,7 +12,7 @@ reveil = "une fois par semaine"
 regle_de_deux = "[C] : aucun secret, écrit le calendrier que les scripts appliquent"
 secrets = ["clé du modèle gratuit attribué"]
 budget = { claude_usd_semaine = 0, appels_gratuits_jour = 10 }
-scripts = ["creneaux"]
+scripts = ["creneaux", "sujets"]
 equipe = []
 +++
 # Programmateur (rythme par réseau)
@@ -29,8 +29,10 @@ Stats par vidéo, heure et réseau. Limites de rythme de chaque plateforme (tenu
 ## Sorties
 Un essai de cadence à la fois par réseau, noté au journal avec sa prédiction. Le calendrier des créneaux appliqué par `flux` : `organisation/creneaux.toml` pour YouTube, `organisation/diffusion.toml` pour les vidéos par jour sur Instagram, Facebook, TikTok et Threads (vidéos déjà publiques sur YouTube, la plus ancienne d'abord). À chaque passage, son besoin chiffré dans `registre/besoins.jsonl` : les sujets qui manquent par semaine pour sortir à la cadence la plus haute (5 par jour), que la Recherche traite en priorité. Il ne se contente pas de baisser la cadence, il demande ; le besoin se ferme de lui-même quand le budget paie cette cadence.
 
+Écriture des sujets (demande #104) : le script `sujets` (`agence/sujets.py`) fait écrire chaque sujet par Ling 3.2 Flash (`inclusionai/ling-3.2-flash:free`, OpenRouter, gratuit), puis par gpt-oss-120b (Groq) si le premier ne répond pas. Il rend le JSON attendu par chaines-studio et `flux` : le sujet (titre en, es, pt) et son calcul chiffré (règle, résultat, étapes, descriptions par langue). Le code refuse tout JSON hors format. Le journal (`registre/journal/sujets.jsonl`) note le nombre de sujets écrits et acceptés. Cela remplace l'appel à Claude pour l'écriture : l'Auteur relit et écrit le code Remotion. Lancement : `python -m agence.lancer sujets "<idée>"`. Pas encore branché à un workflow (`.github/` est protégé) ni à chaines-studio : à faire avec Jules.
+
 ## Outils
-Script `creneaux`, lecture du registre.
+Scripts `creneaux` et `sujets`, lecture du registre.
 
 ## Secrets et permissions
 Aucun jeton de chaîne.

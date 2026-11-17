@@ -53,6 +53,8 @@ POSTES = {
                            ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 4000)],
     "responsable-organisation": [("gemini", "gemini-flash-latest", 5000), ("groq", "openai/gpt-oss-120b", 5000),
                                  ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 5000)],
+    # Écriture des sujets (agence/sujets.py) : Ling 3.2 Flash, gratuit, à la place de Claude ; gpt-oss-120b en secours.
+    "ecrire-sujets": [("openrouter", "inclusionai/ling-3.2-flash:free", 9000), ("groq", "openai/gpt-oss-120b", 9000)],
     # Gabarits Remotion (agence/gabarits.py) : un JSON de données par sujet, contrôlé par schéma. Mêmes modèles que
     # le poste « sujets » (justes sur les ordres de grandeur), plus Groq en tête pour la vitesse. Jamais Claude.
     "gabarits": [("groq", "openai/gpt-oss-120b", 4000), ("gemini", "gemini-flash-latest", 4000),
