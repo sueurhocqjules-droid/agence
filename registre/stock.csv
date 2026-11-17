@@ -131,3 +131,9 @@ balloon-pt,pt,balloon,programme,2026-11-25T15:00:00+00:00,kf31OPDxgro,2026-11-17
 candle-en,en,candle,programme,2026-11-26T17:00:00+00:00,assTlpSF_Mc,2026-11-17T17:08:34+00:00,"artefact 14323524146, {'duree_s': 62.1, 'son_moyen_db': -18.0, 'noir_s': 0}"
 candle-es,es,candle,programme,2026-11-27T01:00:00+00:00,gvwKuDJcMNE,2026-11-17T17:08:41+00:00,"artefact 14322284828, {'duree_s': 62.1, 'son_moyen_db': -18.0, 'noir_s': 0}"
 candle-pt,pt,candle,programme,2026-11-26T15:00:00+00:00,8LEF-_3LGWg,2026-11-17T17:08:48+00:00,"artefact 14322474589, {'duree_s': 62.1, 'son_moyen_db': -18.0, 'noir_s': 0}"
+flood-en,en,flood,en_rendu,,,2026-11-17T23:11:34+00:00,
+wind-en,en,wind,en_rendu,,,2026-11-17T23:11:34+00:00,
+flood-es,es,flood,en_rendu,,,2026-11-17T23:11:34+00:00,
+wind-es,es,wind,en_rendu,,,2026-11-17T23:11:34+00:00,
+flood-pt,pt,flood,en_rendu,,,2026-11-17T23:11:34+00:00,
+wind-pt,pt,wind,en_rendu,,,2026-11-17T23:11:34+00:00,

@@ -1,4 +1,4 @@
-# Tableau de bord (17/11/2026 22:57 UTC)
+# Tableau de bord (17/11/2026 23:11 UTC)
 
 Écrit par les scripts à partir du registre. Ne pas modifier à la main.
 
@@ -10,9 +10,9 @@
 
 | chaîne | vues totales | vues gagnées 7 j | vidéos | relevé |
 |---|---|---|---|---|
-| en | 19595 | 13125 | 30 | 2026-11-17T17:07 |
-| es | 7 | 6 | 30 | 2026-11-17T17:07 |
-| pt | 5395 | 5078 | 30 | 2026-11-17T17:07 |
+| en | 19655 | 13185 | 32 | 2026-11-17T23:07 |
+| es | 7 | 6 | 32 | 2026-11-17T23:07 |
+| pt | 5458 | 5141 | 32 | 2026-11-17T23:07 |
 
 ## Diffusions des 7 derniers jours
 
@@ -20,7 +20,7 @@
 |---|---|---|
 | facebook | 30 | 0 |
 | instagram | 30 | 4 |
-| tiktok | 24 | 0 |
+| tiktok | 30 | 0 |
 
 ## Consommation de l'agence cette semaine (depuis le 13/11 23:00 UTC)
 
