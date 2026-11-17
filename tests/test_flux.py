@@ -32,5 +32,12 @@ class Telecharger(unittest.TestCase):
             self.assertIsNone(flux.telecharger({"archive_download_url": "x"}, dossier))
 
 
+class HeuresDeSortieEs(unittest.TestCase):
+    def test_es_sort_a_18_heures(self):
+        """Décision du 16/11 : la chaîne es sort à 18 h (réglage organisation/creneaux.toml)."""
+        from agence import mesures
+        self.assertEqual(mesures.heures_de_sortie()["es"], [18])
+
+
 if __name__ == "__main__":
     unittest.main()
