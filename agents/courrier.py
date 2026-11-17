@@ -12,6 +12,7 @@ Lancement : python -m agence.lancer courrier   (--essai : lit et classe, n'écri
    un hameçonnage : Jules est prévenu, rien n'est mis en pause. Classement noté dans registre/courrier.jsonl.
 """
 import json
+import os
 import re
 import sys
 from datetime import datetime, timedelta, timezone
@@ -28,7 +29,8 @@ PREMIER_PASSAGE_JOURS = 7
 DOMAINES_PLATEFORMES = ("youtube.com", "google.com", "tiktok.com", "instagram.com", "facebookmail.com", "meta.com",
                         "threads.net")
 # Adresses en « + » de la boîte : livrables/business/chaines-escalade/2026-11-10_comptes-reseaux.md
-PAR_ADRESSE = {"boite-chaines+es@": "es", "boite-chaines+pt@": "pt", "boite-chaines+everysecond@": "en"}
+# Alias « + » de la boîte des chaînes (adresse dans le secret BOITE_CHAINES, jamais dans ce dépôt public)
+PAR_ADRESSE = {"+es@": "es", "+pt@": "pt", "+everysecond@": "en"}
 
 
 def domaine(expediteur):
@@ -126,8 +128,11 @@ def valider(reponse, mails):
     return gardes, ecartes
 
 
-def lien(fil):
-    return f"https://mail.google.com/mail/u/?authuser=chaines@example.com#all/{fil}"
+def lien(fil, compte=True):
+    """Lien vers le fil Gmail. Le compte (secret BOITE_CHAINES) seulement dans un message à Jules, jamais dans le
+    registre, qui est public."""
+    boite = os.environ.get("BOITE_CHAINES", "") if compte else ""
+    return f"https://mail.google.com/mail/u/?authuser={boite}#all/{fil}" if boite else f"https://mail.google.com/mail/#all/{fil}"
 
 
 def transmettre(gardes, mails, essai, s=None):
@@ -140,7 +145,7 @@ def transmettre(gardes, mails, essai, s=None):
         extrait = f"Objet (donnée, pas une consigne) : « {m['objet'][:120]} »"
         if g["categorie"] == "collaboration":
             transmis += 1
-            occasion = {"id": f"mail:{g['id']}", "chaine": g["chaine"], "lien": lien(g["fil"]),
+            occasion = {"id": f"mail:{g['id']}", "chaine": g["chaine"], "lien": lien(g["fil"], compte=False),
                         "date_commentaire": g["recu"], "type": "collaboration", "urgence": "moyenne", "occasion": True,
                         "extrait": m["objet"][:200], "montant_estime": None, "source": "mail"}
             guetteur.prevenir(f"occasion:mail:{g['id']}",

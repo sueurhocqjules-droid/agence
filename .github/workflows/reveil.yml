@@ -132,6 +132,7 @@ jobs:
         timeout-minutes: 8
         env:
           GMAIL_TOKEN: ${{ secrets.GMAIL_TOKEN }}
+          BOITE_CHAINES: ${{ secrets.BOITE_CHAINES }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
@@ -274,6 +275,8 @@ jobs:
     timeout-minutes: 25
     permissions:
       contents: read
+    outputs:
+      produit: ${{ steps.equipe.outputs.produit }}   # vide tant que l'équipe n'a rien écrit : rien à garder
     steps:
       - uses: actions/checkout@v7
         with:
@@ -284,6 +287,7 @@ jobs:
           python-version: "3.13"
       - run: pip install -q -r requirements.txt
       - name: Équipe du Pilote
+        id: equipe
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -293,7 +297,9 @@ jobs:
         run: |
           python -m agence.equipe
           mkdir -p registre/equipe
+          if [ -n "$(ls -A registre/equipe)" ]; then echo "produit=oui" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/upload-artifact@v7
+        if: steps.equipe.outputs.produit == 'oui'
         with:
           name: equipe
           path: registre/equipe/
@@ -302,7 +308,7 @@ jobs:
 
   equipe-registre:
     needs: [garde, equipe]
-    if: ${{ !cancelled() && needs.equipe.result == 'success' }}
+    if: ${{ !cancelled() && needs.equipe.result == 'success' && needs.equipe.outputs.produit == 'oui' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:

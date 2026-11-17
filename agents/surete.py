@@ -3,7 +3,7 @@
 Lancement : python -m agence.lancer garde_fous   (ou python -m agents.surete --essai : calcule et affiche, n'agit pas)
 
 1. Compteur : dollars Claude et appels gratuits de la semaine par agent (registre/couts.csv, plus l'atelier de
-   chaines-studio si ATELIER_COUTS pointe vers son atelier/couts.csv), minutes GitHub du mois des dépôts privés.
+   chaines-studio si ATELIER_COUTS pointe vers son atelier/couts.csv).
 2. Seuils (organisation/seuils.toml) : alerte Telegram, puis pause des agents Claude et question pour reprendre.
 3. Sanctions : une vidéo rejetée par YouTube met sa chaîne en pause, avec une question à Jules pour reprendre.
 4. Pannes : un même programme en échec plusieurs passages d'affilée, alerte.
@@ -13,17 +13,13 @@ Une alerte ne part qu'une fois : sa clé est notée dans registre/alertes.csv.
 """
 import csv
 import json
-import math
 import os
-import subprocess
 import sys
 import tomllib
 from datetime import datetime, timezone
 from pathlib import Path
 
 from agence import lancer, mesures, organisation, questions, registre, telegram
-
-DEPOTS_PRIVES = ["sueurhocqjules-droid/agence"]  # chaines-studio : la clé de lecture ne donne pas accès à l'API des runs
 
 # Raisons de refus de l'API YouTube (videos.status.rejectionReason), en clair, et si c'est grave pour la chaîne
 REFUS = {
@@ -84,23 +80,6 @@ def part_semaine(maintenant, reglages):
     if maintenant < cl["lancement_jusqu_au"]:
         return None
     return float(cl["part_pourcent"]) * float(cl["dollars_par_pourcent"])
-
-
-def minutes_github(maintenant):
-    """Minutes du mois des dépôts privés (durée des runs, arrondie à la minute). None si l'API n'est pas joignable."""
-    total = 0
-    for depot in DEPOTS_PRIVES:
-        r = subprocess.run(["gh", "api", "-X", "GET", f"repos/{depot}/actions/runs", "--paginate",
-                            "-f", f"created=>={maintenant:%Y-%m}-01", "-f", "per_page=100",
-                            "--jq", ".workflow_runs[] | [.run_started_at, .updated_at] | @tsv"],
-                           capture_output=True, text=True)
-        if r.returncode:
-            print(f"Minutes GitHub illisibles pour {depot} : {r.stderr.strip()[:200]}")
-            return None
-        for ligne in r.stdout.splitlines():
-            debut, fin = (datetime.fromisoformat(x) for x in ligne.split("\t"))
-            total += math.ceil(max((fin - debut).total_seconds(), 1) / 60)
-    return total
 
 
 def sanctions(stats):
@@ -223,13 +202,6 @@ def passage(essai):
     elif plafond is not None and c["hors_reserve"] >= plafond * cl["alerte_part_pourcent"] / 100:
         s.alerter(f"claude:{c['semaine']}", "budget", f"{c['dollars']:.2f} $ équivalent Claude depuis vendredi{part} "
                   f"({detail}), sur une part de {plafond:.0f} $. Rien à faire pour l'instant.")
-
-    minutes = minutes_github(maintenant)
-    if minutes is not None:
-        print(f"GitHub : {minutes} minutes ce mois sur les dépôts privés")
-        if minutes >= reglages["github"]["alerte_minutes_mois"]:
-            s.alerter(f"github:{maintenant:%Y-%m}", "quota", f"{minutes} minutes GitHub ce mois sur les dépôts privés, "
-                      f"sur 2 000 gratuites. Au-delà, les réveils s'arrêtent jusqu'au mois suivant.")
 
     for chaine, video_id, titre, statut in sanctions(registre.lire("stats")):
         code = statut.partition(":")[2]

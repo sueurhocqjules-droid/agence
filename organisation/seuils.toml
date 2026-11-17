@@ -26,10 +26,6 @@ echecs_identiques_max = 10
 # Minutes sans écrire un fichier (Edit, Write) : une séance qui tourne en rond
 minutes_sans_ecrire_max = 120
 
-[github]
-# Offre gratuite : 2 000 minutes par mois pour les dépôts privés (illimité pour un dépôt public)
-alerte_minutes_mois = 1500
-
 [echecs]
 # Passages en échec d'affilée d'un même agent ou script avant d'alerter Jules
 alerte_consecutifs = 3

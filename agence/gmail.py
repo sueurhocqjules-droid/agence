@@ -19,7 +19,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/gmail.readonly",
     "https://www.googleapis.com/auth/gmail.settings.basic",
 ]
-COMPTE = "boite-chaines@"
+COMPTE = os.environ.get("BOITE_CHAINES", "")   # adresse de la boîte des chaînes (.env), hors du dépôt public
 
 
 def service():
@@ -47,7 +47,7 @@ def connexion():
         authorization_prompt_message="Ouvrir ce lien dans le profil Chrome de Capi (boite-chaines) et autoriser :\n{url}",
     )
     adresse = build("gmail", "v1", credentials=creds, cache_discovery=False).users().getProfile(userId="me").execute()["emailAddress"]
-    if not adresse.startswith(COMPTE):
+    if COMPTE and adresse.lower() != COMPTE.lower():
         sys.exit(f"Mauvais compte autorisé ({adresse}), attendu boite-chaines. Jeton non enregistré.")
     LOCAL.parent.mkdir(exist_ok=True)
     LOCAL.write_text(creds.to_json(), encoding="utf-8")
