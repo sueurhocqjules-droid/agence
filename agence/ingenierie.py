@@ -316,6 +316,64 @@ def _commenter(genre, numero, texte):
     _gh(genre, "comment", str(numero), "-R", DEPOT, "--body-file", "-", entree=texte)
 
 
+def _tests_sur(sha, branche):
+    """Relance les tests sur le commit `sha` de la branche, dans la copie propre. Vrai s'ils sont verts."""
+    copie = copie_pr()
+    if not copie.exists():
+        subprocess.run(["git", "clone", "-q", str(consignes.RACINE), str(copie)], check=True)
+    _git(copie, "fetch", "-q", f"https://github.com/{DEPOT}.git", branche, auth=True)
+    _git(copie, "checkout", "-q", sha)
+    return subprocess.run([sys.executable, "-m", "unittest", "discover", "tests"], cwd=str(copie),
+                          capture_output=True).returncode == 0
+
+
+def _reconstruire(pr, branche, sha):
+    """Une seule reconstruction de la branche sur main, quand la mise à jour par GitHub a refusé (conflit).
+    Rend le nouveau commit, ou None si le conflit reste."""
+    copie = copie_pr()
+    if not copie.exists():
+        subprocess.run(["git", "clone", "-q", str(consignes.RACINE), str(copie)], check=True)
+    _git(copie, "fetch", "-q", f"https://github.com/{DEPOT}.git", branche, "main", auth=True)
+    _git(copie, "checkout", "-q", sha)
+    if _git(copie, "rebase", "FETCH_HEAD", check=False).returncode != 0:
+        _git(copie, "rebase", "--abort", check=False)
+        return None
+    nouveau = _git(copie, "rev-parse", "HEAD").stdout.strip()
+    _git(copie, "push", "-q", f"--force-with-lease={branche}:{sha}",
+         f"https://github.com/{DEPOT}.git", f"HEAD:refs/heads/{branche}", auth=True)
+    return nouveau
+
+
+def remettre_a_jour(pr, sha):
+    """Avant la fusion : met la branche à jour depuis main, relance les tests sur le nouveau commit.
+    Rend (sha à fusionner, raison de blocage ou None). Si rien n'a bougé, le sha reste celui déjà contrôlé."""
+    if not sha:
+        return sha, None
+    branche = _gh("api", f"repos/{DEPOT}/pulls/{pr}", "--jq", ".head.ref").strip()
+    try:
+        _gh("api", "-X", "PUT", f"repos/{DEPOT}/pulls/{pr}/update-branch", "-f", f"expected_head_sha={sha}")
+    except subprocess.CalledProcessError as e:
+        # Conflit (ou branche déjà à jour, selon GitHub) : on reconstruit sur main une seule fois
+        if "up to date" in (e.stderr or "").lower() or not branche:
+            return sha, None
+        try:
+            nouveau = _reconstruire(pr, branche, sha)
+        except subprocess.CalledProcessError as e2:
+            return sha, f"mise à jour de la branche impossible : {(e2.stderr or '').strip()[:200]}"
+        if not nouveau:
+            return sha, ("bloquant : conflit avec main, même après reconstruction de la branche. Il faut refaire la "
+                         "demande sur la version actuelle de main")
+        sha = nouveau
+    else:
+        nouveau = _gh("api", f"repos/{DEPOT}/pulls/{pr}", "--jq", ".head.sha").strip()
+        if not nouveau or nouveau == sha:
+            return sha, None
+        sha = nouveau
+    if not _tests_sur(sha, branche):
+        return sha, "les tests ne sont pas verts une fois la branche remise à jour sur main"
+    return sha, None
+
+
 def conclure(pr, env=os.environ):
     lu = {k: env.get(f"INGENIERIE_{k}", "") for k in ("TESTS", "BANC", "BANC_DEMANDE", "CONTROLE", "PROTEGE",
                                                        "VERDICT", "SHA", "ISSUE")}
@@ -323,8 +381,12 @@ def conclure(pr, env=os.environ):
                               lu["VERDICT"])
     lien = f"https://github.com/{DEPOT}/pull/{pr}"
     if choix == "fusion":
+        # Plusieurs demandes tournent en parallèle : on remet la branche à jour sur main et on reteste avant de fusionner
+        lu["SHA"], blocage = remettre_a_jour(pr, lu["SHA"])
+        if blocage:
+            choix, raisons = "ouverte", [blocage]
+    if choix == "fusion":
         # --match-head-commit : on fusionne le commit qui a été contrôlé, pas un commit poussé entre-temps.
-        # Plusieurs demandes tournent en parallèle : une PR fusionnée avant celle-ci peut la mettre en conflit.
         try:
             _gh("pr", "merge", str(pr), "-R", DEPOT, "--squash", "--delete-branch", "--match-head-commit", lu["SHA"])
         except subprocess.CalledProcessError as e:
