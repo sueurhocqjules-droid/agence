@@ -1,0 +1,10 @@
+{
+  "categorie": "Cuisine",
+  "produit": "Air fryer",
+  "indices": [
+    {"icone": "🍟", "texte": "Makes crispy fries with almost no oil"},
+    {"icone": "🌬️", "texte": "Hot air spins around your food"},
+    {"icone": "⏱️", "texte": "Dinner is ready in 15 minutes"}
+  ],
+  "voix": "Guess the product! It makes crispy fries with almost no oil. Hot air spins around your food. Dinner is ready in fifteen minutes. Three, two, one. It's an air fryer!"
+}

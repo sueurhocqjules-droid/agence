@@ -1,6 +1,6 @@
 """Gabarits Remotion des chaînes « Scale of Everything » et « 1 Second vs 1 Hour » (dossier remotion/).
 
-    python -m agence.gabarits <scale-zoom|one-sec-vs-one-hour> "<sujet>" [--voix fr-FR-DeniseNeural] [--sortie out/x.mp4]
+    python -m agence.gabarits <scale-zoom|one-sec-vs-one-hour|guess-the-product> "<sujet>" [--voix fr-FR-DeniseNeural] [--sortie out/x.mp4]
 
 Un modèle gratuit (poste « gabarits » de agence/postes.py, ordre choisi avec l'Expert en modèles) écrit un JSON de
 données pour le sujet. Le code le contrôle par schéma, fait la voix avec edge-tts, puis rend la vidéo avec Remotion.
@@ -25,18 +25,50 @@ COULEUR = re.compile(r"^#[0-9a-fA-F]{6}$")
 GABARITS = {
     "scale-zoom": ("ScaleZoom", "scale-zoom.json"),
     "one-sec-vs-one-hour": ("OneSecVsOneHour", "one-sec-vs-one-hour.json"),
+    "guess-the-product": ("GuessTheProduct", "guess-the-product.json"),
 }
+# Voix par défaut : français, sauf « Guess the Product » (anglais, chaîne d'affiliation)
+VOIX_PAR_DEFAUT = {"guess-the-product": "en-US-AriaNeural"}
+VOIX_FR = "fr-FR-DeniseNeural"
 
 FORMES = {
     "scale-zoom": '{"titre": "...", "objets": [{"nom": "...", "taille_m": 1.7, "couleur": "#2e86c1"}], "voix": "..."}'
                   " : 4 à 12 objets de tailles différentes (taille_m en mètres, nombre positif), du plus petit au plus grand",
     "one-sec-vs-one-hour": '{"titre": "...", "etats": [{"instant": 0.0, "seconde": "...", "heure": "...", "couleur": "#c0392b"}], "voix": "..."}'
                            " : 3 à 6 états, instant entre 0 et 1 (le premier à 0), seconde = ce qui se passe en 1 s, heure = en 1 h",
+    "guess-the-product": '{"categorie": "...", "produit": "...", "indices": [{"icone": "(un emoji)", "texte": "..."}], "voix": "..."}'
+                         " : exactement 3 indices, du plus vague au plus clair, icone = un seul emoji, texte et voix en anglais",
 }
 
 
 def _texte(v, maxi=80):
     return isinstance(v, str) and 0 < len(v.strip()) <= maxi
+
+
+def _valider_produit(donnees):
+    erreurs = []
+    for champ in ("categorie", "produit"):
+        if not _texte(donnees.get(champ), 40):
+            erreurs.append(f"{champ} : texte de 1 à 40 caractères")
+    voix = donnees.get("voix")
+    if not isinstance(voix, str) or not 0 < len(voix.split()) <= MOTS_VOIX_MAX:
+        erreurs.append(f"voix : texte de 1 à {MOTS_VOIX_MAX} mots")
+    indices = donnees.get("indices")
+    if not isinstance(indices, list) or len(indices) != 3:
+        return erreurs + ["indices : liste d'exactement 3 indices"]
+    for i, ind in enumerate(indices):
+        if not isinstance(ind, dict):
+            erreurs.append(f"indices[{i}] : pas un objet")
+            continue
+        if not _texte(ind.get("texte"), 60):
+            erreurs.append(f"indices[{i}].texte : texte de 1 à 60 caractères")
+        if not _texte(ind.get("icone"), 8):
+            erreurs.append(f"indices[{i}].icone : un emoji")
+    produit = donnees.get("produit")
+    if _texte(produit, 40) and any(isinstance(ind, dict) and isinstance(ind.get("texte"), str)
+                                   and produit.lower() in ind["texte"].lower() for ind in indices):
+        erreurs.append("indices : un indice donne le nom du produit")
+    return erreurs
 
 
 def valider(gabarit, donnees):
@@ -45,6 +77,8 @@ def valider(gabarit, donnees):
         return [f"gabarit inconnu : {gabarit}"]
     if not isinstance(donnees, dict):
         return ["les données ne sont pas un objet JSON"]
+    if gabarit == "guess-the-product":
+        return _valider_produit(donnees)
     erreurs = []
     if not _texte(donnees.get("titre"), 60):
         erreurs.append("titre : texte de 1 à 60 caractères")
@@ -92,6 +126,11 @@ def valider(gabarit, donnees):
 
 
 def consigne(gabarit, sujet):
+    if gabarit == "guess-the-product":
+        return ("Tu écris les données d'une vidéo verticale « Guess the Product » : 3 indices, puis la révélation d'un produit "
+                f"à vendre en affiliation. Catégorie ou idée : {sujet}\nRéponds par un seul objet JSON, sans texte autour, "
+                f"de cette forme : {FORMES[gabarit]}. Le produit est réel et courant. Aucun indice ne contient son nom. "
+                f"Le champ voix, en anglais, lit les 3 indices puis révèle le produit, {MOTS_VOIX_MAX} mots au plus.")
     return ("Tu écris les données d'une vidéo verticale de 30 secondes, en français simple, avec des chiffres justes. "
             f"Sujet : {sujet}\nRéponds par un seul objet JSON, sans texte autour, de cette forme : {FORMES[gabarit]}. "
             f"Le champ voix est le texte lu à voix haute, {MOTS_VOIX_MAX} mots au plus. Pas de tiret long.")
@@ -105,7 +144,7 @@ def donnees_du_sujet(gabarit, sujet, demander=postes.demander):
         reponse, *_ = demander("gabarits", texte)
         donnees = modeles.extraire_json(reponse)
         if isinstance(donnees, dict):
-            for cle in ("titre", "voix"):
+            for cle in (("categorie", "produit", "voix") if gabarit == "guess-the-product" else ("titre", "voix")):
                 donnees[cle] = modeles.propre(donnees.get(cle))
         erreurs = valider(gabarit, donnees)
         if not erreurs:
@@ -119,12 +158,13 @@ def faire_la_voix(texte, mp3, voix="fr-FR-DeniseNeural"):
                    check=True, timeout=300)
 
 
-def rendre(gabarit, donnees, sortie, avec_voix=True, voix="fr-FR-DeniseNeural"):
+def rendre(gabarit, donnees, sortie, avec_voix=True, voix=None):
     """Rend la vidéo MP4 9:16. La voix, si demandée, est posée dans remotion/public/ le temps du rendu."""
     composition = GABARITS[gabarit][0]
     erreurs = valider(gabarit, donnees)
     if erreurs:
         raise ValueError("données refusées par le schéma : " + " ; ".join(erreurs[:6]))
+    voix = voix or VOIX_PAR_DEFAUT.get(gabarit, VOIX_FR)
     donnees = dict(donnees)
     public = REMOTION / "public"
     mp3 = public / f"voix-{gabarit}.mp3"
@@ -156,7 +196,7 @@ def main(argv):
     options = dict(zip(argv[2::2], argv[3::2]))
     donnees = donnees_du_sujet(gabarit, sujet)
     sortie = rendre(gabarit, donnees, options.get("--sortie", f"out/{gabarit}.mp4"),
-                    voix=options.get("--voix", "fr-FR-DeniseNeural"))
+                    voix=options.get("--voix"))
     print(f"vidéo : {sortie}")
     return 0
 
