@@ -7,6 +7,7 @@ import json
 import os
 import shutil
 import subprocess
+import tempfile
 import unittest
 import urllib.error
 from pathlib import Path
@@ -65,6 +66,53 @@ class Signe(unittest.TestCase):
         self.assertIn("if: always()", etape)
         self.assertIn("python -m agence.alarme signe", etape)
         self.assertIn("ALARME_SECRET: ${{ secrets.ALARME_SECRET }}", etape)
+
+    def test_le_signe_transmet_les_heures_du_reveil(self):
+        vues = []
+
+        def ouvrir(requete, timeout):
+            vues.append(json.loads(requete.data))
+            return Reponse(b'{"ok": true}')
+
+        with mock.patch.dict(os.environ, {"ALARME_SECRET": "s3cret"}):
+            alarme.signe(ouvrir=ouvrir, heures=[5, 17])
+            alarme.signe("réveil à la main", ouvrir=ouvrir)
+        self.assertEqual(vues[0], {"source": "réveil", "heures_utc": [5, 17]})
+        self.assertEqual(vues[1]["source"], "réveil à la main")
+        self.assertEqual(vues[1]["heures_utc"], alarme.heures_reveil())
+
+    def test_heures_du_reveil_lues_dans_le_rythme_et_verifiees(self):
+        self.assertTrue(alarme.heures_reveil())   # organisation/rythme.toml en donne
+        with tempfile.TemporaryDirectory() as d:
+            fichier = Path(d, "rythme.toml")
+            for texte, attendu in (("[reveil]\nheures_utc = [17, 5, 5]", [5, 17]),
+                                   ("[reveil]\nheures_utc = [5, 24]", None),
+                                   ("[reveil]\nheures_utc = []", None),
+                                   ("[reveil]\nheures_utc = [true]", None),
+                                   ("[direction]\nseances_par_jour = 1", None),
+                                   ("pas du toml [", None)):
+                fichier.write_text(texte, encoding="utf-8")
+                self.assertEqual(alarme.heures_reveil(fichier), attendu, texte)
+        self.assertIsNone(alarme.heures_reveil(Path("absent.toml")))
+
+    def test_seul_un_reveil_programme_compte_pour_son_creneau(self):
+        texte = (RACINE / ".github/workflows/reveil.yml").read_text(encoding="utf-8")
+        self.assertIn("type: boolean", texte.split("programme:")[1].split("jobs:")[0])
+        seance = texte.split("- name: Séance de la Direction")[1].split("- name:")[0]
+        self.assertIn("github.event_name == 'schedule' || inputs.programme", seance)
+        self.assertIn("gh run list -w semaine.yml", seance)   # une séance au plus par créneau
+        etape = texte.split("- name: Signe de vie")[1]
+        self.assertIn("'réveil' || 'réveil à la main'", etape)
+        self.assertIn('signe "$SOURCE"', etape)
+
+    def test_le_cron_de_github_n_est_qu_un_filet(self):
+        texte = (RACINE / ".github/workflows/reveil.yml").read_text(encoding="utf-8")
+        garde = texte.split("  garde:")[1].split("  agents:")[0]
+        self.assertIn("-e workflow_dispatch", garde)
+        self.assertIn("5 hours ago", garde)
+        agents = texte.split("  agents:")[1].split("steps:")[0]
+        self.assertIn("needs: garde", agents)
+        self.assertIn("needs.garde.outputs.lancer == 'true'", agents)
 
 
 class Deploiement(unittest.TestCase):
@@ -229,6 +277,44 @@ const B = { Authorization: "Bearer signe" };
         self.assertEqual(r["resultat"]["marque"], {"ok": True, "lus": 1})
         self.assertEqual(r["cles"], ["clic:000600000002"])
 
+    def test_le_worker_lance_le_reveil_a_son_heure_une_fois(self):
+        r = self.scenario("""
+          env.DELAI_MINUTES = "1440";
+          kv.set("etat", JSON.stringify({ dernier: "2026-11-17T11:20:00Z", source: "réveil", heures: [5, 11, 17, 23] }));
+          await w.scheduled({ scheduledTime: Date.parse("2026-11-17T16:07:00Z") }, env);   // créneau de 11 h fait
+          await w.scheduled({ scheduledTime: Date.parse("2026-11-17T17:07:00Z") }, env);   // créneau de 17 h : relance
+          await w.scheduled({ scheduledTime: Date.parse("2026-11-17T18:07:00Z") }, env);   // déjà relancé
+          return JSON.parse(kv.get("etat"));""", relance="jeton-gh")
+        relances = [a for a in r["appels"] if "api.github.com" in a["url"]]
+        self.assertEqual(len(relances), 1)
+        self.assertTrue(relances[0]["url"].endswith("/actions/workflows/reveil.yml/dispatches"))
+        self.assertEqual(relances[0]["corps"], {"ref": "main", "inputs": {"programme": "true"}})
+        self.assertEqual(r["resultat"]["relance_reveil"], "2026-11-17T17:07:00.000Z")
+        self.assertFalse(any("telegram" in a["url"] for a in r["appels"]))   # aucune alarme
+
+    def test_sans_jeton_ni_signe_aucun_reveil_lance(self):
+        r = self.scenario("""
+          env.DELAI_MINUTES = "1440";
+          await w.scheduled({ scheduledTime: Date.parse("2026-11-17T17:07:00Z") }, env);   // jamais de signe
+          kv.set("etat", JSON.stringify({ dernier: "2026-11-17T05:20:00Z", source: "réveil" }));
+          env.GITHUB_RELANCE_TOKEN = "";
+          await w.scheduled({ scheduledTime: Date.parse("2026-11-17T17:07:00Z") }, env);
+          env.GITHUB_RELANCE_TOKEN = "jeton-gh"; env.ESSAI = "1";
+          await w.scheduled({ scheduledTime: Date.parse("2026-11-17T17:07:00Z") }, env);
+          return 0;""", relance="jeton-gh")
+        self.assertFalse(any("api.github.com" in a["url"] for a in r["appels"]))
+
+    def test_le_signe_garde_le_reveil_et_les_heures(self):
+        r = self.scenario("""
+          await appel('POST', '/signe', { source: 'réveil', heures_utc: [6, 18] }, B);
+          const reveil = JSON.parse(kv.get("etat"));
+          await appel('POST', '/signe', { source: 'réveil à la main' }, B);
+          return { reveil, main: JSON.parse(kv.get("etat")) };""")
+        reveil, main = r["resultat"]["reveil"], r["resultat"]["main"]
+        self.assertEqual(reveil["heures"], [6, 18])
+        self.assertEqual(reveil["reveil"], reveil["dernier"])
+        self.assertEqual((main["reveil"], main["heures"], main["source"]), (reveil["reveil"], [6, 18], "réveil à la main"))
+
     def test_le_signe_de_vie_marche_toujours(self):
         r = self.scenario("return (await appel('POST', '/signe', { source: 'essai' }, B)).corps.ok;")
         self.assertTrue(r["resultat"])
@@ -270,6 +356,40 @@ class Worker(unittest.TestCase):
         calme = self.js("w.apresSigne(0, {dernier: 'x', alerte: null}, 'réveil')")
         self.assertEqual([vraie["retour"], essai["retour"], calme["retour"]], [True, False, False])
         self.assertIsNone(vraie["etat"]["alerte"])
+
+    def test_reveil_du_au_dernier_creneau_passe(self):
+        def du(maintenant, etat):
+            return self.js(f"w.reveilDu(Date.parse('{maintenant}'), {etat})")
+        self.assertIsNone(du("2026-11-17T16:07:00Z", "{reveil: '2026-11-17T11:30:00Z'}"))
+        self.assertEqual(du("2026-11-17T17:07:00Z", "{reveil: '2026-11-17T11:30:00Z'}"), "2026-11-17T17:00:00.000Z")
+        # minuit passé : le créneau de 23 h de la veille
+        self.assertEqual(du("2026-11-18T02:07:00Z", "{reveil: '2026-11-17T17:30:00Z'}"), "2026-11-17T23:00:00.000Z")
+        # heures choisies par l'agence
+        self.assertIsNone(du("2026-11-17T16:07:00Z", "{reveil: '2026-11-17T11:30:00Z', heures: [11, 20]}"))
+        self.assertEqual(du("2026-11-17T20:07:00Z", "{reveil: '2026-11-17T11:30:00Z', heures: [11, 20]}"),
+                         "2026-11-17T20:00:00.000Z")
+        # ancien état : le dernier signe compte s'il venait d'un réveil
+        self.assertIsNone(du("2026-11-17T12:07:00Z", "{dernier: '2026-11-17T11:30:00Z', source: 'réveil'}"))
+        self.assertIsNotNone(du("2026-11-17T12:07:00Z", "{dernier: '2026-11-17T11:30:00Z', source: 'réveil à la main'}"))
+
+    def test_un_reveil_lance_sans_nouvelles_est_relance_au_bout_de_3_h(self):
+        etat = "{reveil: '2026-11-17T11:30:00Z', relance_reveil: '2026-11-17T17:07:00Z'}"
+        self.assertIsNone(self.js(f"w.reveilDu(Date.parse('2026-11-17T19:07:00Z'), {etat})"))
+        self.assertEqual(self.js(f"w.reveilDu(Date.parse('2026-11-17T20:07:00Z'), {etat})"), "2026-11-17T17:00:00.000Z")
+
+    def test_heures_invalides_remplacees_par_celles_du_cron(self):
+        for mauvaises in ("[]", "[24]", "[1.5]", "'5'", "null", "[-1]"):
+            self.assertEqual(self.js(f"w.heuresValides({mauvaises})"), [5, 11, 17, 23], mauvaises)
+        self.assertEqual(self.js("w.heuresValides([17, 5, 5])"), [5, 17])
+
+    def test_apres_signe_seul_le_reveil_programme_avance(self):
+        avant = ("{dernier: 'x', source: 'réveil', reveil: '2026-11-17T05:20:00Z', "
+                 "relance_reveil: '2026-11-17T05:07:00Z', heures: [5, 17]}")
+        main = self.js(f"w.apresSigne(Date.parse('2026-11-17T09:00:00Z'), {avant}, 'réveil à la main')")["etat"]
+        self.assertEqual((main["reveil"], main["relance_reveil"], main["heures"]),
+                         ("2026-11-17T05:20:00Z", "2026-11-17T05:07:00Z", [5, 17]))
+        prog = self.js(f"w.apresSigne(Date.parse('2026-11-17T17:20:00Z'), {avant}, 'réveil', [6])")["etat"]
+        self.assertEqual((prog["reveil"], prog["heures"]), ("2026-11-17T17:20:00.000Z", [6]))
 
     def test_messages(self):
         essai = self.js("w.messageAlarme({dernier: '2026-11-14T00:00:00Z', source: 'réveil'}, 1500, true)")
