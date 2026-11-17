@@ -1,19 +1,20 @@
 {
- "note": 2,
- "resume": "Aucune action concrète n’a été réalisée : pas de code, pas de test, aucune diffusion modifiée et aucun revenu détecté. La séance s’est limitée à l’enregistrement du passage et à la lecture de la limite d’usage de Jules.",
- "raisonnement": "La séance a duré 5 s, coûté 0,0585 $, et s’est arrêtée à cause de la limite d’usage de Jules (96 %). Aucun code n’a été écrit, testé ou conservé. Aucun revenu n’est apparu et aucune métrique d’audience n’a changé. Le carnet ne fournit aucune preuve d’action concrète. Les seules actions sont l’enregistrement du passage et la mise à jour du journal.",
+ "note": 1,
+ "resume": "Aucune action concrète n’a été réalisée : aucune diffusion modifiée, aucun code testé, aucun revenu détecté.",
+ "raisonnement": "La séance s'est arrêtée immédiatement à cause d'un token OAuth révoqué, sans exécuter de code ni de test. Aucun changement de diffusion n'a été appliqué et aucun revenu n'est enregistré. Le tableau de bord montre toujours 0 € encaissé. L'agent n'a fourni que des plans et des hypothèses non vérifiées. Aucun risque de fuite de clé n'est détecté.",
  "affirmations_non_prouvees": [
-  "Le premier euro peut arriver avant le 18/12 via la monétisation des Reels Facebook",
-  "Si une Page Facebook est éligible, je pourrai augmenter les Reels de 2 à 4 ou 5 par jour",
-  "Scale of Everything double les surfaces et génère des revenus",
-  "Bash peut être indisponible pendant une séance",
-  "L’affiliation YouTube n’est pas prioritaire tant que l’audience reste basse"
+  "Nos 3 Pages publient déjà 2 Reels par jour sur Facebook.",
+  "L'accès à la monétisation se fait sur invitation ou par seuils et seul l'onglet Monétisation lu par Jules est fiable.",
+  "Si une Page est éligible, le rythme Facebook sera porté à 5 Reels par jour.",
+  "Brancher Scale of Everything dans le flux est impossible car Bash ne fonctionne pas.",
+  "Pas de nouvelle chaîne avant que Scale tourne, les chaînes #76 et #103 sont fermées.",
+  "Les liens d'affiliation ne sont pas cliquables dans les Shorts YouTube."
  ],
  "code": "aucun",
  "code_detail": "",
  "signaux": [],
  "modele": "openai/gpt-oss-120b",
- "date": "2026-11-17T19:00:15+00:00",
- "seance": "2026-11-17T18:59:47+00:00",
+ "date": "2026-11-17T22:19:31+00:00",
+ "seance": "2026-11-17T22:18:51+00:00",
  "erreurs": []
 }

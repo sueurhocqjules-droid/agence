@@ -1,14 +1,15 @@
 {
- "debut": "2026-11-17T18:59:47+00:00",
- "fin": "2026-11-17T18:59:52+00:00",
- "cout_usd": 0.0585,
- "jetons": 16429,
- "tours": null,
- "erreur": "arrêt anti-emballement : réserve de Jules atteinte : 96% de sa limite hebdomadaire utilisés",
- "arret": "réserve de Jules atteinte : 96% de sa limite hebdomadaire utilisés",
- "utilisation": 0.96,
+ "debut": "2026-11-17T22:18:51+00:00",
+ "fin": "2026-11-17T22:18:55+00:00",
+ "run": "44188662653",
+ "cout_usd": 0.0,
+ "jetons": 0,
+ "tours": 1,
+ "erreur": "séance arrêtée (success) : Failed to authenticate: OAuth token revoked. Please log in again or contact your administrator.",
+ "arret": null,
+ "utilisation": null,
  "ecritures": 0,
- "resume": "",
+ "resume": "Failed to authenticate: OAuth token revoked. Please log in again or contact your administrator.",
  "message_jules": "",
  "demandes": [],
  "fermer": [],
@@ -18,6 +19,7 @@
  "code_retire": [],
  "tests": "aucun code",
  "gardes": [],
+ "proposes": [],
  "studio": "rien de neuf",
- "juge": 2
+ "juge": 1
 }

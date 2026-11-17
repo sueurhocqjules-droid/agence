@@ -1,4 +1,4 @@
-# Tableau de bord (17/11/2026 19:00 UTC)
+# Tableau de bord (17/11/2026 22:19 UTC)
 
 Écrit par les scripts à partir du registre. Ne pas modifier à la main.
 
@@ -10,9 +10,9 @@
 
 | chaîne | vues totales | vues gagnées 7 j | vidéos | relevé |
 |---|---|---|---|---|
-| en | 19595 | ? | 30 | 2026-11-17T17:07 |
-| es | 7 | ? | 30 | 2026-11-17T17:07 |
-| pt | 5395 | ? | 30 | 2026-11-17T17:07 |
+| en | 19595 | 13125 | 30 | 2026-11-17T17:07 |
+| es | 7 | 6 | 30 | 2026-11-17T17:07 |
+| pt | 5395 | 5078 | 30 | 2026-11-17T17:07 |
 
 ## Diffusions des 7 derniers jours
 
@@ -33,11 +33,13 @@
 
 ## Séances du Pilote (7 jours)
 
-- 2 séance(s), 1 sans erreur, 1 arrêtée(s) par l'anti-emballement
+- 3 séance(s), 1 sans erreur, 1 arrêtée(s) par l'anti-emballement
 - Code gardé : 2 fichier(s), retiré par le tri : 0
   - 2026-11-17T14:40 : ok, 0.7588 $, juge None/10
   - 2026-11-17T18:59 : echec, 0.0585 $, juge 2/10, arrêt : réserve de Jules atteinte : 96% de sa limite hebdomadaire utilisés
+  - 2026-11-17T22:18 : echec, 0.0 $, juge 1/10
 
 ## Derniers avis du juge
 
 - 2026-11-17T19:00 (openai/gpt-oss-120b) 2/10, code aucun : Aucune action concrète n’a été réalisée : pas de code, pas de test, aucune diffusion modifiée et aucun revenu détecté. La séance s’est limitée à l’enregistrement du passage et à la lecture de la limite d’usage de Jules.
+- 2026-11-17T22:19 (openai/gpt-oss-120b) 1/10, code aucun : Aucune action concrète n’a été réalisée : aucune diffusion modifiée, aucun code testé, aucun revenu détecté.
