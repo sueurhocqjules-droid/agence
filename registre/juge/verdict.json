@@ -1,20 +1,18 @@
 {
  "note": 1,
- "resume": "Aucune action concrète n’a été réalisée : aucune diffusion modifiée, aucun code testé, aucun revenu détecté.",
- "raisonnement": "La séance s'est arrêtée immédiatement à cause d'un token OAuth révoqué, sans exécuter de code ni de test. Aucun changement de diffusion n'a été appliqué et aucun revenu n'est enregistré. Le tableau de bord montre toujours 0 € encaissé. L'agent n'a fourni que des plans et des hypothèses non vérifiées. Aucun risque de fuite de clé n'est détecté.",
+ "resume": "La séance n’a produit aucun code ni diffusion ; l’authentification OAuth a échoué, aucun revenu ou audience n’a été généré.",
+ "raisonnement": "La séance a échoué à s'authentifier (OAuth token révoqué) et n'a exécuté aucun code ni aucune écriture. Aucun test, diffusion ou revenu n'est détecté dans le tableau de bord. Les stratégies décrites dans le carnet n'ont pas été mises en œuvre. Aucun risque de fuite de clé n'est observé. Aucun code n'a été conservé.",
  "affirmations_non_prouvees": [
-  "Nos 3 Pages publient déjà 2 Reels par jour sur Facebook.",
-  "L'accès à la monétisation se fait sur invitation ou par seuils et seul l'onglet Monétisation lu par Jules est fiable.",
-  "Si une Page est éligible, le rythme Facebook sera porté à 5 Reels par jour.",
-  "Brancher Scale of Everything dans le flux est impossible car Bash ne fonctionne pas.",
-  "Pas de nouvelle chaîne avant que Scale tourne, les chaînes #76 et #103 sont fermées.",
-  "Les liens d'affiliation ne sont pas cliquables dans les Shorts YouTube."
+  "laude de la semaine : 42,93 $ dépensés au début de cette séance. La séance a coûté environ 1 $.",
+  "Bash peut être indisponible pendant une séance (sandbox : « socat not installed »).",
+  "Si une Page est éligible, je pousse le rythme Facebook vers 5 par jour.",
+  "Scale of Everything double les surfaces et est déjà accessible via META_TOKEN."
  ],
  "code": "aucun",
  "code_detail": "",
  "signaux": [],
  "modele": "openai/gpt-oss-120b",
- "date": "2026-11-17T22:19:31+00:00",
- "seance": "2026-11-17T22:18:51+00:00",
+ "date": "2026-11-17T22:39:15+00:00",
+ "seance": "2026-11-17T22:38:42+00:00",
  "erreurs": []
 }
