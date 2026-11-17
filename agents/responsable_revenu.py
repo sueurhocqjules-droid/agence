@@ -23,9 +23,13 @@ import sys
 import urllib.request
 from datetime import datetime, timedelta, timezone
 
-from agence import besoins, memoire, mesures, modeles, postes, registre, youtube
+from agence import besoins, guichet, memoire, mesures, modeles, postes, registre, youtube
 
 POSTE = "responsable-revenu"
+# Programme d'affiliation à demander au guichet par chaîne (voie affiliation sans option après le délai)
+PROGRAMMES = {"en": "Amazon Associates US", "pt": "Amazon Associados Brasil"}
+PROGRAMMES_LIEN = {"Amazon Associates US": "https://affiliate-program.amazon.com",
+                   "Amazon Associados Brasil": "https://associados.amazon.com.br"}
 ETAT = "regles-plateformes.json"
 PAGE = "regles-plateformes.md"
 OBJECTIF = "50 € par mois (objectif 1 de MISSION.md), 0 € aujourd'hui"
@@ -298,6 +302,32 @@ def derniere_voie():
     return {v["chaine"]: v["voie"] for v in lignes[-1]["voies"]} if lignes else {}
 
 
+def demander_comptes_affiliation(voies, maintenant, dossier=None, ecrire=guichet.demander):
+    """Un besoin de voie affiliation qui passe le délai sans aucune option : une demande de compte de programme
+    d'affiliation au guichet, au nom de la chaîne (PROGRAMMES : en et pt). Renvoie les numéros de demande.
+    Le guichet n'écrit pas deux fois la même demande, et le rappel d'une adresse par chaîne s'y ajoute seul."""
+    dossier = besoins.dossier(maintenant) if dossier is None else dossier
+    par_id = {b["id"]: b for b in dossier}
+    numeros = []
+    for v in voies:
+        programme = PROGRAMMES.get(v["chaine"])
+        b = par_id.get(v.get("besoin_id"))
+        if v["voie"] != "affiliation" or not programme or not b or not b["delai_depasse"] or b["options"]:
+            continue
+        nom = youtube.CHAINES[v["chaine"]][0]
+        numero, _ = ecrire(
+            f"Compte {programme} de la chaîne {nom}",
+            quoi=f"créer le compte {programme} au nom de la chaîne « {nom} » ({v['chaine']}), et me donner le lien "
+                 f"d'affiliation à mettre dans son profil et ses descriptions (champ lien_affiliation de la chaîne)",
+            pourquoi=f"objectif 1 : le besoin {b['id']} a {b['age_h']} h (délai {b['delai_h']} h) et aucune option : "
+                     f"la voie affiliation demande un programme ouvert au nom de la chaîne",
+            debloque=f"la voie affiliation de la chaîne « {nom} » : lien et mention de promotion payée ajoutés "
+                     "par l'agence, commission à la vente",
+            par=POSTE, lien=PROGRAMMES_LIEN[programme])
+        numeros.append(numero)
+    return numeros
+
+
 def passage(essai, lire=lire_page, demander=postes.demander):
     jour = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     etat = verifier(lire_etat(), jour, lire)
@@ -374,6 +404,10 @@ def passage(essai, lire=lire_page, demander=postes.demander):
                     voie={"chaine": v["chaine"], "ancienne": avant.get(v["chaine"]), "nouvelle": v["voie"]})
         for r in a_relire:
             registre.decider(POSTE, f"règle à relire : {r}", etat[r]["detail"])
+        try:
+            demander_comptes_affiliation(voies, maintenant)
+        except Exception as e:  # noqa: BLE001 : le guichet injoignable n'arrête pas le passage, il est redit au suivant
+            print(f"GUICHET demande de compte d'affiliation non écrite : {type(e).__name__} {str(e)[:150]}")
         with open(registre.DOSSIER / "revenu.jsonl", "a", encoding="utf-8", newline="\n") as f:
             f.write(json.dumps({"date": registre.maintenant(), "par": POSTE, "modele": modele, "ligne": ligne,
                                 "voies": voies, "regles": {i: e["etat"] for i, e in etat.items()},

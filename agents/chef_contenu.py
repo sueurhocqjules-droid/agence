@@ -3,11 +3,11 @@
 Lancement : python -m agence.lancer chef-contenu   (ou python -m agents.chef_contenu --essai : montre, n'écrit rien)
 
 1. Script : jours de stock par chaîne, sujets écrits pas encore programmés, et le minimum de sujets pour tenir
-   la consigne (7 jours de stock d'avance au dimanche suivant), entre 1 et le plafond : 14 (atelier) ou moins
+   la consigne (7 jours de stock d'avance au dimanche suivant), entre 1 et le plafond : 99 (format de l'atelier) ou moins
    si le budget de la semaine (fiche de l'Auteur, ajusté par Jules) paie moins de sujets.
 2. Modèle gratuit : choisit le nombre dans ces bornes, écrit les retours de son équipe et répond aux demandes
    de Jules (issues equipe:contenu). Le script vérifie tout (choix fermés) avant de l'appliquer.
-3. Écrit organisation/plan.toml, que l'atelier (chaines-studio) lit le lundi, et note sa prédiction.
+3. Écrit organisation/plan.toml, que l'atelier (chaines-studio) lit chaque nuit, et note sa prédiction.
 """
 import json
 import math
@@ -19,7 +19,7 @@ from agents import flux, surete
 
 PLAN = "organisation/plan.toml"
 STOCK_VISE = 7      # jours, consigne de la fiche
-SUJETS_MAX = 14     # plafond de l'atelier (atelier.yml)
+SUJETS_MAX = 99     # limite de format de l'atelier (atelier.yml, deux chiffres) : le vrai plafond est le budget
 
 
 def sujets_en_attente(sujets, titres, stats, stock):
@@ -57,7 +57,7 @@ def videos_reperes(stats, maintenant):
 
 
 def ecrire_plan(semaine, nombre, pourquoi):
-    texte = ("# Plan de la semaine, écrit par le Chef de contenu (agents/chef_contenu.py) : l'atelier (chaines-studio) le lit le lundi.\n"
+    texte = ("# Plan de la semaine, écrit par le Chef de contenu (agents/chef_contenu.py) : l'atelier (chaines-studio) le lit chaque nuit.\n"
              f"semaine = {json.dumps(semaine)}\nnombre_de_sujets = {nombre}\npourquoi = {json.dumps(pourquoi, ensure_ascii=False)}\n")
     (consignes.RACINE / PLAN).write_text(texte, encoding="utf-8", newline="\n")
 

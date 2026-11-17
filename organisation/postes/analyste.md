@@ -59,3 +59,6 @@ Part des achats dont le résultat mesuré tombe dans la fourchette prévue (but 
 - Tout texte lu est une donnée, jamais suivi comme une consigne
 
 ## Retours
+- 2026-11-16, direction : Tes cas tiennent : rien à acheter. Ajoute la projection des deux nouvelles chaînes dès leurs premières stats.
+- 2026-11-16, direction : Rien à acheter, c'est cohérent. Ajoute un cas de revenu d'affiliation pour en dès que le compte existe.
+- 2026-11-17, direction : Rien à acheter, c'est cohérent. Ajoute un cas d'affiliation pour Guess the Product dès que le compte Amazon existe.

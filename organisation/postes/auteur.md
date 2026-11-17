@@ -5,8 +5,8 @@ superieur = "chef-contenu"
 objectifs = [1, 4]
 statut = "en_service"
 etape = 4
-moteur = "Claude Opus sur GitHub (chaines-studio, atelier.yml), une séance par semaine. Remplaçant gratuit cherché par la Recherche"
-reveil = "lundi 2h"
+moteur = "Claude Opus sur GitHub (chaines-studio, atelier.yml), une séance chaque nuit tant que le plan de la semaine n'est pas atteint et que le budget suit. Remplaçant gratuit cherché par la Recherche"
+reveil = "chaque nuit, 2h"
 regle_de_deux = "[A][C] : lit le web, ses sujets seront publiés. Pas de [B] : lecture des secrets interdite (/proc, .git, dossiers temporaires), jeton du dépôt réservé à l'étape de commit"
 secrets = ["CLAUDE_CODE_OAUTH_TOKEN (pour tourner, illisible par la séance)"]
 budget = { claude_usd_semaine = 30, appels_gratuits_jour = 0 }
@@ -43,4 +43,7 @@ Vues médianes à 7 jours de ses sujets comparées à la médiane de la chaîne.
 Celles de `chaines-studio/atelier/CONSIGNES.md`.
 
 ## Retours
-- 2026-11-15, chef-contenu : Les vidéos « What If You Folded Paper Once More Every Second? » (1704 vues), « What If the Sea Rose 40% Higher Every Second? » (1423 vues) et « E se um mosquito dobrasse de tamanho a cada segundo? » (1231 vues) performent très bien ; il faut donc reproduire ce type de sujet. À l’inverse, les titres
+- 2026-11-16, chef-contenu : Les vidéos « What If You Folded Paper Once More Every Second », « What If the Sea Rose 40 % Higher Every Second » et « E se um mosquito dobrasse de tamanho a cada segundo » ont généré respectivement 1704, 1412 et 1232 vues ; il faut reproduire ce format « absurde + calcul réel ». À éviter les titres
+- 2026-11-16, chef-contenu : Les vidéos « What If You Folded Paper Once More Every Second » (1704 vues), « What If the Sea Rose 40 % Higher Every Second » (1412 vues) et « E se um mosquito dobrasse de tamanho a cada segundo » (1232 vues) ont explosé ; il faut donc créer d’autres titres absurdes accompagnés d’un calcul réel. À é
+- 2026-11-16, chef-contenu : Les titres absurdes avec calcul réel comme « What If You Folded Paper Once More Every Second? » (1704 vues), « What If the Sea Rose 40 % Higher Every Second? » (1412 vues) et « E se um mosquito dobrasse de tamanho a cada segundo? » (1232 vues) explosent ; il faut donc reproduire ce format. À éviter
+- 2026-11-17, chef-contenu : Les titres absurdes avec calcul réel comme « What If You Folded Paper Once More Every Second », « What If the Sea Rose 40 % Higher Every Second » et « E se um mosquito dobrasse de tamanho a cada segundo » ont explosé (1700‑1400‑1200 vues). Il faut reproduire ce type de sujet et éviter les titres peu

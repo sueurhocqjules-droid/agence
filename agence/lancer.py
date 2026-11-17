@@ -7,6 +7,7 @@
 3. Refuse si son budget est atteint : dollars Claude de la semaine, appels gratuits du jour (champ budget de la fiche)
 4. Le lance avec ses seuls secrets : toute variable d'allure secrète qu'il n'a pas déclarée est retirée
 5. Note le passage au journal du responsable (registre/journal/<agent>.jsonl), et tout refus au journal d'audit
+   Un échec (code non nul) met les 20 dernières lignes de la sortie dans le bloquant
 """
 import json
 import os
@@ -89,6 +90,30 @@ def noter_journal(responsable, entree):
         f.write(json.dumps(entree, ensure_ascii=False) + "\n")
 
 
+CATEGORIES_ECHEC = (  # du plus précis au plus vague : la première qui correspond gagne
+    ("quota ou 429", re.compile(r"\b429\b|quota|rate.?limit|too many requests|resource.?exhausted", re.I)),
+    ("limite de 5 h", re.compile(r"5.?hours?\b.{0,40}limit|usage limit|limit.{0,60}reset", re.I)),
+    ("tours épuisés", re.compile(r"error_max_turns|max.?turns|tours? épuisés", re.I)),
+    ("conflit", re.compile(r"conflict|conflit", re.I)),
+    ("tests", re.compile(r"FAILED \(|\bFAIL:|\bERROR:|AssertionError|tests? en échec", re.I)),
+)
+
+
+def categorie_echec(sortie):
+    """La cause d'un échec, lue dans la sortie : quota ou 429, limite de 5 h, tours épuisés, conflit, tests, sinon autre."""
+    texte = "\n".join(sortie)
+    return next((nom for nom, motif in CATEGORIES_ECHEC if motif.search(texte)), "autre")
+
+
+def bloquant_echec(nom, code, sortie):
+    """Texte du bloquant d'un échec : sa catégorie et les 20 dernières lignes de la sortie (erreurs comprises), pas un renvoi."""
+    fin = sortie[-20:]
+    texte = "\n".join(fin)[-2000:]
+    if not texte.strip():
+        return f"{nom} a échoué (code {code}), sortie vide"
+    return f"{nom} a échoué (code {code}), cause : {categorie_echec(fin)}. 20 dernières lignes :\n{texte}"
+
+
 def lancer(nom, arguments):
     postes, liste_scripts = organisation.fiches(), organisation.scripts()
     responsable, module, declares, budget = preparer(nom, postes, liste_scripts)
@@ -134,7 +159,7 @@ def lancer(nom, arguments):
         entree["secrets_en_trop"] = en_trop
     if proc.returncode:
         entree["cause"] = cause_echec(sortie)
-        entree["bloquant"] = f"{nom} a échoué (code {proc.returncode}) : {entree['cause']}"[:300]
+        entree["bloquant"] = bloquant_echec(nom, proc.returncode, sortie)
     noter_journal(responsable, entree)
     return proc.returncode
 

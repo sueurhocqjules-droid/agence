@@ -62,6 +62,19 @@ class Budget(unittest.TestCase):
         self.assertIsNone(lancer.budget_atteint("auteur", self.budget, couts, MERCREDI))
 
 
+class BloquantEchec(unittest.TestCase):
+    def test_garde_les_20_dernieres_lignes(self):
+        texte = lancer.bloquant_echec("flux", 1, [f"ligne {i}" for i in range(30)])
+        self.assertIn("code 1", texte)
+        self.assertIn("ligne 29", texte)
+        self.assertIn("ligne 10", texte)
+        self.assertNotIn("ligne 9\n", texte + "\n")
+        self.assertNotIn("voir la sortie", texte)
+
+    def test_sortie_vide_le_dit(self):
+        self.assertIn("sortie vide", lancer.bloquant_echec("flux", 2, []))
+
+
 class Secrets(unittest.TestCase):
     def test_seuls_les_secrets_declares_passent(self):
         env = {"YT_TOKEN_EN": "a", "GH_TOKEN": "b", "GROQ_API_KEY": "c", "PATH": "/bin", "RENDU_DIR": "rendu"}
@@ -87,6 +100,31 @@ class Hierarchie(unittest.TestCase):
     def test_agent_non_construit_refuse(self):
         with self.assertRaises(ValueError):
             lancer.preparer("direction", POSTES, {})
+
+
+class CauseDEchec(unittest.TestCase):
+    """Chaque panne vue devient un cas : la catégorie écrite dans « bloquant » doit être la bonne."""
+    CAS = {
+        "quota ou 429": ["appel", "HTTP 429 Too Many Requests"],
+        "limite de 5 h": ["Claude usage limit reached", "your 5-hour limit resets at 3am"],
+        "tours épuisés": ["claude s'est arrêté (error_max_turns) : "],
+        "conflit": ["CONFLICT (content): Merge conflict in agence/x.py"],
+        "tests": ["FAIL: test_a (tests.test_x.T)", "FAILED (failures=1)"],
+        "autre": ["Traceback", "KeyError: 'x'"],
+    }
+
+    def test_chaque_categorie(self):
+        for attendue, lignes in self.CAS.items():
+            with self.subTest(attendue):
+                self.assertEqual(lancer.categorie_echec(lignes), attendue)
+
+    def test_bloquant_garde_la_categorie_et_20_lignes(self):
+        sortie = [f"ligne {i}" for i in range(30)] + ["HTTP 429"]
+        texte = lancer.bloquant_echec("ingenierie", 1, sortie)
+        self.assertIn("code 1", texte)
+        self.assertIn("quota ou 429", texte)
+        self.assertEqual(len(texte.splitlines()), 1 + 20)
+        self.assertNotIn("ligne 5\n", texte)
 
 
 class CauseEchec(unittest.TestCase):
