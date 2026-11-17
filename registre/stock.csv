@@ -125,3 +125,9 @@ mosquito-es,es,mosquito,en_rendu,,,2026-11-17T11:25:02+00:00,
 moon-es,es,moon,en_rendu,,,2026-11-17T11:25:02+00:00,
 mosquito-pt,pt,mosquito,en_rendu,,,2026-11-17T11:25:02+00:00,
 moon-pt,pt,moon,en_rendu,,,2026-11-17T11:25:02+00:00,
+balloon-en,en,balloon,programme,2026-11-25T17:00:00+00:00,2XBw05s-fkk,2026-11-17T17:08:14+00:00,"artefact 14322234934, {'duree_s': 62.31, 'son_moyen_db': -18.0, 'noir_s': 0}"
+balloon-es,es,balloon,programme,2026-11-26T01:00:00+00:00,7p-q5Opp9kk,2026-11-17T17:08:20+00:00,"artefact 14324266247, {'duree_s': 62.31, 'son_moyen_db': -18.0, 'noir_s': 0}"
+balloon-pt,pt,balloon,programme,2026-11-25T15:00:00+00:00,kf31OPDxgro,2026-11-17T17:08:27+00:00,"artefact 14324790071, {'duree_s': 62.31, 'son_moyen_db': -18.0, 'noir_s': 0}"
+candle-en,en,candle,programme,2026-11-26T17:00:00+00:00,assTlpSF_Mc,2026-11-17T17:08:34+00:00,"artefact 14323524146, {'duree_s': 62.1, 'son_moyen_db': -18.0, 'noir_s': 0}"
+candle-es,es,candle,programme,2026-11-27T01:00:00+00:00,gvwKuDJcMNE,2026-11-17T17:08:41+00:00,"artefact 14322284828, {'duree_s': 62.1, 'son_moyen_db': -18.0, 'noir_s': 0}"
+candle-pt,pt,candle,programme,2026-11-26T15:00:00+00:00,8LEF-_3LGWg,2026-11-17T17:08:48+00:00,"artefact 14322474589, {'duree_s': 62.1, 'son_moyen_db': -18.0, 'noir_s': 0}"
