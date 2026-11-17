@@ -1,7 +1,9 @@
 """Telegram : le téléphone de Jules, par le bot @Agence_ytb_bot. Aucun modèle, aucun jeton Claude.
 
 Secrets : TELEGRAM_BOT_TOKEN et TELEGRAM_CHAT_ID (secrets du dépôt sur GitHub, agence/.env en local, ignoré par Git).
-Seule la conversation de Jules (TELEGRAM_CHAT_ID) reçoit des messages, et seuls ses clics sont lus.
+Seule la conversation de Jules (TELEGRAM_CHAT_ID) reçoit des messages. Ses clics sur les boutons arrivent au Worker
+de l'alarme par webhook (alarme/worker.js) : getUpdates ne marche plus une fois le webhook posé, et un clic non lu y
+disparaissait en 2 à 3 minutes.
 """
 import json
 import os
@@ -48,28 +50,6 @@ def envoyer(texte, boutons=None):
     if boutons:
         donnees["reply_markup"] = {"inline_keyboard": [[{"text": t, "callback_data": d} for t, d in boutons]]}
     return appeler("sendMessage", donnees)["message_id"]
-
-
-def clics(depuis):
-    """Clics de Jules sur des boutons depuis l'update `depuis` :
-    (prochain décalage, [(id de l'update, id du clic, donnée, id du message, date d'envoi du message en secondes)]).
-
-    Tout ce qui ne vient pas de la conversation de Jules est ignoré. Les updates lues sont confirmées
-    à Telegram au prochain appel avec le décalage renvoyé.
-    """
-    jules, prochain, resultat = chat_jules(), depuis, []
-    for update in appeler("getUpdates", {"offset": depuis, "timeout": 0, "allowed_updates": ["callback_query"]}):
-        prochain = max(prochain, update["update_id"] + 1)
-        clic = update.get("callback_query")
-        if not clic or clic["from"]["id"] != jules or clic.get("message", {}).get("chat", {}).get("id") != jules:
-            continue
-        resultat.append((update["update_id"], clic["id"], clic.get("data", ""), clic["message"]["message_id"],
-                         clic["message"].get("date", 0)))
-    return prochain, resultat
-
-
-def accuser(id_clic, texte):
-    appeler("answerCallbackQuery", {"callback_query_id": id_clic, "text": texte[:200]})
 
 
 def remplacer(id_message, texte):

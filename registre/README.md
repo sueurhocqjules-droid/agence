@@ -13,7 +13,6 @@ La mémoire commune de l'agence. Chaque agent y lit et y écrit, en ajout seulem
 | `alertes.csv` | une alerte envoyée par la Sûreté (sa `cle` empêche de la renvoyer) | `date`, `cle`, `niveau` (budget, quota, sanction, panne), `message` |
 | `guichet.json` | l'état du récapitulatif du guichet (`agence/guichet.py`) | `recap` (jour du dernier récapitulatif envoyé à Jules, heure de Paris), `urgents` (numéros des demandes urgentes déjà signalées), `nouvelles` (demandes écrites pendant le réveil en cours, vidées par le récapitulatif) |
 | `contacts.jsonl` | un message envoyé à une personne après validation de Jules (`agence/contacts.py`). Les demandes du guichet et les messages en attente vivent dans les issues `guichet` et `contact` du dépôt, pas ici | `date`, `issue`, `chaine`, `objet`, `destinataires` (nombre), `domaines` (jamais l'adresse entière) |
-| `telegram.json` | le dernier clic lu sur Telegram | `decalage` |
 | `bilans/<date>.md` | le bilan d'une semaine, copie de l'issue envoyée à Jules | |
 | `bilans/critique-<lundi>.md`, `bilans/direction-<lundi>.md` | la section du critique et le mot de la Direction, écrits le dimanche, repris en tête du bilan du lundi | |
 | `journal/<agent>.jsonl` | un passage d'un agent ou d'un de ses scripts, écrit par le lanceur | `date`, `quoi`, `resultat` (ok, echec, refuse), `code`, `duree_s`, `sortie` (dernières lignes), `bloquant` (ce qui doit remonter), `secrets_en_trop` |
