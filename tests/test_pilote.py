@@ -177,7 +177,7 @@ class Plafonds(unittest.TestCase):
             with mock.patch.object(flux, "DIFFUSION", reglage):
                 self.assertEqual(flux.cadence_diffusion(), {"instagram": flux.DIFFUSION_JOUR_MAX, "facebook": 2,
                                                             "threads": 0, "tiktok": 0})
-        self.assertEqual(flux.DIFFUSION_JOUR_MAX, 5)
+        self.assertEqual(flux.DIFFUSION_JOUR_MAX, 25)
 
     def test_un_sujet_mal_forme_est_saute_les_autres_passent(self):
         from agents import flux

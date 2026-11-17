@@ -37,7 +37,7 @@ attends une mesure, ou tu demandes au guichet, plutôt que de deviner.
 `registre/stats.csv`), Sûreté (`agents/surete.py` : budget, pauses), `courrier` (tri de la boîte mail des chaînes),
 `flux` (`agents/flux.py` : rend les sujets du studio sur `studio-rendu`, les programme sur YouTube, puis les diffuse
 sur Instagram, Facebook, TikTok par Buffer et Threads, au rythme de `organisation/diffusion.toml` et aux heures de
-`organisation/creneaux.toml`, plafonnés dans le code à 4 sorties YouTube et 5 diffusions par réseau, par chaîne et
+`organisation/creneaux.toml`, plafonnés dans le code à 4 sorties YouTube (limite d'envoi de YouTube) et 25 diffusions par réseau, par chaîne et
 par jour), `guetteur` (paliers de monétisation, commentaires), `contacts` (envoie les messages
 validés par Jules), ton équipe (`equipe/`), le récapitulatif du guichet à Jules, le tableau de bord, puis ta séance
 si aucune n'est en cours.

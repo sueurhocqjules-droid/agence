@@ -39,8 +39,8 @@ PARIS = ZoneInfo("Europe/Paris")
 DELAI_MIN = timedelta(hours=2)    # jamais de sortie plus tôt : une date passée publierait aussitôt
 ENVOIS_MAX = 4                    # par chaîne et par passage (Studio bloquait au-delà de 3 ou 4 par jour)
 # Plafonds par jour, quoi que disent creneaux.toml et diffusion.toml (réglages du Pilote) : ce fichier est protégé
-SORTIES_JOUR_MAX = 4              # sorties YouTube par chaîne
-DIFFUSION_JOUR_MAX = 5            # diffusions par réseau et par chaîne
+SORTIES_JOUR_MAX = 4              # sorties YouTube par chaîne : limite d'envoi de YouTube vécue le 11/11 (uploadLimitExceeded, téléphone non vérifié)
+DIFFUSION_JOUR_MAX = 25           # diffusions par réseau et par chaîne : anti-emballement, sous Buffer (25 TikTok / 24 h) et Facebook (30 Reels / 24 h)
 RENDUS_MAX = 12                   # par passage, une machine par vidéo
 DIFFUSION = Path(__file__).resolve().parents[1] / "organisation" / "diffusion.toml"
 REELS_FACEBOOK_MAX_S = 90         # Reels des Pages : 3 à 90 s
