@@ -1,7 +1,7 @@
 +++
 id = "surete"
 titre = "Responsable sûreté"
-superieur = "direction"
+superieur = "jules"
 ligne_directe = "jules"
 objectifs = [1, 2, 3]
 statut = "en_service"

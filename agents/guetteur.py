@@ -15,11 +15,28 @@ Lancement : python -m agence.lancer guetteur   (--essai : montre, n'écrit ni n'
 import json
 import os
 import sys
+import urllib.error
+import urllib.parse
+import urllib.request
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from agence import mesures, modeles, postes, registre, telegram, youtube
-from agents.veilleur import api
+
+API = "https://www.googleapis.com/youtube/v3/"
+
+
+def api(ressource, **params):
+    """Appel à l'API YouTube Data en lecture publique. Le message d'erreur ne contient jamais la clé."""
+    cle = os.environ.get("YOUTUBE_API_KEY")
+    if not cle:
+        raise SystemExit("Clé YOUTUBE_API_KEY absente des secrets du dépôt agence")
+    url = API + ressource + "?" + urllib.parse.urlencode({**params, "key": cle})
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "agence"}), timeout=60) as r:
+            return json.load(r)
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"YouTube {ressource} : HTTP {e.code}") from None
 
 SEUILS = registre.DOSSIER / "seuils.json"
 OCCASIONS = registre.DOSSIER / "occasions.jsonl"

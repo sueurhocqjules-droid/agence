@@ -1,4 +1,4 @@
-"""Tests de l'étape 6 : compteur, seuils, sanctions, pannes, questions à choix fermés, bilan.  python -m unittest discover tests"""
+"""Tests de l'étape 6 : compteur, seuils, sanctions, pannes, questions à choix fermés python -m unittest discover tests"""
 import json
 import tempfile
 import time
@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from agence import lancer, organisation, questions
-from agents import bilan, surete
+from agents import surete
 
 REGLAGES = {"claude": {"dollars_par_pourcent": 0, "limite_pourcent": 20}}
 MERCREDI = datetime(2026, 11, 11, 15, tzinfo=timezone.utc)
@@ -63,7 +63,7 @@ class Echecs(unittest.TestCase):
 
 class Questions(unittest.TestCase):
     def test_actions_fermees(self):
-        for bonne in ("rien", "pause:flux", "reprise:chaine:en", "pause:tout", "reprise:auteur"):
+        for bonne in ("rien", "pause:flux", "reprise:chaine:en", "pause:tout", "reprise:pilote"):
             questions.verifier(bonne)
         for mauvaise in ("supprimer:flux", "pause:inconnu", "reprise:chaine:fr", "pause:", "rm -rf /", "reprise:flux;rien"):
             with self.assertRaises(ValueError):
@@ -131,28 +131,6 @@ class HorsPause(unittest.TestCase):
         pauses = [{"cible": "chaine:en", "action": "pause", "par": "surete", "raison": "essai"}]
         self.assertIsNotNone(lancer.pause_active(["chaine:en"], pauses))
         self.assertIsNone(lancer.pause_active(["chaine:pt"], pauses))
-
-
-class Bilan(unittest.TestCase):
-    def test_un_lundi_couvre_la_semaine_passee(self):
-        debut, fin = bilan.periode(LUNDI_MATIN)
-        self.assertEqual((debut.day, fin.day, fin.hour), (9, 16, 0))
-
-    def test_vues_gagnees_et_sorties(self):
-        stats = [{"releve": "2026-11-08T12:00:00+00:00", "chaine": "en", "video_id": "a", "titre": "A", "statut": "public",
-                  "sortie": "2026-11-01T00:00:00+00:00", "vues": "100"},
-                 {"releve": "2026-11-15T12:00:00+00:00", "chaine": "en", "video_id": "a", "titre": "A", "statut": "public",
-                  "sortie": "2026-11-01T00:00:00+00:00", "vues": "150"},
-                 {"releve": "2026-11-15T12:00:00+00:00", "chaine": "en", "video_id": "b", "titre": "B", "statut": "public",
-                  "sortie": "2026-11-12T00:00:00+00:00", "vues": "80"},
-                 {"releve": "2026-11-16T12:00:00+00:00", "chaine": "en", "video_id": "b", "titre": "B", "statut": "public",
-                  "sortie": "2026-11-12T00:00:00+00:00", "vues": "999"}]
-        debut, fin = bilan.periode(LUNDI_MATIN)
-        par_chaine, _, avant = bilan.chaines(stats, debut, fin)
-        self.assertEqual(par_chaine["en"]["gagnees"], 130)
-        self.assertEqual(par_chaine["en"]["sorties"], 1)
-        self.assertEqual(par_chaine["en"]["meilleure"][0], "B")
-        self.assertIsNotNone(avant)
 
 
 if __name__ == "__main__":

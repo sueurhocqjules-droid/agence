@@ -72,8 +72,9 @@ class Diffuser(unittest.TestCase):
         self.assertIn(("facebook", "en", "volt-en", "hors_format"), notes)
 
     def test_erreur_arrete_le_compte_et_se_signale(self):
-        (_, erreurs, _), envoyes, notes = self.lancer(publics=SUJETS, cadence={"instagram": 2, "facebook": 0},
-                                                      echec=meta.ErreurMeta("limite"))
+        with mock.patch.object(flux.lancer, "noter_journal"):   # pas d'écriture dans le vrai journal
+            (_, erreurs, _), envoyes, notes = self.lancer(publics=SUJETS, cadence={"instagram": 2, "facebook": 0},
+                                                          echec=meta.ErreurMeta("limite"))
         self.assertEqual(erreurs, ["instagram:volt-en"])  # un seul essai, pas de deuxième vidéo sur ce compte
         self.assertEqual(notes[0][:4], ("instagram", "en", "volt-en", "erreur"))
 
@@ -85,7 +86,7 @@ class Diffuser(unittest.TestCase):
                         echec=meta.ErreurMeta("POST ig1/media : Media upload has failed", 2207026, reponse))
         noter.assert_called_once()
         agent, entree = noter.call_args[0]
-        self.assertEqual(agent, "chef-contenu")
+        self.assertEqual(agent, "pilote")
         for morceau in ("volt-en", "2207026", "AbC123", "OAuthException"):
             self.assertIn(morceau, entree["bloquant"])
 
@@ -118,7 +119,7 @@ class RefusInstagram(unittest.TestCase):
             flux.diffusion("instagram", "en", "volt-en", "erreur", note="code 2207003 : adresse illisible")
             flux.diffusion("facebook", "en", "volt-en", "erreur", note="autre")
         journal.assert_called_once()
-        self.assertEqual(journal.call_args[0][0], "chef-contenu")
+        self.assertEqual(journal.call_args[0][0], "pilote")
         self.assertIn("code 2207003", journal.call_args[0][1]["bloquant"])
 
     def test_conteneur_en_erreur_garde_le_code(self):

@@ -252,9 +252,8 @@ def passage(maintenant, etat, demandes, contacts, cles, envoyer, illisibles=()):
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     from agence import contacts   # ici seulement : contacts importe ce module
-    from agence import demandes as lecture
     demandes, attente, cles = ouvertes(), contacts.en_attente(), cles_sans_autorisation()
-    pannes = lecture.illisibles()
+    pannes = []
     if "recap" not in sys.argv[1:]:
         print(message_recap(demandes, attente, cles, pannes) or "Guichet : rien d'ouvert.")
         return

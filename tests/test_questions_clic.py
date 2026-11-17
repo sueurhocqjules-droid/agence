@@ -6,7 +6,7 @@ from unittest import mock
 from agence import questions
 
 QUESTION = {"date": "2026-11-17T00:47:00Z", "id": "1117-0047-1", "par": "ingenierie", "texte": "Je fusionne la PR #99 ?",
-            "si_oui": "accord:99", "si_non": "refus:99", "etat": "ouverte", "reponse": "", "message_id": "5"}
+            "si_oui": "pause:flux", "si_non": "reprise:flux", "etat": "ouverte", "reponse": "", "message_id": "5"}
 
 
 class ClicGardeParLeWorker(unittest.TestCase):
@@ -29,7 +29,7 @@ class ClicGardeParLeWorker(unittest.TestCase):
         prises, appliquer, tg, worker = self.relever_deux_fois("q:1117-0047-1:oui")
         self.assertEqual(prises, [1, 0])
         appliquer.assert_called_once()
-        self.assertEqual(appliquer.call_args.args[0], "accord:99")
+        self.assertEqual(appliquer.call_args.args[0], "pause:flux")
         worker.clics_lus.assert_called_with([600000001])
         textes = [appel.args[1] for appel in tg.remplacer.call_args_list]
         self.assertIn("Ta réponse : OUI. C'est fait", textes[0])
@@ -37,7 +37,7 @@ class ClicGardeParLeWorker(unittest.TestCase):
 
     def test_un_non_applique_le_refus(self):
         _, appliquer, _, _ = self.relever_deux_fois("q:1117-0047-1:non")
-        self.assertEqual([a.args[0] for a in appliquer.call_args_list], ["refus:99"])
+        self.assertEqual([a.args[0] for a in appliquer.call_args_list], ["reprise:flux"])
 
     def test_sans_clic_rien_n_est_marque(self):
         with mock.patch.object(questions.registre, "lire", return_value=[]), \
@@ -55,7 +55,6 @@ class QuestionQuiChangeQuelqueChose(unittest.TestCase):
     def test_oui_et_non_rien_refuse(self):
         with self.assertRaises(ValueError) as e:
             questions.poser("Cette clé ?", "rien", "rien", pourquoi="accès à une clé")
-        self.assertIn("accord-jules", str(e.exception))
 
     def test_message_ne_promet_pas_l_heure(self):
         texte = questions.message("Je reprends ?", "raison", "reprise:flux", "rien", "surete", "",

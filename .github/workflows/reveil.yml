@@ -12,15 +12,14 @@ on:
   workflow_dispatch:
     inputs:
       programme:
-        description: "Réveil programmé (lancé par le Worker à son heure) : compte pour la séance de la Direction"
+        description: "Réveil programmé (lancé par le Worker à son heure) : compte pour la séance du Pilote"
         type: boolean
         default: false
 
 permissions:
   contents: write
-  actions: write      # la Sûreté compte les minutes GitHub du mois ; les délais lancent l'Ingénierie (workflow_dispatch)
+  actions: write      # la Sûreté compte les minutes GitHub du mois ; le réveil lance la séance du Pilote
   issues: write       # guichet et contacts : demandes écrites par l'agence, commentaire et fermeture d'un contact envoyé
-  pull-requests: read # PR qui attendent l'accord de Jules (agence/accords.py)
 
 concurrency:
   group: registre     # un seul écrivain du registre à la fois
@@ -105,18 +104,9 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          FUSION_TOKEN: ${{ secrets.FUSION_TOKEN }}   # Oui de Jules sur une PR protégée : étiquette et fusion en son nom
           ALARME_SECRET: ${{ secrets.ALARME_SECRET }} # lecture des clics gardés par le Worker de l'alarme
           PYTHONUTF8: "1"
         run: python -m agence.lancer reponses relever
-      - name: PR qui attendent l'accord de Jules (question Telegram)
-        if: ${{ !cancelled() }}
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          GH_TOKEN: ${{ github.token }}
-          PYTHONUTF8: "1"
-        run: python -m agence.lancer accords
       - name: Stats des chaînes
         if: ${{ !cancelled() }}
         env:
@@ -174,15 +164,6 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           PYTHONUTF8: "1"
         run: python -m agence.lancer guetteur
-      # « Décider vite » (MISSION.md) : un besoin écrit depuis plus de 48 h fait partir en essai, chez l'Ingénierie, sa
-      # première option gratuite et sans compte. Sans modèle. Un départ par réveil au plus
-      - name: Délais des besoins (départ en essai à 48 h)
-        if: ${{ !cancelled() }}
-        timeout-minutes: 5
-        env:
-          GH_TOKEN: ${{ github.token }}   # écrit la demande à l'Ingénierie et lance son workflow
-          PYTHONUTF8: "1"
-        run: python -m agence.lancer delais partir
       # Messages validés par Jules (issues `contact` + `valide`). Sans GMAIL_SEND_TOKEN (droit gmail.send seul), rien ne
       # part : le script le demande au guichet, une fois. Jeton d'envoi à part de celui du Courrier (lecture seule)
       - name: Contacts (messages validés)
@@ -203,31 +184,30 @@ jobs:
           GH_TOKEN: ${{ github.token }}   # lecture des issues `guichet` et `contact`
           PYTHONUTF8: "1"
         run: python -m agence.lancer guichet recap
-      # Séances de la Direction en semaine, au rythme qu'elle choisit elle-même (organisation/rythme.toml,
-      # MISSION « Lancement », Jules le 16/11). La boucle relancée attend la fin de ce réveil (même groupe de concurrence).
-      # Seulement sur un réveil programmé, pour qu'aucune relance à la main ne déclenche de boucle en chaîne
-      - name: Séance de la Direction (rythme choisi)
+      # Séance du Pilote au rythme qu'il choisit (organisation/rythme.toml, [pilote]). pilote.yml commence après ce
+      # réveil pour la partie qui écrit le registre (même groupe de concurrence). Seulement sur un réveil programmé,
+      # pour qu'une relance à la main ne déclenche pas de séance. Nuit et matin d'abord : la limite de 5 h de
+      # l'abonnement est partagée avec Jules, qui s'en sert surtout le soir.
+      - name: Séance du Pilote (rythme choisi)
         if: ${{ !cancelled() && (github.event_name == 'schedule' || inputs.programme) }}
         timeout-minutes: 2
         env:
           GH_TOKEN: ${{ github.token }}
           PYTHONUTF8: "1"
         run: |
-          n=$(python -c "import tomllib; print(int(tomllib.load(open('organisation/rythme.toml','rb'))['direction']['seances_par_jour']))" || echo 0)
+          n=$(python -c "import tomllib; print(int(tomllib.load(open('organisation/rythme.toml','rb')).get('pilote', {}).get('seances_par_jour', 1)))" || echo 1)
           h=$((10#$(date -u +%H)))
           if   [ $h -ge 5 ]  && [ $h -lt 11 ]; then creneau=matin
           elif [ $h -ge 11 ] && [ $h -lt 17 ]; then creneau=midi
           elif [ $h -ge 17 ] && [ $h -lt 23 ]; then creneau=soir
           else creneau=nuit; fi
           case "$n" in
-            1) creneaux="soir" ;;
-            2) creneaux="matin soir" ;;
-            3) creneaux="matin midi soir" ;;
-            4) creneaux="matin midi soir nuit" ;;
+            1) creneaux="nuit" ;;
+            2) creneaux="nuit matin" ;;
+            3) creneaux="nuit matin midi" ;;
+            4) creneaux="nuit matin midi soir" ;;
             *) creneaux="" ;;
           esac
-          # Dimanche soir : la boucle est déjà programmée par semaine.yml
-          if [ "$(date -u +%u)" = 7 ] && [ "$creneau" = soir ]; then creneaux=""; fi
           # Une séance au plus par créneau : un autre réveil du même créneau l'a peut-être déjà lancée
           case "$creneau" in
             matin) debut=$(date -u +%Y-%m-%dT05:00:00Z) ;;
@@ -235,14 +215,14 @@ jobs:
             soir)  debut=$(date -u +%Y-%m-%dT17:00:00Z) ;;
             *) if [ $h -ge 23 ]; then debut=$(date -u +%Y-%m-%dT23:00:00Z); else debut=$(date -u -d yesterday +%Y-%m-%dT23:00:00Z); fi ;;
           esac
-          deja=$(gh run list -w semaine.yml -L 10 --json createdAt --jq "[.[] | select(.createdAt >= \"$debut\")] | length" || echo 0)
+          deja=$(gh run list -w pilote.yml -L 10 --json createdAt --jq "[.[] | select(.createdAt >= \"$debut\")] | length" || echo 0)
           if [ "${deja:-0}" -gt 0 ]; then
             echo "Séance déjà lancée depuis $debut ($creneau)"
             creneaux=""
           fi
           case " $creneaux " in
-            *" $creneau "*) gh workflow run semaine.yml -f essai=false && echo "Boucle de la semaine relancée ($creneau, $n séance(s) par jour)" ;;
-            *) echo "Pas de séance à ce créneau ($creneau, $n séance(s) par jour)" ;;
+            *" $creneau "*) gh workflow run pilote.yml && echo "Séance du Pilote lancée ($creneau, $n par jour)" ;;
+            *) echo "Pas de séance à ce créneau ($creneau, $n par jour)" ;;
           esac
       - name: Commiter le registre
         if: always()

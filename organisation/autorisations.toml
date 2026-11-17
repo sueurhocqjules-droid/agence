@@ -1,7 +1,7 @@
 # Autorisations des clés : quelle clé va à quel poste ou script (nom passé à `python -m agence.lancer <nom>`).
 #
 # Fichier protégé (MISSION.md, règle 9 et Gouvernance) : seul Jules l'élargit, avec Claude dans Jarvis. Aucun agent,
-# ni l'Ingénierie, ne le modifie (contrôle agence/protege.py, CODEOWNERS).
+# ni le Pilote, ne le modifie (agence/pilote.py retire tout changement de ce fichier).
 #
 # Le lanceur ne transmet une clé que si elle est à la fois déclarée par la fiche (champ `env`) ou le script
 # (`secrets` de scripts.toml) ET accordée ici à ce nom. Une clé déclarée sans accord n'est pas transmise : elle
@@ -13,32 +13,18 @@
 # État au 14/11/2026 : les clés que chaque poste utilisait déjà.
 
 [cles]
-# Chaînes YouTube (envoi, lecture des stats)
 YT_TOKEN_EN = ["stats", "flux"]
 YT_TOKEN_ES = ["stats", "flux"]
 YT_TOKEN_PT = ["stats", "flux"]
-# Clé publique YouTube, lecture seule
-YOUTUBE_API_KEY = ["guetteur", "veilleur"]
-# Instagram et Facebook (utilisateur système Meta), TikTok par Buffer, Threads (clé des jetons chiffrés du registre)
+YOUTUBE_API_KEY = ["guetteur"]
 META_TOKEN = ["flux"]
 BUFFER_API_KEY = ["flux"]
 THREADS_CLE = ["flux"]
-# Jeton du workflow GitHub (droits fixés par chaque workflow)
-GH_TOKEN = ["accords", "flux", "garde_fous", "bilan", "guichet", "contacts", "delais", "chef-contenu", "chercheur-outils", "direction", "ingenierie", "responsable-organisation", "critique", "stratege"]
-# Bot Telegram : messages à Jules seulement
-TELEGRAM_BOT_TOKEN = ["accords", "reponses", "garde_fous", "bilan", "guichet", "courrier", "guetteur", "direction"]
-# Boîte boite-chaines : lecture et filtres, rien d'autre
+GH_TOKEN = ["flux", "garde_fous", "guichet", "contacts"]
+TELEGRAM_BOT_TOKEN = ["reponses", "garde_fous", "guichet", "courrier", "guetteur"]
 GMAIL_TOKEN = ["courrier"]
-# Boîte boite-chaines : envoi seul (gmail.send), messages validés par Jules. Accordé le 15/11/2026 (guichet #13)
 GMAIL_SEND_TOKEN = ["contacts"]
-# Modèles gratuits
-GROQ_API_KEY = ["chef-operations", "chef-contenu", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "critique", "programmateur", "responsable-organisation", "responsable-revenu"]
-GEMINI_API_KEY = ["chef-operations", "chef-contenu", "chercheur-outils", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "critique", "programmateur", "responsable-organisation", "responsable-revenu"]
-OPENROUTER_API_KEY = ["chercheur-outils", "chef-recherche", "courrier", "guetteur", "expert-modeles", "veilleur", "responsable-organisation", "responsable-revenu"]
-# Jeton GitHub de Jules (dépôt agence seul) : pose son étiquette accord-jules et fusionne une PR protégée après son
-# Oui sur Telegram (agence/accords.py), ferme la PR après son Non. Accordé le 16/11/2026
-FUSION_TOKEN = ["reponses"]
-# Secret partagé avec le Worker de l'alarme : lecture des clics de Jules qu'il garde (demande #46). Accordé le 17/11/2026
+GROQ_API_KEY = ["courrier", "guetteur", "gabarits"]
+GEMINI_API_KEY = ["courrier", "guetteur", "gabarits"]
+OPENROUTER_API_KEY = ["courrier", "guetteur", "gabarits"]
 ALARME_SECRET = ["reponses"]
-# Abonnement Claude de Jules
-CLAUDE_CODE_OAUTH_TOKEN = ["direction", "ingenierie", "stratege"]

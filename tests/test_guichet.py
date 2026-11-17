@@ -10,8 +10,7 @@ from email import message_from_bytes
 from pathlib import Path
 from unittest import mock
 
-from agence import contacts, guichet, lancer, organisation, protege
-from agents import bilan
+from agence import contacts, guichet, lancer, organisation
 
 RACINE = Path(__file__).resolve().parent.parent
 JULES, ROBOT = guichet.JULES, guichet.ROBOT
@@ -255,10 +254,6 @@ class Autorisations(unittest.TestCase):
         for cle, noms in organisation.autorisations().items():
             self.assertFalse(noms - connus, f"{cle} accordée à un nom inconnu : {noms - connus}")
 
-    def test_le_fichier_est_protege(self):
-        self.assertTrue(protege.raison("organisation/autorisations.toml", "modified"))
-        self.assertTrue((RACINE / "organisation" / "autorisations.toml").exists())
-
     def test_le_droit_d_envoi_n_est_accorde_qu_au_script_des_contacts(self):
         self.assertLessEqual(organisation.autorisations().get(contacts.CLE, set()), {"contacts"})
         self.assertLessEqual(organisation.autorisations()["GMAIL_TOKEN"], {"courrier"})   # lire OU écrire, jamais les deux
@@ -416,62 +411,6 @@ class Envoi(unittest.TestCase):
         source = (RACINE / "agence" / "contacts.py").read_text(encoding="utf-8")
         self.assertNotIn("GMAIL_TOKEN\"", source)       # jamais le jeton de lecture du Courrier
         self.assertNotIn("gmail.readonly", source)
-
-
-class MailDuLundi(unittest.TestCase):
-    LUNDI = datetime(2026, 11, 16, 6, 37, tzinfo=timezone.utc)
-
-    def page(self, **k):
-        with mock.patch("builtins.print"):
-            return bilan.page(self.LUNDI, **(dict(demandes=[], attente=[], fermees=[]) | k))
-
-    def test_les_six_parties_dans_l_ordre_de_la_gouvernance(self):
-        texte, _, _ = self.page()
-        titres = re.findall(r"^## (.+)$", texte, re.MULTILINE)
-        self.assertEqual(titres, list(bilan.ORDRE))
-        self.assertEqual([t.split(". ", 1)[1] for t in bilan.ORDRE],
-                         ["À valider", "Contacts en attente", "Demandes ouvertes", "Ce qui a été fait",
-                          "Décisions jugées par le Critique", "Les 4 objectifs en chiffres"])
-
-    def test_l_ordre_est_celui_ecrit_dans_la_mission(self):
-        mission = (RACINE / "organisation" / "MISSION.md").read_text(encoding="utf-8")
-        self.assertIn("à valider, contacts en attente, demandes ouvertes, ce qui a été fait (organisation comprise), "
-                      "décisions jugées par le Critique, les 4 objectifs en chiffres", mission)
-
-    def test_contacts_et_demandes_figurent_avec_leur_lien(self):
-        demandes = [{"numero": 31, "titre": "Droit d'envoi Gmail", "lien": "https://x/31", "urgent": True, "pr": False,
-                     "date": "2026-11-14T08:00:00Z"}]
-        attente = [{"numero": 32, "titre": "Contact (Every Second) : Your proposal", "lien": "https://x/32",
-                    "date": "2026-11-15T08:00:00Z"}]
-        texte, resume, _ = self.page(demandes=demandes, attente=attente)
-        partie = lambda n: texte.split(f"## {bilan.ORDRE[n]}")[1].split("\n## ")[0]
-        self.assertIn("[#32](https://x/32)", partie(1))
-        self.assertIn("**Urgent** : [#31](https://x/31)", partie(2))
-        self.assertIn("1 contact(s) en attente", resume)
-        self.assertIn("1 demande(s) au guichet", resume)
-
-    def test_les_quatre_objectifs_ont_chacun_leur_chiffre(self):
-        objectifs = self.page()[0].split(f"## {bilan.ORDRE[5]}")[1]
-        for titre in ("### Argent", "### Économie", "### Autonomie", "### Apprentissage"):
-            self.assertIn(titre, objectifs)
-
-    def test_github_illisible_n_empeche_pas_le_bilan(self):
-        with mock.patch.object(bilan.guichet, "ouvertes", side_effect=RuntimeError), \
-                mock.patch.object(bilan.guichet, "toutes", side_effect=RuntimeError), \
-                mock.patch.object(bilan.contacts, "en_attente", side_effect=RuntimeError), mock.patch("builtins.print"):
-            texte, _, _ = bilan.page(self.LUNDI)
-        self.assertEqual(texte.count("Liste illisible"), 2)
-
-    def test_decisions_jugees_comptees_dans_la_periode(self):
-        decisions = [{"decision": "baisser la cadence", "auteur": "direction",
-                      "verdict": {"date": "2026-11-12T10:00:00+00:00", "verdict": "fausse", "commentaire": "vues en baisse"}},
-                     {"decision": "vieille", "auteur": "direction",
-                      "verdict": {"date": "2026-11-01T10:00:00+00:00", "verdict": "juste", "commentaire": ""}},
-                     {"decision": "pas jugée", "auteur": "direction", "verdict": None}]
-        debut, fin = bilan.periode(self.LUNDI)
-        justes, fausses, indeterminees, lignes = bilan.jugees(decisions, debut, fin)
-        self.assertEqual((justes, fausses, indeterminees), (0, 1, 0))
-        self.assertIn("baisser la cadence", lignes[0])
 
 
 class Reveil(unittest.TestCase):

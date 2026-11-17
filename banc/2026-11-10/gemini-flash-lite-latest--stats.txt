@@ -1,7 +1,0 @@
-**Trois constats chiffrés :**
-1. La chaîne anglophone domine largement avec un pic à 1 583 vues (« Folded Paper ») et plusieurs vidéos dépassant 1 300 vues.
-2. La chaîne hispanophone est totalement sous-performante : 7 vidéos publiques affichent 0 vue, et une seule culmine à 1 unique vue.
-3. La chaîne lusophone obtient des résultats très faibles, avec un maximum de 246 vues pour la vidéo sur la marche, et quatre vidéos publiques à 0 vue.
-
-**Recommandation concrète pour la semaine :**
-Suspendez temporairement la production des versions espagnole et portugaise. Concentrez vos efforts sur la chaîne anglaise pour identifier les facteurs de succès de ses meilleures publications, puis analysez les problèmes de référencement ou de distribution algorithmique (SEO, horaires, tags) qui bloquent totalement la croissance sur les marchés `es` et `pt`.

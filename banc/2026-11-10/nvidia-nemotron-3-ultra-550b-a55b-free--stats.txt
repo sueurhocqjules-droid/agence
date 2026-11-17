@@ -1,7 +1,0 @@
-**Constats :**
-1. La chaîne EN totalise ~6 470 vues sur 7 Shorts publics (moyenne 924), contre 317 pour PT et 1 seule pour ES.
-2. ES enregistre 0 vue sur 6 vidéos et 1 vue sur la 7e, signalant un blocage de diffusion ou d’indexation.
-3. Le meilleur Short EN (« Papier », 1 583 vues) surpasse le meilleur PT (« Marche », 246 vues) d’un facteur 6,4.
-
-**Recommandation :**
-Concentrer le budget promo sur EN cette semaine ; auditer immédiatement métadonnées ES/PT (balises, miniatures, horaire) et republier les 3 tops EN (Papier, Basket, Riz) en format long pour capter la rétention.

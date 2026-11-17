@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write     # commit du registre (questions.csv) ; la fusion d'une PR protégée passe par FUSION_TOKEN
+  contents: write     # commit du registre (questions.csv)
 
 # Groupe à part : partager « registre » ferait annuler un réveil en attente par une relance (GitHub ne garde qu'un
 # run en attente par groupe). Deux écrivains à la fois restent sûrs : les journaux du registre sont en ajout seul,
@@ -37,7 +37,6 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          FUSION_TOKEN: ${{ secrets.FUSION_TOKEN }}     # Oui de Jules sur une PR protégée : étiquette et fusion en son nom
           ALARME_SECRET: ${{ secrets.ALARME_SECRET }}   # lecture des clics gardés par le Worker
           PYTHONUTF8: "1"
         run: python -m agence.lancer reponses relever

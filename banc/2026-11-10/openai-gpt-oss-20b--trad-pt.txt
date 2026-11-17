@@ -1,3 +1,0 @@
-{
- "titre": "E Se Um Grão de Arroz Dobrar a Cada Segundo?",
- "description": "Um grão de 25 mg, dobrado a cada segundo: {n_elephant} segundos para um elefante, {n_navire} para

@@ -10,7 +10,7 @@ Lancement : python -m agents.flux [--essai]
    langue (agence/meta.py), la plus ancienne d'abord, au rythme fixé par le Programmateur (organisation/diffusion.toml).
    Facebook n'accepte pas plus de 90 s : une vidéo plus longue y est notée « hors_format » et sautée.
    Instagram : on ne publie qu'une fois le conteneur FINISHED. Un envoi refusé note le code et le message de Meta
-   au registre des diffusions et, comme bloquant, au journal du chef-contenu ; il est retenté au réveil suivant,
+   au registre des diffusions et, comme bloquant, au journal du Pilote ; il est retenté au réveil suivant,
    3 fois au plus par vidéo, puis la suivante passe.
    TikTok : par Buffer (agence/buffer.py), même règle, même cadence ; une chaîne pas encore branchée sur Buffer est sautée.
    Threads : agence/threads.py, un jeton par compte (renouvelé ici même) ; un compte pas encore branché est sauté.
@@ -164,8 +164,8 @@ def essais_rates(lignes, reseau, nom):
 def diffusion(reseau, langue, nom, etat, media_id="", note=""):
     registre.ajouter("diffusions", [{"date": registre.maintenant(), "reseau": reseau, "chaine": langue, "nom": nom,
                                      "etat": etat, "media_id": media_id, "note": note}])
-    if reseau == "instagram" and etat == "erreur":  # un envoi refusé est un bloquant au journal du chef-contenu
-        lancer.noter_journal("chef-contenu", {"date": registre.maintenant(), "quoi": f"diffusion instagram {nom}",
+    if reseau == "instagram" and etat == "erreur":  # un envoi refusé est un bloquant au journal du Pilote
+        lancer.noter_journal("pilote", {"date": registre.maintenant(), "quoi": f"diffusion instagram {nom}",
                                               "resultat": "erreur",
                                               "bloquant": f"envoi instagram refusé pour {nom} ({note})"[:400]})
 
@@ -183,10 +183,10 @@ def a_diffuser(sujets, titres_publics, deja, sautes, langue):
 
 
 def noter_refus_instagram(nom, erreur):
-    """Un envoi Instagram refusé remonte comme bloquant au journal du chef de contenu, avec la réponse complète de
-    l'API : la Direction lit les bloquants, et sans la cause on ne peut rien corriger."""
+    """Un envoi Instagram refusé remonte comme bloquant au journal du Pilote, avec la réponse complète de l'API :
+    sans la cause on ne peut rien corriger."""
     reponse = getattr(erreur, "reponse", None) or {"message": str(erreur)}
-    lancer.noter_journal("chef-contenu", {"date": registre.maintenant(), "quoi": "diffusion", "resultat": "erreur",
+    lancer.noter_journal("pilote", {"date": registre.maintenant(), "quoi": "diffusion", "resultat": "erreur",
                                           "bloquant": f"Instagram a refusé {nom} : "
                                                       f"{json.dumps(reponse, ensure_ascii=False)}"})
 

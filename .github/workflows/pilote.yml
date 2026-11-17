@@ -1,0 +1,179 @@
+# Séance du Pilote : le seul agent qui décide (organisation/PILOTE.md). Lancée par le réveil aux créneaux que le
+# Pilote choisit (organisation/rythme.toml), ou à la main : gh workflow run pilote.yml
+# Règle de deux : le job « seance » exécute Claude et le code qu'il écrit, donc il n'a que des droits en lecture et
+# aucune clé lisible par ses commandes. Le tri (tests, relecture par un modèle gratuit) se fait dans une étape à part,
+# après la fin de Claude. Seul le job « publier », sans modèle, écrit : registre, guichet, Telegram, studio.
+name: Pilote
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pilote        # une séance à la fois
+  cancel-in-progress: false
+
+jobs:
+  seance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    permissions:
+      contents: read
+      issues: read     # demandes du guichet déjà ouvertes, données au Pilote en début de séance
+    outputs:
+      faite: ${{ steps.seance.outputs.faite }}
+      studio: ${{ steps.trier.outputs.studio }}
+      paquet: ${{ steps.paquet.outputs.paquet }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          repository: sueurhocqjules-droid/chaines-studio
+          path: chaines-studio
+          ssh-key: ${{ secrets.ATELIER_DEPLOY_KEY }}
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: chaines-studio/package-lock.json
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Outils (numpy pour le son, ffmpeg et emojis pour les planches, Claude Code)
+        timeout-minutes: 8
+        env:
+          OUTILS: https://github.com/sueurhocqjules-droid/studio-rendu/releases/download/outils
+          FFMPEG: ffmpeg-n8.1-latest-linux64-gpl-8.1.tar.xz
+          FFMPEG_SHA256: e940c45bf07cdf0c95e279a81c5f559ff5dfe88f0f395613bfbbd68566771a45
+        run: |
+          pip install -q -r requirements.txt numpy
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/$FFMPEG" "$OUTILS/$FFMPEG"
+          echo "$FFMPEG_SHA256  $RUNNER_TEMP/$FFMPEG" | sha256sum -c -
+          sudo tar -xJf "$RUNNER_TEMP/$FFMPEG" -C /usr/local/bin --strip-components=2 --wildcards "*/bin/ffmpeg" "*/bin/ffprobe"
+          ffmpeg -version | head -1
+          fc-list | grep -q "Noto Color Emoji" || echo "::warning::Police Noto Color Emoji absente de l'image"
+          (cd chaines-studio && npm ci --no-audit --no-fund)
+          npm i -g --no-audit --no-fund @anthropic-ai/claude-code
+          claude --version
+          git config --global user.name "pilote-robot"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Séance Claude (aucune clé hors son propre jeton, illisible par ses commandes)
+        id: seance
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          GH_TOKEN: ${{ github.token }}          # lecture seule, retiré de l'environnement de Claude
+          ATELIER_COUTS: chaines-studio/atelier/couts.csv
+          PYTHONUTF8: "1"
+        run: python -m agence.pilote seance
+
+      - name: Tri (tests, relecture par un modèle gratuit, studio qui compile)
+        id: trier
+        if: ${{ always() && steps.seance.outputs.faite == 'oui' }}
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          PYTHONUTF8: "1"
+        run: python -m agence.pilote trier
+
+      - name: Paquets (aucun droit d'écriture dans ce job)
+        id: paquet
+        if: ${{ always() && steps.trier.outcome == 'success' }}
+        env:
+          STUDIO: ${{ steps.trier.outputs.studio }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/paquet"
+          git add -A
+          git diff --cached --binary > "$RUNNER_TEMP/paquet/agence.patch"
+          if [ "$STUDIO" = oui ]; then
+            (cd chaines-studio && git add -A && git diff --cached --binary) > "$RUNNER_TEMP/paquet/studio.patch"
+          fi
+          echo "paquet=oui" >> "$GITHUB_OUTPUT"
+      - if: ${{ always() && steps.paquet.outputs.paquet == 'oui' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: paquet
+          path: ${{ runner.temp }}/paquet/
+          retention-days: 3
+
+  publier:
+    needs: seance
+    if: ${{ always() && needs.seance.outputs.paquet == 'oui' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: registre    # un seul écrivain du registre à la fois (avec le réveil)
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      issues: write      # demandes au guichet écrites ou fermées par le Pilote
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: pip install -q -r requirements.txt
+      - uses: actions/download-artifact@v8
+        with:
+          name: paquet
+          path: ${{ runner.temp }}/paquet
+      - name: Agence (carnet, scripts gardés, coût, guichet, message à Jules)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          PYTHONUTF8: "1"
+        run: |
+          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git config --global user.name "pilote-robot"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -s "$RUNNER_TEMP/paquet/agence.patch" ]; then
+            git apply --index "$RUNNER_TEMP/paquet/agence.patch" || git apply --index --3way "$RUNNER_TEMP/paquet/agence.patch"
+          fi
+          python -m agence.pilote noter
+          git add -A
+          git commit -q -m "Pilote : séance du $(date -u +%Y-%m-%d) $(date -u +%H)h"
+          for essai in 1 2 3; do
+            git -c http.https://github.com/.extraheader="$auth" pull -q --rebase origin main &&
+              git -c http.https://github.com/.extraheader="$auth" push -q origin HEAD:main && exit 0
+            sleep 5
+          done
+          echo "::error::Séance non poussée après 3 essais"; exit 1
+
+      - uses: actions/checkout@v7
+        if: ${{ needs.seance.outputs.studio == 'oui' }}
+        with:
+          repository: sueurhocqjules-droid/chaines-studio
+          path: chaines-studio
+          ssh-key: ${{ secrets.PILOTE_STUDIO_KEY }}
+      - name: Studio (nouveaux sujets)
+        if: ${{ needs.seance.outputs.studio == 'oui' }}
+        run: |
+          cd chaines-studio
+          git apply --index "$RUNNER_TEMP/paquet/studio.patch" || git apply --index --3way "$RUNNER_TEMP/paquet/studio.patch"
+          git diff --cached --quiet && exit 0
+          git commit -q -m "Pilote : sujets du $(date -u +%Y-%m-%d)"
+          git pull -q --rebase && git push -q
+      - uses: actions/checkout@v7
+        if: ${{ needs.seance.outputs.studio == 'oui' }}
+        with:
+          repository: sueurhocqjules-droid/studio-rendu
+          path: rendu
+          ssh-key: ${{ secrets.RENDU_DEPLOY_KEY }}
+      - name: Pousser le moteur vers studio-rendu
+        if: ${{ needs.seance.outputs.studio == 'oui' }}
+        run: |
+          cd chaines-studio
+          python3 scripts/synchro_rendu.py ../rendu
+          cd ../rendu
+          git add -A
+          git diff --cached --quiet || git commit -q -m "Moteur : sujets du Pilote"
+          git push -q

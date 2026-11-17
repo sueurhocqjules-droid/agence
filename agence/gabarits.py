@@ -97,8 +97,9 @@ def consigne(gabarit, sujet):
             f"Le champ voix est le texte lu à voix haute, {MOTS_VOIX_MAX} mots au plus. Pas de tiret long.")
 
 
-def donnees_du_sujet(gabarit, sujet, demander=postes.demander):
+def donnees_du_sujet(gabarit, sujet, demander=None):
     """Demande le JSON au modèle gratuit, le contrôle par schéma. Un second essai avec la liste des erreurs, puis échec."""
+    demander = demander or postes.demander
     erreurs = []
     texte = consigne(gabarit, sujet)
     for _ in range(2):
