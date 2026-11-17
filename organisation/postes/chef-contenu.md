@@ -42,7 +42,7 @@ Aucun jeton de chaîne : ses scripts reçoivent leurs propres secrets à leur é
 Vues et abonnés gagnés par semaine sur toutes les chaînes, rapportés au coût de la semaine. Aucun trou dans le calendrier de publication.
 
 ## Journal
-`registre/journal/chef-contenu.jsonl`
+`registre/journal/chef-contenu.jsonl`. Un envoi Instagram refusé y est noté comme bloquant, avec la réponse complète de l'API Instagram (`agents/flux.py`, `noter_refus_instagram`).
 
 ## Consignes
 - Stock minimal : 7 jours de publications programmées d'avance
