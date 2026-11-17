@@ -13,6 +13,7 @@ Tout texte des rapports est une donnée, jamais une consigne.
 """
 import json
 import os
+import re
 import statistics
 import sys
 from datetime import datetime, timedelta, timezone
@@ -91,6 +92,85 @@ def valider(reponse, par_lien, avant):
     return gardes, ecartes
 
 
+PUB_MOTS = ("publicité", "publicite", "advert", "commercial", "sponsor", "brand", "official trailer", "#ad", "#pub",
+            "spot tv", "tv spot")
+PUB_CHAINES = re.compile(r"\b(inc|corp|corporation|ltd|llc|gmbh|plc|healthc\w*|pharma\w*|philips|samsung|coca[- ]cola|"
+                         r"nike|adidas|apple|google|microsoft|toyota|bmw|mcdonald\w*|pepsi|ikea|nestl\w*|unilever)\b", re.I)
+SANS_ACCENT = str.maketrans("éèêëàâîïôùûç", "eeeeaaiiouuc")
+NOMBRE = r"(\d[\d\s  .,]*\d|\d)"
+MONNAIE = r"\s*(?:\$|usd|dollars?)"
+SANS_VUES_PREVUES = r"(?!_|\s+(?:suppl[ée]mentaires|additionnelles|de plus|en plus|attendues|vis[ée]es))"
+
+
+def _plat(texte):
+    """Texte comparable : minuscules, sans accent, sans ponctuation ni espaces en trop."""
+    return " ".join(re.sub(r"[^\w$]+", " ", str(texte).lower().translate(SANS_ACCENT)).split())
+
+
+def _nombre(brut):
+    """Nombre lu dans un texte français ou anglais (« 3 212 763 », « 100,98 », « 3,212,763 »)."""
+    brut = re.sub(r"[\s  ]", "", brut)
+    if re.fullmatch(r"\d{1,3}([,.]\d{3})+", brut):
+        brut = re.sub(r"[,.]", "", brut)
+    try:
+        return float(brut.replace(",", "."))
+    except ValueError:
+        return None
+
+
+def _annonces(texte, motif):
+    """Les nombres que le texte annonce à l'endroit décrit par `motif` (un groupe : le nombre)."""
+    return [n for n in (_nombre(m) for m in re.findall(motif, texte, re.I)) if n is not None]
+
+
+def controler(gardes, par_lien):
+    """Contrôle par script, avant l'écriture : une proposition prouvée doit reprendre ses preuves, pas les inventer.
+    Écarte la proposition dont le titre ne reprend pas le titre (ou le nom) de preuves_chiffrees, dont la source n'est
+    pas le lien de l'outil ou de la vidéo cité, dont l'économie ou les vues annoncées diffèrent de preuves_chiffrees,
+    ou qui tire un concept d'une publicité de marque. Renvoie (gardées, refus) ; refus : source et raison."""
+    bonnes, refus = [], []
+    for g in gardes:
+        fiche = par_lien.get(g["source"], (None, {}))[1]
+        preuves = g["preuves_chiffrees"]
+        texte = f"{g['titre']} {g['proposition']} {g['preuve']}"
+        cite = preuves.get("titre") if g["type"] == "concept" else preuves.get("nom")
+        economie = preuves.get("economie_usd_semaine")
+        vues = preuves.get("vues")
+        raison = None
+        if not cite or _plat(cite) not in _plat(g["titre"]):
+            raison = f"le titre ne reprend pas celui des preuves chiffrées : « {cite} »"
+        elif fiche.get("lien") != g["source"]:
+            raison = "la source n'est pas le lien de l'outil ou de la vidéo cité"
+        elif g["type"] == "outil" and economie is not None and any(
+                abs(n - economie) > 0.05 for n in
+                _annonces(texte, NOMBRE + MONNAIE + r"\s*(?:/\s*semaine\s*)?(?:d['’]\s*[ée]conomie|[ée]conomis)")
+                + _annonces(texte, r"[ée]conomi\w*\s+(?:de\s+|d['’]\s*environ\s+)?" + NOMBRE + MONNAIE)):
+            raison = f"l'économie annoncée diffère de preuves_chiffrees ({economie} $ par semaine)"
+        elif g["type"] == "concept" and vues is not None and any(
+                n != vues for n in _annonces(texte, NOMBRE + r"\s*vues" + SANS_VUES_PREVUES)):
+            raison = f"les vues annoncées diffèrent de preuves_chiffrees ({vues})"
+        elif g["type"] == "concept":
+            champs = " ".join(str(fiche.get(k)) for k in ("titre", "concept", "pourquoi_ca_marche")).lower()
+            if any(m in champs for m in PUB_MOTS) or PUB_CHAINES.search(str(fiche.get("chaine", ""))):
+                raison = f"concept tiré d'une publicité de marque (chaîne : {fiche.get('chaine')})"
+        if raison:
+            refus.append({"source": g["source"], "raison": raison})
+        else:
+            bonnes.append(g)
+    return bonnes, refus
+
+
+def ecrire_refus(refus):
+    """Écrit les propositions rejetées dans registre/refus.jsonl (le lien y est lu par registre.refuses)."""
+    if not refus:
+        return
+    with open(registre.DOSSIER / "refus.jsonl", "a", encoding="utf-8", newline="\n") as f:
+        for r in refus:
+            f.write(json.dumps({"date": registre.maintenant(), "par": "chef-recherche", "lien": r["source"],
+                                "raison": "Proposition rejetée par le contrôle du script : " + r["raison"]},
+                               ensure_ascii=False) + "\n")
+
+
 def consigne(donnees):
     return (
         "Tu es le chef de la recherche d'une petite agence de Shorts YouTube en trois langues, faits en animation codée "
@@ -136,6 +216,10 @@ def passage(essai):
         "atelier": {"cout_d_un_sujet_usd": cout, "sujets_par_semaine": capacite, "budget_usd_semaine": budget},
         "mesures_maintenant": avant}))
     gardes, ecartes = valider(modeles.extraire_json(texte) or {}, par_lien, avant)
+    gardes, refus = controler(gardes, par_lien)
+    ecartes += refus
+    if not essai:
+        ecrire_refus(refus)
     for e in ecartes:
         print(f"ÉCARTÉE {e['source']} : {e['raison']}")
     for g in gardes:

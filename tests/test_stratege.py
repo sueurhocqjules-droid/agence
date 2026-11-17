@@ -210,6 +210,43 @@ class Empilement(Registre):
         self.assertIn("1 écart(s) du Stratège", resume)
 
 
+def enums_fautifs(noeud, chemin="schema"):
+    """Les « enum » vides ou à doublons : Claude refuse le schéma (panne du 16/11, 21:53, demande #93)."""
+    if isinstance(noeud, dict):
+        fautes = []
+        if "enum" in noeud and (not noeud["enum"] or len(noeud["enum"]) != len({json.dumps(v) for v in noeud["enum"]})):
+            fautes.append(chemin)
+        for cle, v in noeud.items():
+            fautes += enums_fautifs(v, f"{chemin}.{cle}")
+        return fautes
+    if isinstance(noeud, list):
+        return [f for i, v in enumerate(noeud) for f in enums_fautifs(v, f"{chemin}[{i}]")]
+    return []
+
+
+class Schema(unittest.TestCase):
+    def test_le_schema_est_valide_avec_des_listes_pleines(self):
+        s = stratege.schema(["direction", "critique"], ["GROQ_API_KEY"], ["ecart-1"])
+        self.assertEqual(enums_fautifs(s), [])
+        json.dumps(s)
+
+    def test_le_schema_est_valide_sans_poste_cle_ni_ecart_passe(self):
+        s = stratege.schema([], [], [])
+        self.assertEqual(enums_fautifs(s), [])
+        poste = s["properties"]["ecarts"]["items"]["properties"]["poste"]["anyOf"][1]["properties"]
+        self.assertEqual(poste["cles"], {"type": "array", "maxItems": 0})
+
+    def test_le_schema_n_a_pas_de_doublon(self):
+        s = stratege.schema(["direction", "direction"], ["GH_TOKEN", "GH_TOKEN"], ["e1", "e1"])
+        self.assertEqual(enums_fautifs(s), [])
+
+    def test_les_champs_requis_existent(self):
+        s = stratege.schema(["direction"], ["GH_TOKEN"], [])
+        item = s["properties"]["ecarts"]["items"]
+        self.assertEqual(set(item["required"]), set(item["properties"]))
+        self.assertEqual(set(s["required"]), set(s["properties"]))
+
+
 class Branchements(Registre):
     def test_le_responsable_de_l_organisation_lit_les_postes_proposes(self):
         nouveau = {"id": "repondeur", "titre": "Répondeur"}

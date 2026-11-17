@@ -62,6 +62,19 @@ class Budget(unittest.TestCase):
         self.assertIsNone(lancer.budget_atteint("auteur", self.budget, couts, MERCREDI))
 
 
+class BloquantEchec(unittest.TestCase):
+    def test_garde_les_20_dernieres_lignes(self):
+        texte = lancer.bloquant_echec("flux", 1, [f"ligne {i}" for i in range(30)])
+        self.assertIn("code 1", texte)
+        self.assertIn("ligne 29", texte)
+        self.assertIn("ligne 10", texte)
+        self.assertNotIn("ligne 9\n", texte + "\n")
+        self.assertNotIn("voir la sortie", texte)
+
+    def test_sortie_vide_le_dit(self):
+        self.assertIn("sortie vide", lancer.bloquant_echec("flux", 2, []))
+
+
 class Secrets(unittest.TestCase):
     def test_seuls_les_secrets_declares_passent(self):
         env = {"YT_TOKEN_EN": "a", "GH_TOKEN": "b", "GROQ_API_KEY": "c", "PATH": "/bin", "RENDU_DIR": "rendu"}

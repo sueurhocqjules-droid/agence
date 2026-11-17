@@ -1,24 +1,60 @@
 # Réveil programmé de l'agence : tourne sur les machines de GitHub, PC éteint.
+# L'horloge est le Worker de l'alarme (alarme/worker.js) : il lance ce workflow (programme=true) aux heures choisies par
+# l'agence (organisation/rythme.toml, [reveil]). Le cron de GitHub, qui sautait environ un créneau sur deux et retardait
+# les autres de 1 h 30 à 4 h 30, reste un filet : il ne fait rien si le Worker a lancé un réveil dans les 5 h.
 # Tout passe par le lanceur (python -m agence.lancer <nom>) : pause, budget, journal. Une étape par agent, avec ses seuls secrets.
 # Le registre modifié est commité par le robot GitHub.
 name: Reveil
 
 on:
   schedule:
-    - cron: "17 5,11,17,23 * * *"   # 6h17, 12h17, 18h17, 0h17 à Paris : GitHub retarde ou saute parfois un créneau (11/11), le flux ne refait rien de déjà fait
+    - cron: "17 5,11,17,23 * * *"   # filet si le Worker se tait ; le flux ne refait rien de déjà fait
   workflow_dispatch:
+    inputs:
+      programme:
+        description: "Réveil programmé (lancé par le Worker à son heure) : compte pour la séance de la Direction"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
   actions: write      # la Sûreté compte les minutes GitHub du mois ; les délais lancent l'Ingénierie (workflow_dispatch)
   issues: write       # guichet et contacts : demandes écrites par l'agence, commentaire et fermeture d'un contact envoyé
+  pull-requests: read # PR qui attendent l'accord de Jules (agence/accords.py)
 
 concurrency:
   group: registre     # un seul écrivain du registre à la fois
   cancel-in-progress: false
 
 jobs:
+  # Filet : un réveil du cron de GitHub ne fait rien si un réveil lancé à la main ou par le Worker est parti dans les 5 h
+  # (il arrive souvent avec des heures de retard). En cas de doute (API injoignable), il tourne.
+  garde:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      lancer: ${{ steps.garde.outputs.lancer }}
+    steps:
+      - id: garde
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENEMENT: ${{ github.event_name }}
+        run: |
+          lancer=true
+          if [ "$EVENEMENT" = schedule ]; then
+            depuis=$(date -u -d '5 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+            recents=$(gh run list -w reveil.yml -e workflow_dispatch -L 20 --json createdAt,conclusion               --jq "[.[] | select(.createdAt >= \"$depuis\" and .conclusion != \"cancelled\")] | length" || echo 0)
+            if [ "${recents:-0}" -gt 0 ]; then
+              lancer=false
+              echo "Réveil déjà lancé depuis $depuis : le cron de GitHub arrive après coup, rien à faire"
+            fi
+          fi
+          echo "lancer=$lancer" >> "$GITHUB_OUTPUT"
+
   agents:
+    needs: garde
+    if: needs.garde.outputs.lancer == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -69,8 +105,18 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FUSION_TOKEN: ${{ secrets.FUSION_TOKEN }}   # Oui de Jules sur une PR protégée : étiquette et fusion en son nom
+          ALARME_SECRET: ${{ secrets.ALARME_SECRET }} # lecture des clics gardés par le Worker de l'alarme
           PYTHONUTF8: "1"
         run: python -m agence.lancer reponses relever
+      - name: PR qui attendent l'accord de Jules (question Telegram)
+        if: ${{ !cancelled() }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_TOKEN: ${{ github.token }}
+          PYTHONUTF8: "1"
+        run: python -m agence.lancer accords
       - name: Stats des chaînes
         if: ${{ !cancelled() }}
         env:
@@ -161,7 +207,7 @@ jobs:
       # MISSION « Lancement », Jules le 16/11). La boucle relancée attend la fin de ce réveil (même groupe de concurrence).
       # Seulement sur un réveil programmé, pour qu'aucune relance à la main ne déclenche de boucle en chaîne
       - name: Séance de la Direction (rythme choisi)
-        if: ${{ !cancelled() && github.event_name == 'schedule' }}
+        if: ${{ !cancelled() && (github.event_name == 'schedule' || inputs.programme) }}
         timeout-minutes: 2
         env:
           GH_TOKEN: ${{ github.token }}
@@ -182,6 +228,18 @@ jobs:
           esac
           # Dimanche soir : la boucle est déjà programmée par semaine.yml
           if [ "$(date -u +%u)" = 7 ] && [ "$creneau" = soir ]; then creneaux=""; fi
+          # Une séance au plus par créneau : un autre réveil du même créneau l'a peut-être déjà lancée
+          case "$creneau" in
+            matin) debut=$(date -u +%Y-%m-%dT05:00:00Z) ;;
+            midi)  debut=$(date -u +%Y-%m-%dT11:00:00Z) ;;
+            soir)  debut=$(date -u +%Y-%m-%dT17:00:00Z) ;;
+            *) if [ $h -ge 23 ]; then debut=$(date -u +%Y-%m-%dT23:00:00Z); else debut=$(date -u -d yesterday +%Y-%m-%dT23:00:00Z); fi ;;
+          esac
+          deja=$(gh run list -w semaine.yml -L 10 --json createdAt --jq "[.[] | select(.createdAt >= \"$debut\")] | length" || echo 0)
+          if [ "${deja:-0}" -gt 0 ]; then
+            echo "Séance déjà lancée depuis $debut ($creneau)"
+            creneaux=""
+          fi
           case " $creneaux " in
             *" $creneau "*) gh workflow run semaine.yml -f essai=false && echo "Boucle de la semaine relancée ($creneau, $n séance(s) par jour)" ;;
             *) echo "Pas de séance à ce créneau ($creneau, $n séance(s) par jour)" ;;
@@ -198,10 +256,13 @@ jobs:
           git -c http.https://github.com/.extraheader="$auth" push -q
       # Alarme hors de GitHub (Worker Cloudflare, alarme/worker.js) : sans signe de vie pendant 24 h, Jules est prévenu
       # sur Telegram. Ne casse jamais le réveil ; ne fait rien tant que ALARME_SECRET n'est pas posé
+      # Seul un réveil programmé (Worker ou cron) vaut pour son créneau : un lancement à la main ne fait pas de séance.
+      # Le signe transmet aussi les heures du réveil au Worker.
       - name: Signe de vie (alarme hors de GitHub)
         if: always()
         timeout-minutes: 2
         env:
           ALARME_SECRET: ${{ secrets.ALARME_SECRET }}
+          SOURCE: ${{ (github.event_name == 'schedule' || inputs.programme) && 'réveil' || 'réveil à la main' }}
           PYTHONUTF8: "1"
-        run: python -m agence.alarme signe
+        run: python -m agence.alarme signe "$SOURCE"

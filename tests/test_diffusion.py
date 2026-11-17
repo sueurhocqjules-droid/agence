@@ -101,5 +101,41 @@ class Legende(unittest.TestCase):
         self.assertEqual(len(texte), meta.LEGENDE_MAX)
 
 
+class RefusInstagram(unittest.TestCase):
+    def test_trois_refus_et_on_n_insiste_plus(self):
+        refus = lambda n: [{"reseau": "instagram", "chaine": "en", "nom": "volt-en", "etat": "erreur"}] * n
+        self.assertEqual(flux.essais_rates(refus(2) + [{"reseau": "facebook", "chaine": "en", "nom": "volt-en",
+                                                        "etat": "erreur"}],
+                                           "instagram", "volt-en"), 2)
+        lancer = Diffuser("lancer").lancer
+        _, envoyes, _ = lancer(publics=SUJETS, lignes=refus(2), cadence={"instagram": 1, "facebook": 0})
+        self.assertEqual(envoyes, [("ig", "titre volt")])  # 3e essai
+        _, envoyes, _ = lancer(publics=SUJETS, lignes=refus(3), cadence={"instagram": 1, "facebook": 0})
+        self.assertEqual(envoyes, [("ig", "titre coeur")])  # volt abandonné, la suivante passe
+
+    def test_refus_note_au_journal_comme_bloquant(self):
+        with mock.patch.object(flux.registre, "ajouter"), mock.patch.object(flux.lancer, "noter_journal") as journal:
+            flux.diffusion("instagram", "en", "volt-en", "erreur", note="code 2207003 : adresse illisible")
+            flux.diffusion("facebook", "en", "volt-en", "erreur", note="autre")
+        journal.assert_called_once()
+        self.assertEqual(journal.call_args[0][0], "chef-contenu")
+        self.assertIn("code 2207003", journal.call_args[0][1]["bloquant"])
+
+    def test_conteneur_en_erreur_garde_le_code(self):
+        reponses = iter([{"id": "c1"}, {"status_code": "ERROR", "status": "Error: failed with error code 2207003"}])
+        with mock.patch.object(meta, "appel", side_effect=lambda *a, **k: next(reponses)):
+            with self.assertRaises(meta.ErreurMeta) as e:
+                meta.publier_instagram("ig1", "https://x/v.mp4", "t", "d")
+        self.assertEqual(e.exception.code, 2207003)
+
+    def test_publie_seulement_quand_le_conteneur_est_fini(self):
+        appels = []
+        reponses = iter([{"id": "c1"}, {"status_code": "IN_PROGRESS"}, {"status_code": "FINISHED"}, {"id": "m1"}])
+        with mock.patch.object(meta, "appel", side_effect=lambda *a, **k: appels.append(a[1]) or next(reponses)), \
+                mock.patch.object(meta.time, "sleep"):
+            self.assertEqual(meta.publier_instagram("ig1", "https://x/v.mp4", "t", "d"), "m1")
+        self.assertEqual(appels, ["ig1/media", "c1", "c1", "ig1/media_publish"])
+
+
 if __name__ == "__main__":
     unittest.main()

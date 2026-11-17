@@ -48,3 +48,4 @@ Occasions réelles remontées (retenues par la Direction), peu de fausses alerte
 
 ## Retours
 - 13/11/2026 : en service à chaque réveil. Premier passage : 19 commentaires, 0 occasion ; seuil le plus proche au registre (`registre/seuils.json`) et dans le bloc Argent du bilan du lundi. Reçoit aussi les collaborations venues par mail (Courrier)
+- 2026-11-17, direction : 0 occasion en 28 jours. Signale tout message de marque dès qu'il arrive : le sponsoring est maintenant la voie de en et de pt.

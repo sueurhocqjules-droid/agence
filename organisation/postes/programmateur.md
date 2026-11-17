@@ -47,3 +47,5 @@ Vues gagnées par semaine et par réseau, à coût de production égal.
 ## Retours
 - 2026-11-15, chef-contenu : Les créneaux actuels (EN : 1 h et 18 h, ES : 2 h et 19 h, PT : 16 h et 23 h) restent adaptés ; aucune modification n’est nécessaire pour le moment.
 - 2026-11-16, chef-contenu : Les créneaux actuels (EN : 18 h, ES : 2 h, PT : 16 h) restent adaptés, aucune modification n’est nécessaire.
+- 2026-11-16, chef-contenu : Les créneaux restent EN : 18 h, ES : 2 h, PT : 16 h ; aucune modification n’est nécessaire.
+- 2026-11-17, chef-contenu : Les créneaux actuels (EN 18 h, ES 2 h, PT 16 h) restent adaptés, aucune modification nécessaire.
