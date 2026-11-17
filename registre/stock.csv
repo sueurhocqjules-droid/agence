@@ -101,3 +101,27 @@ wifi-pt,pt,wifi,en_rendu,,,2026-11-17T00:51:54+00:00,
 magnet-en,en,magnet,en_rendu,,,2026-11-17T00:51:54+00:00,
 magnet-es,es,magnet,en_rendu,,,2026-11-17T00:51:54+00:00,
 magnet-pt,pt,magnet,en_rendu,,,2026-11-17T00:51:54+00:00,
+eye-en,en,eye,programme,2026-11-21T17:00:00+00:00,IxYBkoo-WdQ,2026-11-17T11:23:28+00:00,"artefact 14287801976, {'duree_s': 71.7, 'son_moyen_db': -18.0, 'noir_s': 0}"
+eye-es,es,eye,programme,2026-11-22T01:00:00+00:00,wvZ5brRY4rI,2026-11-17T11:23:34+00:00,"artefact 14288485155, {'duree_s': 71.7, 'son_moyen_db': -18.0, 'noir_s': 0}"
+eye-pt,pt,eye,programme,2026-11-21T15:00:00+00:00,vSh4Fm88CY0,2026-11-17T11:23:41+00:00,"artefact 14286869629, {'duree_s': 71.7, 'son_moyen_db': -18.0, 'noir_s': 0}"
+press-en,en,press,programme,2026-11-22T17:00:00+00:00,p6hXBq3qL6U,2026-11-17T11:23:48+00:00,"artefact 14288530062, {'duree_s': 63.32, 'son_moyen_db': -18.0, 'noir_s': 0}"
+press-es,es,press,programme,2026-11-23T01:00:00+00:00,8QMkofhPW1k,2026-11-17T11:23:54+00:00,"artefact 14287856857, {'duree_s': 63.32, 'son_moyen_db': -18.0, 'noir_s': 0}"
+press-pt,pt,press,programme,2026-11-22T15:00:00+00:00,TCI3DMbNkyo,2026-11-17T11:24:00+00:00,"artefact 14287132619, {'duree_s': 63.32, 'son_moyen_db': -18.0, 'noir_s': 0}"
+wifi-en,en,wifi,programme,2026-11-23T17:00:00+00:00,40QjDIPTkSk,2026-11-17T11:24:07+00:00,"artefact 14287957206, {'duree_s': 70.91, 'son_moyen_db': -18.0, 'noir_s': 0}"
+wifi-es,es,wifi,programme,2026-11-24T01:00:00+00:00,rL1R_zjsxeo,2026-11-17T11:24:14+00:00,"artefact 14287777482, {'duree_s': 70.91, 'son_moyen_db': -18.0, 'noir_s': 0}"
+wifi-pt,pt,wifi,programme,2026-11-23T15:00:00+00:00,QtsF_7hvLgE,2026-11-17T11:24:22+00:00,"artefact 14287742089, {'duree_s': 70.91, 'son_moyen_db': -18.0, 'noir_s': 0}"
+magnet-en,en,magnet,programme,2026-11-24T17:00:00+00:00,fnhq7w0TXUE,2026-11-17T11:24:29+00:00,"artefact 14287772515, {'duree_s': 62.1, 'son_moyen_db': -18.0, 'noir_s': 0}"
+magnet-es,es,magnet,programme,2026-11-25T01:00:00+00:00,eWhX-l_HeHM,2026-11-17T11:24:36+00:00,"artefact 14288046938, {'duree_s': 62.1, 'son_moyen_db': -18.0, 'noir_s': 0}"
+magnet-pt,pt,magnet,programme,2026-11-24T15:00:00+00:00,5n5lYHNsd8g,2026-11-17T11:24:44+00:00,"artefact 14286769835, {'duree_s': 62.1, 'son_moyen_db': -18.0, 'noir_s': 0}"
+balloon-en,en,balloon,en_rendu,,,2026-11-17T11:25:02+00:00,
+balloon-es,es,balloon,en_rendu,,,2026-11-17T11:25:02+00:00,
+balloon-pt,pt,balloon,en_rendu,,,2026-11-17T11:25:02+00:00,
+candle-en,en,candle,en_rendu,,,2026-11-17T11:25:02+00:00,
+candle-es,es,candle,en_rendu,,,2026-11-17T11:25:02+00:00,
+candle-pt,pt,candle,en_rendu,,,2026-11-17T11:25:02+00:00,
+mosquito-en,en,mosquito,en_rendu,,,2026-11-17T11:25:02+00:00,
+moon-en,en,moon,en_rendu,,,2026-11-17T11:25:02+00:00,
+mosquito-es,es,mosquito,en_rendu,,,2026-11-17T11:25:02+00:00,
+moon-es,es,moon,en_rendu,,,2026-11-17T11:25:02+00:00,
+mosquito-pt,pt,mosquito,en_rendu,,,2026-11-17T11:25:02+00:00,
+moon-pt,pt,moon,en_rendu,,,2026-11-17T11:25:02+00:00,

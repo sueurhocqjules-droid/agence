@@ -1,14 +1,14 @@
 {
- "date": "2026-11-17T00:51:58+00:00",
+ "date": "2026-11-17T11:25:06+00:00",
  "plus_proche": {
   "chaine": "en",
   "palier": "yt_fans",
   "nom": "YouTube, palier fans (dons, Shopping)",
-  "progression": 0.0062,
+  "progression": 0.0065,
   "critere": "vues_shorts_90j",
-  "valeur": 18714,
+  "valeur": 19517,
   "cible": 3000000,
-  "texte": "Every Second (en) : 18 714 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
+  "texte": "Every Second (en) : 19 517 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
  },
  "paliers": [
   {
@@ -18,7 +18,7 @@
    "criteres": [
     {
      "critere": "abonnes",
-     "valeur": 13,
+     "valeur": 14,
      "cible": 500
     },
     {
@@ -28,11 +28,11 @@
     },
     {
      "critere": "vues_shorts_90j",
-     "valeur": 18714,
+     "valeur": 19517,
      "cible": 3000000
     }
    ],
-   "progression": 0.0062,
+   "progression": 0.0065,
    "atteint": false,
    "inconnu": []
   },
@@ -43,16 +43,16 @@
    "criteres": [
     {
      "critere": "abonnes",
-     "valeur": 13,
+     "valeur": 14,
      "cible": 1000
     },
     {
      "critere": "vues_shorts_90j",
-     "valeur": 18714,
+     "valeur": 19517,
      "cible": 10000000
     }
    ],
-   "progression": 0.0019,
+   "progression": 0.002,
    "atteint": false,
    "inconnu": []
   },
@@ -68,12 +68,12 @@
     },
     {
      "critere": "videos_90j",
-     "valeur": 19,
+     "valeur": 20,
      "cible": 3
     },
     {
      "critere": "vues_shorts_90j",
-     "valeur": 6,
+     "valeur": 7,
      "cible": 3000000
     }
    ],
@@ -93,7 +93,7 @@
     },
     {
      "critere": "vues_shorts_90j",
-     "valeur": 6,
+     "valeur": 7,
      "cible": 10000000
     }
    ],
@@ -118,7 +118,7 @@
     },
     {
      "critere": "vues_shorts_90j",
-     "valeur": 5338,
+     "valeur": 5375,
      "cible": 3000000
     }
    ],
@@ -138,7 +138,7 @@
     },
     {
      "critere": "vues_shorts_90j",
-     "valeur": 5338,
+     "valeur": 5375,
      "cible": 10000000
     }
    ],
@@ -147,5 +147,5 @@
    "inconnu": []
   }
  ],
- "curseur_commentaires": "2026-11-16T18:39:46Z"
+ "curseur_commentaires": "2026-11-17T00:49:19Z"
 }
