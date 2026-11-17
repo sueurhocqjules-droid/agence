@@ -1,11 +1,23 @@
 # Rythme des séances de la Direction, fixé par la Direction elle-même (MISSION.md, « Lancement », Jules le 16/11).
 # Fichier non protégé : la Direction le change par une demande à l'Ingénierie (classe 1).
-# Le réveil (reveil.yml, 4 créneaux par jour) relance la boucle de la semaine (semaine.yml) aux créneaux choisis,
-# en plus de celle du dimanche soir. Coût d'une boucle relevé le 15/11 : environ 1 $ (Direction 0,63 $, Stratège 0,35 $,
+# Le réveil (reveil.yml) relance la boucle de la semaine (semaine.yml) aux créneaux choisis, en plus de celle du
+# dimanche soir. Coût d'une boucle relevé le 15/11 : environ 1 $ (Direction 0,63 $, Stratège 0,35 $,
 # le reste en modèles gratuits), hors demandes à l'Ingénierie qu'elle lance.
 #
-# seances_par_jour : 0 = le dimanche seulement ; 1 = chaque jour (créneau de 18h17) ; 2 = 6h17 et 18h17 ;
-#                    3 = 6h17, 12h17 et 18h17 ; 4 = les 4 créneaux du réveil.
+# seances_par_jour : 0 = le dimanche seulement ; 1 = chaque jour (créneau du soir) ; 2 = matin et soir ;
+#                    3 = matin, midi et soir ; 4 = les 4 créneaux. Créneaux (heure UTC du réveil) : matin de 5 h à 10 h,
+#                    midi de 11 h à 16 h, soir de 17 h à 22 h, nuit de 23 h à 4 h ; une séance au plus par créneau.
+
+# Demande #55 (issue #50 de Jules, point 1) : une séance par jour jusqu'au 2026-11-29 inclus, pour tenir le 18/12.
+# Le 2026-11-30, remettre seances_par_jour à 0 (une par semaine, le dimanche) ; la Direction revoit alors ce rythme.
+# Rien ne le remet à 0 tout seul : le réveil ne lit pas de date (reveil.yml est protégé).
 
 [direction]
-seances_par_jour = 0
+seances_par_jour = 1
+
+# Heures (UTC, entiers de 0 à 23) où le réveil passe. Le Worker de l'alarme lance reveil.yml à chacune d'elles : il
+# les reçoit à chaque signe de vie, le changement compte donc dès le réveil suivant. Le cron de GitHub de reveil.yml
+# (5, 11, 17 et 23 h) reste un filet, ignoré quand un réveil est passé dans les 5 h. Chaque réveil coûte des minutes
+# d'Actions (environ 5 à 10) et les appels de ses scripts : à mettre en balance avec le budget avant d'en ajouter.
+[reveil]
+heures_utc = [5, 11, 17, 23]

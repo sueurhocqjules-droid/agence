@@ -9,6 +9,9 @@ Lancement : python -m agents.flux [--essai]
 3. Diffusion : chaque vidéo déjà publique sur YouTube part en Reel sur le compte Instagram et la Page Facebook de sa
    langue (agence/meta.py), la plus ancienne d'abord, au rythme fixé par le Programmateur (organisation/diffusion.toml).
    Facebook n'accepte pas plus de 90 s : une vidéo plus longue y est notée « hors_format » et sautée.
+   Instagram : on ne publie qu'une fois le conteneur FINISHED. Un envoi refusé note le code et le message de Meta
+   au registre des diffusions et, comme bloquant, au journal du chef-contenu ; il est retenté au réveil suivant,
+   3 fois au plus par vidéo, puis la suivante passe.
    TikTok : par Buffer (agence/buffer.py), même règle, même cadence ; une chaîne pas encore branchée sur Buffer est sautée.
    Threads : agence/threads.py, un jeton par compte (renouvelé ici même) ; un compte pas encore branché est sauté.
 4. Ce qui manque sans rendu (ou dont le rendu a expiré avant sa diffusion) : poussé dans la file de studio-rendu
@@ -150,9 +153,21 @@ def cadence_diffusion():
         return {reseau: r["par_jour"] for reseau, r in tomllib.load(f).items()}
 
 
+ESSAIS_INSTAGRAM_MAX = 3  # un envoi Instagram refusé est retenté au réveil suivant, 3 fois au plus
+
+
+def essais_rates(lignes, reseau, nom):
+    """Nombre d'envois déjà refusés (état « erreur ») de cette vidéo sur ce réseau."""
+    return sum(1 for l in lignes if l["reseau"] == reseau and l["nom"] == nom and l["etat"] == "erreur")
+
+
 def diffusion(reseau, langue, nom, etat, media_id="", note=""):
     registre.ajouter("diffusions", [{"date": registre.maintenant(), "reseau": reseau, "chaine": langue, "nom": nom,
                                      "etat": etat, "media_id": media_id, "note": note}])
+    if reseau == "instagram" and etat == "erreur":  # un envoi refusé est un bloquant au journal du chef-contenu
+        lancer.noter_journal("chef-contenu", {"date": registre.maintenant(), "quoi": f"diffusion instagram {nom}",
+                                              "resultat": "erreur",
+                                              "bloquant": f"envoi instagram refusé pour {nom} ({note})"[:400]})
 
 
 def publies_aujourdhui(lignes, reseau, langue, maintenant):
@@ -211,6 +226,8 @@ def diffuser(essai, sujets, etats, pauses, dossier, maintenant, fichiers=None):
                 nom = f"{sujet}-{langue}"
                 if nom not in fichiers:
                     fichiers[nom] = fichier_controle(nom, dossier)
+                if reseau == "instagram" and essais_rates(lignes, reseau, nom) >= ESSAIS_INSTAGRAM_MAX:
+                    continue  # 3 refus déjà notés : on n'insiste plus, la suivante passe
                 if not fichiers[nom]:
                     if nom not in a_rendre:
                         a_rendre.append(nom)  # rendu expiré ou incomplet : refait, diffusé au passage suivant
@@ -235,7 +252,7 @@ def diffuser(essai, sujets, etats, pauses, dossier, maintenant, fichiers=None):
                         media_id = meta.publier_facebook(meta.PAGES[langue], cle_page, fichier, titre, description)
                 except meta.ErreurMeta as e:
                     print(f"ERREUR {reseau} {nom} : {e}")
-                    diffusion(reseau, langue, nom, "erreur", note=str(e)[:300])
+                    diffusion(reseau, langue, nom, "erreur", note=f"code {e.code or '?'} : {e}"[:300])
                     erreurs.append(f"{reseau}:{nom}")
                     if reseau == "instagram":
                         noter_refus_instagram(nom, e)

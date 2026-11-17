@@ -1,9 +1,10 @@
-Cette séance lance deux nouvelles chaînes en anglais, tirées des concepts du Veilleur. « Scale of Everything » fait des comparaisons de taille (de la fourmi à l'univers, de l'atome au trou noir : 1,7 à 22 M de vues). « 1 Second vs 1 Hour » compare des cuissons et des défis (13 à 38 M de vues). Les deux formats se prêtent à des gabarits : un modèle gratuit écrit les chiffres, sans entamer le budget de l'Auteur.
-Les 35 concepts ont chacun une réponse. 8 vont aux deux nouvelles chaînes, 2 rejoignent Every Second (escargot, glace), 7 restent à creuser (explications d'ingénierie, ambiance « cocooning », devinettes d'affiliation) et 18 sont écartés : vraie vidéo filmée, publicité de marque, contenu pour enfants, armes.
-Pour le revenu, les comptes d'affiliation Amazon (US pour en, Brésil pour pt) doivent partir au guichet cette semaine. Je fais vérifier que la demande est bien partie.
-La chaîne es fait toujours 5 vues. Son diagnostic réglage par réglage a été recommandé à l'Ingénierie. Les sujets et la cadence ne changent pas jusqu'au 29/11.
-L'Ingénierie échoue près d'une fois sur deux. Je lui demande d'abord d'écrire la vraie cause de chaque échec, de remettre chaque PR à jour avant de la fusionner et de prévenir Jules elle-même dès qu'une PR l'attend.
-Ce que j'attends de toi, Jules :
-1. Étiquette accord-jules sur la PR #63, qui permet de lire tes issues : https://github.com/sueurhocqjules-droid/agence/pull/63
-2. Étiquette accord-jules sur la PR #68, qui écrit la cause des échecs : https://github.com/sueurhocqjules-droid/agence/pull/68
-3. Crée les comptes des deux nouvelles chaînes et les deux comptes Amazon Partenaires, à leur arrivée au guichet.
+Merci pour les 12 Oui de ce midi : les PR qui attendaient (cause des pannes, GH_TOKEN, Instagram, Stratège, guichet Amazon) vont se fusionner. Désormais, chaque PR qui t'attend t'est envoyée sur Telegram le jour même.
+Les chiffres : 24 899 vues sur 7 jours (en 19 517, pt 5 375 et en hausse, es 7). Claude : 11,7 % de la limite. Revenu : 0 €.
+Revenu : nous sommes en retard sur le chemin le plus court. Le sponsoring visé par le Responsable du revenu ne rapportera pas vite avec 20 000 vues par semaine. La voie la plus rapide reste l'affiliation : la demande des comptes Amazon part maintenant au guichet.
+Ce que je décide :
+1. L'écriture des sujets par un modèle gratuit (Ling 3.2 Flash) est mise en service tout de suite. Le délai de 72 h est dépassé et cela libère le budget de l'Auteur.
+2. La sortie de es à 18 h, décidée hier, n'avait pas été appliquée (es sort toujours à 2 h). Elle passe par le code.
+3. Une nouvelle chaîne « Guess the Product » : deviner un produit à partir d'indices, avec un lien d'affiliation. Tu recevras une demande de comptes, sur une adresse distincte.
+4. Trois concepts deviennent des sujets de nos chaînes : l'escargot, Sisyphe et l'astuce de Gauss. Le concept de l'explosion est écarté.
+Le démarchage des marques (proposé par le Stratège) est confié au Responsable de l'organisation. Tu recevras ensuite un lot (liste et modèle de message) à valider d'un seul Oui.
+Ce que j'attends de toi : créer les comptes de Guess the Product et ceux d'Amazon Partenaires quand ils arrivent.

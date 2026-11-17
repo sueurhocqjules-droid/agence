@@ -27,7 +27,7 @@ Transformer une demande écrite (une issue étiquetée `ingenierie`) en code qui
 La demande : quoi, pourquoi, preuve. Écrite par un agent (`agence.ingenierie.demander`, par exemple la Direction dans sa séance, ou un agent pour une décision de classe 1) ou par Jules. `organisation/MISSION.md`, `organisation/MEMOIRE.md` quand elle existe, le code et les fiches que la demande touche.
 
 ## Sorties
-Une PR par demande. Fusionnée seule si les tests sont verts, le banc vert quand un agent ou une fiche est touché, aucun fichier protégé touché, et la relecture d'un modèle qui n'est pas Claude rend « ok ». Sinon la PR reste ouverte avec la raison en commentaire. Si elle touche un fichier protégé (règle 9), elle attend Jules avec l'étiquette `guichet`. Le coût de chaque séance dans `registre/couts.csv`, la fusion au journal d'audit, tout arrêt en `bloquant` dans son journal.
+Une PR par demande. Fusionnée seule si les tests sont verts, le banc vert quand un agent ou une fiche est touché, aucun fichier protégé touché, et la relecture d'un modèle qui n'est pas Claude rend « ok ». Juste avant la fusion, la branche est remise à jour depuis main (update-branch) et les tests sont relancés sur le nouveau commit : s'ils sont rouges, pas de fusion. En cas de conflit, la branche est reconstruite sur main une seule fois, puis le blocage est noté clairement. Sinon la PR reste ouverte avec la raison en commentaire. Si elle touche un fichier protégé (règle 9), elle attend Jules avec l'étiquette `guichet`. Le coût de chaque séance dans `registre/couts.csv`, la fusion au journal d'audit, tout arrêt en `bloquant` dans son journal.
 
 ## Outils
 Workflow `.github/workflows/ingenierie.yml` et module `agence/ingenierie.py` (`construire`, `reprendre`, `conclure`, `demander`). La séance Claude lit et écrit les fichiers d'une copie de travail et ne peut lancer qu'une commande : `python -m unittest`. Le script fait le reste (commit, branche, PR, contrôles, fusion).
@@ -51,6 +51,7 @@ Part des demandes fusionnées seules, délai entre la demande et la fusion (cibl
 - Français simple dans les fiches, les messages et les commentaires, comme le reste du dépôt
 
 ## Retours
-- 2026-11-15, direction : 5 échecs sur 13 passages, dont deux en code 1 le 15/11 sans cause écrite. Avant tout le reste : la lecture des demandes de Jules, puis le diagnostic de la chaîne es. Les PR #22 et #23 attendent Jules, c'est normal.
 - 2026-11-16, direction : 13 échecs, dont celui du 16/11 encore ouvert : commence par écrire sa cause. Ensuite, dans l'ordre : GH_TOKEN, la PR #42 reconstruite, le rythme, la liste « à valider » lue en direct.
 - 2026-11-16, direction : 45 % d'échecs avec pour seule cause « code 1 » : commence par écrire la vraie cause. Remets chaque PR à jour sur main avant de la fusionner, puis corrige ou ferme les PR #69 et #70. Ensuite : les gabarits des deux nouvelles chaînes.
+- 2026-11-16, direction : 33 échecs : la vraie cause écrite au journal passe toujours en premier. Ensuite : le Stratège, le Chercheur d'outils, puis le guichet de l'affiliation sans fichier protégé.
+- 2026-11-17, direction : Les 12 PR qui attendaient sont accordées : fusionne-les dans l'ordre et remets-les à jour sur main. Ensuite : les sujets par Ling, puis es à 18 h, puis le Répondeur. Les gabarits des deux nouvelles chaînes du 16/11 restent à livrer.

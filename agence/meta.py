@@ -11,6 +11,7 @@ et developers.facebook.com/docs/video-api/guides/reels-publishing (Reels des Pag
 """
 import json
 import os
+import re
 import time
 import urllib.error
 import urllib.parse
@@ -126,8 +127,18 @@ def publier_instagram(ig_id, adresse, titre, description):
     """Publie un Reel à partir de l'adresse publique de la vidéo. Renvoie l'id du média."""
     conteneur = appel("POST", f"{ig_id}/media", {"media_type": "REELS", "video_url": adresse,
                                                   "caption": legende(titre, description), "share_to_feed": "true"})["id"]
-    attendre(lambda: appel("GET", conteneur, {"fields": "status_code"}).get("status_code"),
-             {"FINISHED"}, {"ERROR", "EXPIRED"}, "Instagram")
+    detail = []
+
+    def etat():
+        reponse = appel("GET", conteneur, {"fields": "status_code,status"})
+        detail.append(reponse.get("status") or "")
+        return reponse.get("status_code")
+    try:  # on ne publie qu'une fois le conteneur FINISHED : Meta a alors pu lire la vidéo à son adresse
+        attendre(etat, {"FINISHED"}, {"ERROR", "EXPIRED"}, "Instagram")
+    except ErreurMeta as e:
+        cause = next((d for d in reversed(detail) if d), "")
+        trouve = re.search(r"\d{6,}", cause)
+        raise ErreurMeta(f"{e} {cause}".strip(), int(trouve.group()) if trouve else e.code) from None
     return appel("POST", f"{ig_id}/media_publish", {"creation_id": conteneur})["id"]
 
 

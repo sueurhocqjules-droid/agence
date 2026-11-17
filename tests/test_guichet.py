@@ -125,6 +125,34 @@ class Demande(unittest.TestCase):
         for champ in guichet.CHAMPS:
             self.assertIn(f"**{champ} :**", commentaire)
 
+    def test_une_pr_protegee_est_deposee_au_recapitulatif_une_seule_fois(self):
+        gh = FauxGitHub()
+        for _ in range(2):
+            guichet.signaler_pr(40, "fusionner", "fichier protégé", "la demande #12", "https://x/pull/40", gh=gh,
+                                demande="12")
+        etat = guichet.lire_etat()
+        self.assertEqual(list(etat["prs_a_dire"]), ["40"])
+        message = etat["prs_a_dire"]["40"]
+        for attendu in ("https://x/pull/40", "#12", "la demande #12", "ajouter l'étiquette accord-jules"):
+            self.assertIn(attendu, message)
+        envois = []
+        matin = datetime(2026, 11, 14, 5, 17, tzinfo=timezone.utc)
+        etat, envoyes = guichet.passage(matin, etat, [], [], [], envois.append)
+        self.assertEqual(envoyes, ["récapitulatif"])
+        self.assertIn("ajouter l'étiquette accord-jules", envois[0])
+        self.assertEqual(etat["prs_a_dire"], {})
+        guichet.ETAT.write_text(json.dumps(etat), encoding="utf-8")
+        guichet.signaler_pr(40, "fusionner", "fichier protégé", "la demande #12", "https://x/pull/40", gh=gh)
+        self.assertEqual(guichet.lire_etat()["prs_a_dire"], {})
+
+    def test_le_message_attend_le_recapitulatif_s_il_n_est_pas_l_heure(self):
+        etat = {"recap": "", "urgents": [], "signalees": [40], "prs_a_dire": {"40": "PR #40 en attente"}}
+        envois = []
+        etat, envoyes = guichet.passage(datetime(2026, 11, 13, 23, 17, tzinfo=timezone.utc), etat, [], [], [],
+                                        envois.append)
+        self.assertEqual((envoyes, envois), ([], []))
+        self.assertEqual(list(etat["prs_a_dire"]), ["40"])
+
 
 class Recap(unittest.TestCase):
     MATIN = datetime(2026, 11, 14, 5, 17, tzinfo=timezone.utc)    # 6h17 à Paris
