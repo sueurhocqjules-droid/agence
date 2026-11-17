@@ -14,8 +14,9 @@ Le secret partagé vit dans .secrets/alarme_secret (ignoré par Git), le Worker 
 Le secret du webhook Telegram vit dans .secrets/telegram_webhook (le Worker et Telegram en ont une copie). Le jeton
 GITHUB_RELANCE_TOKEN (agence/.env, Actions en écriture sur agence seul) est facultatif : sans lui, un clic s'applique
 au prochain réveil au lieu de tout de suite.
-Délai normal : 24 h. Le réveil passe 4 fois par jour, mais GitHub en a déjà sauté un et retardé un autre de 7 h
-le 11/11 (a-reverifier.md) : 19 h de silence restent plausibles sans panne, 24 h n'en sont plus.
+Le signe de vie transmet aussi les heures du réveil (organisation/rythme.toml, [reveil] heures_utc) : le Worker
+lance reveil.yml à chacune d'elles, car le cron de GitHub en sautait environ la moitié et retardait les autres.
+Délai normal : 24 h, une journée entière sans aucun réveil malgré le Worker et le cron de GitHub en filet.
 """
 import json
 import os
@@ -23,6 +24,7 @@ import secrets
 import subprocess
 import sys
 import time
+import tomllib
 import urllib.error
 import urllib.request
 import uuid
@@ -42,17 +44,36 @@ SOUS_DOMAINE = "everysecondlab"   # sous-domaine workers.dev du compte, créé a
 BASE = f"https://{NOM}.{SOUS_DOMAINE}.workers.dev"   # deployer prévient si l'adresse réelle diffère
 ADRESSE = f"{BASE}/signe"
 API = "https://api.cloudflare.com/client/v4"
+RYTHME = RACINE / "organisation" / "rythme.toml"
 
 
 # --- Côté réveil -------------------------------------------------------------------------------------------
 
-def signe(source="réveil", adresse=None, ouvrir=urllib.request.urlopen):
-    """Envoie un signe de vie. Ne lève jamais : un échec se voit à l'alarme, pas en cassant le réveil."""
+def heures_reveil(fichier=RYTHME):
+    """Heures UTC du réveil choisies par l'agence, ou None si absentes ou invalides (le Worker garde alors les siennes)."""
+    try:
+        with open(fichier, "rb") as f:
+            heures = tomllib.load(f).get("reveil", {}).get("heures_utc")
+    except (OSError, tomllib.TOMLDecodeError):
+        return None
+    if not isinstance(heures, list) or not 0 < len(heures) <= 24:
+        return None
+    if not all(isinstance(h, int) and not isinstance(h, bool) and 0 <= h <= 23 for h in heures):
+        return None
+    return sorted(set(heures))
+
+
+def signe(source="réveil", adresse=None, ouvrir=urllib.request.urlopen, heures=None):
+    """Envoie un signe de vie (et les heures du réveil). Ne lève jamais : un échec se voit à l'alarme, pas en cassant le réveil."""
     secret = os.environ.get("ALARME_SECRET", "").strip()
     if not secret:
         print("Signe de vie non envoyé : ALARME_SECRET n'est pas posé sur GitHub (python -m agence.alarme poser-secret-github)")
         return False
-    requete = urllib.request.Request(adresse or ADRESSE, data=json.dumps({"source": source}).encode(), method="POST",
+    corps = {"source": source}
+    heures = heures if heures is not None else heures_reveil()
+    if heures:
+        corps["heures_utc"] = heures
+    requete = urllib.request.Request(adresse or ADRESSE, data=json.dumps(corps).encode(), method="POST",
                                      headers={"Authorization": f"Bearer {secret}", "Content-Type": "application/json",
                                               "User-Agent": "agence-reveil"})
     try:
