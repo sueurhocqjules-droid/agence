@@ -1,25 +1,27 @@
 """Questions Oui/Non à Jules par Telegram, et application de sa réponse par un script à choix fermés.
 
-    python -m agence.questions relever                        (script `reponses`, à chaque réveil)
+    python -m agence.questions relever                        (script `reponses` : à chaque réveil, et par
+                                                               reponses.yml dès que Jules clique)
     python -m agence.questions poser "<question>" --pourquoi "<ce qui s'est passé>" --oui <action> [--non <action>]
                                      [--conseil "<ce qui aide Jules à choisir>"] [--par <agent>]
 
 Une action est `rien`, `pause:<cible>` ou `reprise:<cible>`, avec une cible connue : agent, script, `tout`
 ou `chaine:<langue>`, ou `accord:<n>` / `refus:<n>` pour une PR qui touche un fichier protégé (agence/accords.py).
 Rien d'autre ne peut sortir d'un clic. Questions dans registre/questions.csv
-(la dernière ligne d'une question fait foi), décalage Telegram dans registre/telegram.json.
+(la dernière ligne d'une question fait foi).
+
+Les clics arrivent au Worker de l'alarme par webhook (alarme/worker.js, demande #46), qui les garde : Telegram
+efface un clic non lu en 2 à 3 minutes, bien avant le réveil suivant. relever les lit là, puis les marque lus.
 """
 import argparse
-import json
 import re
 import sys
 import time
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
-from agence import organisation, registre, telegram, youtube
+from agence import alarme, organisation, registre, telegram, youtube
 
-DECALAGE = registre.DOSSIER / "telegram.json"
 GARDE_S = 6 * 3600  # un clic sur une question inconnue plus récente que ça est gardé (registre en retard)
 CLIC = re.compile(r"^q:([0-9a-z-]{1,24}):(oui|non)$")
 REVEILS_UTC = (5, 11, 17, 23)  # heures UTC du cron de reveil.yml, à la minute 17
@@ -103,9 +105,10 @@ def message(texte, pourquoi, si_oui, si_non, par, conseil="", maintenant=None):
         morceaux.append(f"Pour t'aider à choisir : {conseil}")
     non = "ça reste en pause" if si_non == "rien" and si_oui.startswith("reprise:") else en_clair(si_non)
     morceaux.append(f"Oui : {en_clair(si_oui)}.\nNon : {non}.")
-    morceaux.append(f"Ta réponse sera prise au prochain réveil de l'agence (prévu vers {prochain_reveil(maintenant or datetime.now(timezone.utc))}, "
-                    "mais GitHub peut le retarder de quelques heures). "
-                    "D'ici là le bouton ne réagit pas, c'est normal : ce message changera quand ce sera fait.")
+    morceaux.append("Ta réponse est enregistrée dès le clic (les boutons disparaissent) et appliquée dans les minutes "
+                    "qui suivent, au plus tard au prochain réveil de l'agence (prévu vers "
+                    f"{prochain_reveil(maintenant or datetime.now(timezone.utc))}, que GitHub peut retarder de "
+                    "quelques heures). Ce message changera encore quand ce sera fait.")
     return "\n\n".join(morceaux)
 
 
@@ -141,22 +144,31 @@ def clore(si_oui, raison):
                 print(f"Message non mis à jour : {e}")
 
 
+def _deja(question, texte):
+    """Ce que voit Jules après un clic qui ne change rien (question inconnue, close, ou clic relu)."""
+    if not question:
+        return f"{texte}\n\nQuestion inconnue de l'agence : rien n'est fait."
+    if question["etat"] == "repondue":
+        return f"{question['texte']}\n\nTa réponse : {question['reponse'].upper()} (déjà prise)."
+    return f"{question['texte']}\n\nPlus besoin de répondre : rien n'est fait."
+
+
 def relever():
-    """Lit les clics de Jules, applique la réponse aux questions ouvertes. Renvoie le nombre de réponses prises."""
-    depuis = json.loads(DECALAGE.read_text(encoding="utf-8"))["decalage"] if DECALAGE.exists() else 0
-    prochain, clics = telegram.clics(depuis)
-    questions, prises = etat_questions(registre.lire("questions")), 0
-    for id_update, id_clic, donnee, id_message, envoi in clics:
-        trouve = CLIC.match(donnee)
+    """Lit les clics de Jules gardés par le Worker, applique la réponse aux questions ouvertes, marque les clics lus.
+    Un clic relu (marquage perdu) tombe sur une question déjà répondue : jamais appliqué deux fois.
+    Renvoie le nombre de réponses prises."""
+    questions, prises, lus = etat_questions(registre.lire("questions")), 0, []
+    for clic in alarme.clics_recus():
+        trouve = CLIC.match(clic.get("donnee", ""))
         question = questions.get(trouve.group(1)) if trouve else None
-        if trouve and not question and time.time() - envoi < GARDE_S:
-            # Question récente absente d'ici : ce registre est en retard sur celui qui l'a posée. On garde le clic
-            # (et les suivants) pour le prochain passage au lieu de le perdre.
+        if trouve and not question and time.time() - clic.get("envoi", 0) < GARDE_S:
+            # Question récente absente d'ici : ce registre est en retard sur celui qui l'a posée. Le clic reste
+            # au Worker pour le prochain passage au lieu d'être perdu.
             print(f"Clic sur {trouve.group(1)}, question pas encore dans ce registre : gardé pour le prochain passage")
-            prochain = id_update
-            break
+            continue
+        lus.append(clic["update_id"])
         if not question or question["etat"] != "ouverte":
-            _accuser(id_clic, "Question inconnue ou déjà tranchée")
+            _remplacer(clic["message_id"], _deja(question, clic.get("texte", "")))
             continue
         reponse = trouve.group(2)
         action = question["si_oui"] if reponse == "oui" else question["si_non"]
@@ -171,20 +183,17 @@ def relever():
         questions[question["id"]] = question
         prises += 1
         print(f"Réponse {reponse} à {question['id']} : {action}")
-        _accuser(id_clic, f"Bien reçu : {reponse}")
-        try:
-            telegram.remplacer(int(id_message), f"{question['texte']}\n\nTa réponse : {reponse.upper()}. {fait}")
-        except RuntimeError as e:
-            print(f"Message non mis à jour : {e}")
-    DECALAGE.write_text(json.dumps({"decalage": prochain}) + "\n", encoding="utf-8")
+        _remplacer(clic["message_id"], f"{question['texte']}\n\nTa réponse : {reponse.upper()}. {fait}")
+    if lus:
+        alarme.clics_lus(lus)
     return prises
 
 
-def _accuser(id_clic, texte):
+def _remplacer(id_message, texte):
     try:
-        telegram.accuser(id_clic, texte)
-    except RuntimeError:
-        pass  # un clic de plus de quelques minutes ne peut plus être accusé : sans gravité
+        telegram.remplacer(int(id_message), texte)
+    except RuntimeError as e:  # message identique ou effacé : sans gravité, la réponse est prise
+        print(f"Message non mis à jour : {e}")
 
 
 def main():

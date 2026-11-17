@@ -5,8 +5,15 @@ qui prévient Jules sur Telegram si plus rien n'arrive pendant DELAI_MINUTES (vo
     python -m agence.alarme deployer [--essai N]   # en local : Worker, KV, secrets, cron (CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID)
     python -m agence.alarme etat                   # en local : état lu dans le KV du Worker
     python -m agence.alarme poser-secret-github    # Jules, une fois : pose ALARME_SECRET sur GitHub sans l'afficher
+    python -m agence.alarme brancher-telegram      # en local, après deployer : Telegram pousse les clics au Worker
+
+Le Worker garde aussi les clics de Jules sur les boutons Oui/Non (demande #46) : clics_recus et clics_lus les lisent
+pour agence/questions.py, avec le même secret que le signe de vie.
 
 Le secret partagé vit dans .secrets/alarme_secret (ignoré par Git), le Worker et GitHub en ont chacun une copie.
+Le secret du webhook Telegram vit dans .secrets/telegram_webhook (le Worker et Telegram en ont une copie). Le jeton
+GITHUB_RELANCE_TOKEN (agence/.env, Actions en écriture sur agence seul) est facultatif : sans lui, un clic s'applique
+au prochain réveil au lieu de tout de suite.
 Délai normal : 24 h. Le réveil passe 4 fois par jour, mais GitHub en a déjà sauté un et retardé un autre de 7 h
 le 11/11 (a-reverifier.md) : 19 h de silence restent plausibles sans panne, 24 h n'en sont plus.
 """
@@ -24,6 +31,7 @@ from pathlib import Path
 RACINE = Path(__file__).resolve().parents[1]
 SOURCE = RACINE / "alarme" / "worker.js"
 FICHIER_SECRET = RACINE / ".secrets" / "alarme_secret"
+FICHIER_WEBHOOK = RACINE / ".secrets" / "telegram_webhook"
 NOM = "agence-alarme"
 KV = "agence-alarme-etat"
 DEPOT = "sueurhocqjules-droid/agence"
@@ -31,7 +39,8 @@ DELAI_MINUTES = 24 * 60
 CRON = "7 * * * *"            # toutes les heures : l'alarme part au plus 1 h après le délai
 CRON_ESSAI = "* * * * *"
 SOUS_DOMAINE = "everysecondlab"   # sous-domaine workers.dev du compte, créé au premier déploiement s'il manque
-ADRESSE = f"https://{NOM}.{SOUS_DOMAINE}.workers.dev/signe"   # deployer prévient si l'adresse réelle diffère
+BASE = f"https://{NOM}.{SOUS_DOMAINE}.workers.dev"   # deployer prévient si l'adresse réelle diffère
+ADRESSE = f"{BASE}/signe"
 API = "https://api.cloudflare.com/client/v4"
 
 
@@ -55,6 +64,42 @@ def signe(source="réveil", adresse=None, ouvrir=urllib.request.urlopen):
     except (urllib.error.URLError, OSError, ValueError) as e:
         print(f"Alarme injoignable : {e}")
     return False
+
+
+# --- Clics de Jules gardés par le Worker (agence/questions.py) -----------------------------------------------
+
+def _secret_alarme():
+    secret = os.environ.get("ALARME_SECRET", "").strip()
+    if not secret and FICHIER_SECRET.exists():
+        secret = FICHIER_SECRET.read_text(encoding="utf-8").strip()
+    if not secret:
+        raise RuntimeError("ALARME_SECRET manquant : les clics de Jules ne peuvent pas être lus")
+    return secret
+
+
+def _worker(methode, chemin, donnees=None, ouvrir=urllib.request.urlopen):
+    corps = json.dumps(donnees).encode() if donnees is not None else None
+    requete = urllib.request.Request(f"{BASE}{chemin}", data=corps, method=methode,
+                                     headers={"Authorization": f"Bearer {_secret_alarme()}",
+                                              "Content-Type": "application/json", "User-Agent": "agence-reponses"})
+    try:
+        with ouvrir(requete, timeout=30) as reponse:
+            return json.load(reponse)
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"Worker {methode} {chemin} : {e.code}") from None
+    except (urllib.error.URLError, OSError, ValueError) as e:
+        raise RuntimeError(f"Worker injoignable ({chemin}) : {e}") from None
+
+
+def clics_recus(ouvrir=urllib.request.urlopen):
+    """Clics gardés par le Worker, du plus ancien au plus récent : dicts update_id, clic_id, donnee, message_id,
+    envoi (date du message, en secondes), texte (texte du message au moment du clic), recu."""
+    return sorted(_worker("GET", "/clics", ouvrir=ouvrir)["clics"], key=lambda c: c["update_id"])
+
+
+def clics_lus(ids, ouvrir=urllib.request.urlopen):
+    """Retire du Worker les clics traités."""
+    return _worker("POST", "/clics/lus", {"ids": sorted(ids)}, ouvrir=ouvrir)
 
 
 # --- Côté Cloudflare (en local) ----------------------------------------------------------------------------
@@ -86,12 +131,30 @@ def _cloudflare(methode, chemin, donnees=None, corps=None, type_contenu="applica
     return resultat
 
 
+def _secret_local(fichier):
+    """Un secret créé au premier déploiement dans .secrets/ (ignoré par Git), jamais affiché. token_urlsafe ne
+    donne que A-Z, a-z, 0-9, _ et -, les seuls caractères admis par Telegram pour secret_token."""
+    if not fichier.exists():
+        fichier.parent.mkdir(exist_ok=True)
+        fichier.write_text(secrets.token_urlsafe(32), encoding="utf-8")
+    return fichier.read_text(encoding="utf-8").strip()
+
+
 def secret_partage():
-    """Le secret partagé, créé au premier déploiement dans .secrets/ (ignoré par Git), jamais affiché."""
-    if not FICHIER_SECRET.exists():
-        FICHIER_SECRET.parent.mkdir(exist_ok=True)
-        FICHIER_SECRET.write_text(secrets.token_urlsafe(32), encoding="utf-8")
-    return FICHIER_SECRET.read_text(encoding="utf-8").strip()
+    return _secret_local(FICHIER_SECRET)
+
+
+def secret_webhook():
+    return _secret_local(FICHIER_WEBHOOK)
+
+
+def jeton_relance():
+    """GITHUB_RELANCE_TOKEN (environnement ou agence/.env), ou "" s'il n'est pas posé."""
+    from agence import telegram   # même lecture de agence/.env que les clés Telegram
+    try:
+        return telegram._reglage("GITHUB_RELANCE_TOKEN")
+    except RuntimeError:
+        return ""
 
 
 def espace_kv():
@@ -101,9 +164,9 @@ def espace_kv():
     return _cloudflare("POST", "/storage/kv/namespaces", {"title": KV})["id"]
 
 
-def metadonnees(id_kv, delai_minutes, essai, secret, bot, chat):
+def metadonnees(id_kv, delai_minutes, essai, secret, bot, chat, webhook="", relance=""):
     """Liaisons du Worker. Les secrets sont reposés à chaque déploiement, depuis l'environnement et .secrets/."""
-    return {
+    meta = {
         "main_module": "worker.js",
         "compatibility_date": "2026-11-01",
         "bindings": [
@@ -115,6 +178,10 @@ def metadonnees(id_kv, delai_minutes, essai, secret, bot, chat):
             {"type": "secret_text", "name": "TELEGRAM_CHAT_ID", "text": chat},
         ],
     }
+    for nom, valeur in (("WEBHOOK_SECRET", webhook), ("GITHUB_RELANCE_TOKEN", relance)):
+        if valeur:
+            meta["bindings"].append({"type": "secret_text", "name": nom, "text": valeur})
+    return meta
 
 
 def _multipart(meta, source):
@@ -141,8 +208,9 @@ def deployer(essai_minutes=None):
     """Déploie (ou redéploie) le Worker. essai_minutes : délai raccourci, cron chaque minute, messages marqués TEST."""
     essai = essai_minutes is not None
     id_kv = espace_kv()
+    relance = jeton_relance()
     meta = metadonnees(id_kv, essai_minutes if essai else DELAI_MINUTES, essai, secret_partage(),
-                       os.environ["TELEGRAM_BOT_TOKEN"], os.environ["TELEGRAM_CHAT_ID"])
+                       os.environ["TELEGRAM_BOT_TOKEN"], os.environ["TELEGRAM_CHAT_ID"], secret_webhook(), relance)
     corps, type_contenu = _multipart(meta, SOURCE.read_bytes())
     _cloudflare("PUT", f"/workers/scripts/{NOM}", corps=corps, type_contenu=type_contenu)
     sous_domaine = sous_domaine_compte()
@@ -150,10 +218,20 @@ def deployer(essai_minutes=None):
     _cloudflare("POST", f"/workers/scripts/{NOM}/subdomain", {"enabled": True, "previews_enabled": False})
     adresse = f"https://{NOM}.{sous_domaine}.workers.dev/signe"
     print(f"Worker {NOM} déployé : délai {meta['bindings'][1]['text']} min, cron {CRON_ESSAI if essai else CRON}, "
-          f"{'ESSAI' if essai else 'normal'}")
+          f"{'ESSAI' if essai else 'normal'}, clics appliqués {'tout de suite' if relance else 'au prochain réveil'}")
     if adresse != ADRESSE:
-        print(f"ATTENTION : l'adresse réelle est {adresse}, à reporter dans ADRESSE (agence/alarme.py)")
+        print(f"ATTENTION : l'adresse réelle est {adresse}, à reporter dans BASE (agence/alarme.py)")
     return adresse
+
+
+def brancher_telegram():
+    """Telegram pousse désormais chaque clic au Worker (un clic non lu disparaît en 2 à 3 minutes chez Telegram).
+    Un webhook posé rend getUpdates inutilisable : plus rien ne doit le lire."""
+    from agence import telegram
+    telegram.appeler("setWebhook", {"url": f"{BASE}/telegram", "secret_token": secret_webhook(),
+                                    "allowed_updates": ["callback_query"], "max_connections": 5})
+    info = telegram.appeler("getWebhookInfo", {})
+    print(f"Webhook Telegram branché sur {info.get('url')} ({info.get('pending_update_count', 0)} clic(s) en attente)")
 
 
 def etat():
@@ -209,6 +287,8 @@ def main(arguments):
         print(json.dumps(etat(), ensure_ascii=False))
     elif commande == "poser-secret-github":
         poser_secret_github()
+    elif commande == "brancher-telegram":
+        brancher_telegram()
     else:
         print(__doc__)
         return 2

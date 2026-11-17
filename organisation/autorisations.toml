@@ -38,5 +38,7 @@ OPENROUTER_API_KEY = ["chercheur-outils", "chef-recherche", "courrier", "guetteu
 # Jeton GitHub de Jules (dépôt agence seul) : pose son étiquette accord-jules et fusionne une PR protégée après son
 # Oui sur Telegram (agence/accords.py), ferme la PR après son Non. Accordé le 16/11/2026
 FUSION_TOKEN = ["reponses"]
+# Secret partagé avec le Worker de l'alarme : lecture des clics de Jules qu'il garde (demande #46). Accordé le 17/11/2026
+ALARME_SECRET = ["reponses"]
 # Abonnement Claude de Jules
 CLAUDE_CODE_OAUTH_TOKEN = ["direction", "ingenierie", "stratege"]
