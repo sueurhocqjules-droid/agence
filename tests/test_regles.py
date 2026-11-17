@@ -145,6 +145,28 @@ class NouvelleChaine(Registre):
         self.assertEqual(d["auteur"], "direction")
         self.assertIn("(#31)", d["decision"])
 
+    def test_chaque_concept_recoit_un_verdict_et_seul_a_creuser_revient(self):
+        concepts = [{"date": "2026-11-15T22:00:00+00:00", "lien": f"https://y/{i}", "concept": f"c{i}", "etat": "propose"}
+                    for i in range(3)]
+        (self.tmp / "concepts.jsonl").write_text("".join(json.dumps(c) + "\n" for c in concepts), encoding="utf-8")
+        ouverts = direction.concepts_a_trancher()
+        self.assertEqual([c["lien"] for c in ouverts], ["https://y/0", "https://y/1", "https://y/2"])
+        s = direction.schema(["chef-contenu"], concepts=[c["lien"] for c in ouverts])
+        self.assertIn("concepts", s["required"])
+        self.assertEqual(s["properties"]["concepts"]["items"]["properties"]["argent"]["enum"], list(direction.ARGENT))
+        v = lambda lien, verdict, argent="viral": {"lien": lien, "verdict": verdict, "argent": argent, "piste": "p",
+                                                   "pourquoi": "w"}
+        reponse = {"concepts": [v("https://y/0", "nouvelle_chaine"), v("https://y/1", "a_creuser", "affiliation"),
+                                v("https://inconnu", "ecarte")],
+                   "decisions": [], "retours": [], "consignes": [], "questions": []}
+        faits, refus = direction.appliquer(reponse, T, {})
+        self.assertEqual(len([f for f in faits if f.startswith("concept ")]), 2)
+        self.assertTrue(any("hors liste" in r for r in refus))
+        self.assertTrue(any("1 concept(s) sans verdict" in r for r in refus))   # https://y/2 oublié
+        restants = direction.concepts_a_trancher()
+        self.assertEqual([c["lien"] for c in restants], ["https://y/1", "https://y/2"])
+        self.assertEqual(restants[0]["dernier_verdict"]["piste"], "p")
+
     def test_une_demande_refusee_est_notee_sans_arreter_la_seance(self):
         reponse = {"chaines": [{"nom": "X", "concept": "c", "reseaux": ["myspace"], "pourquoi": "p"}],
                    "decisions": [], "retours": [], "consignes": [], "questions": []}
@@ -252,7 +274,7 @@ class DepartEnEssai(Registre):
         self.ecrire("besoins", [besoin(), besoin("auteur-voix", "2026-11-14T10:00:00+00:00")])
         self.ecrire("candidats", [LIBRE, autre])
         faits, _ = delais.partir(T, self.retenir)
-        self.assertEqual(len(faits), delais.DEPARTS_MAX)
+        self.assertEqual(len(faits), min(2, delais.DEPARTS_MAX))
         self.assertIn("auteur-voix", faits[0])
 
     def test_un_depart_refuse_est_dit_et_ne_laisse_aucune_decision(self):

@@ -8,6 +8,8 @@
    l'Ingénierie par `catalogue.retenir`, au nom du poste qui a le besoin. Une option avec compte (guichet) ou
    payante (capital) ne part jamais d'ici : elle reste à la Direction et à Jules. Un seul départ par passage, et
    pas de nouveau départ pour un besoin tant que 48 h ne sont pas passées depuis le précédent.
+   Au même passage, les comptes d'affiliation au guichet (`comptes_affiliation`) : le Responsable du revenu ne se
+   réveille que le dimanche, la demande ne doit pas attendre.
 2. Mesure. Le temps entre un besoin écrit et sa mise en service (le besoin fermé comme comblé), contre sa cible :
    72 h en classe 1, une semaine en classe 2. Lue par le Chef des opérations (rapport du dimanche) et par le bilan
    du lundi, qui ne citent que ce qui dérape.
@@ -21,7 +23,7 @@ from datetime import datetime, timedelta, timezone
 from agence import besoins, catalogue, mesures, registre
 
 CIBLE_H = {1: 72, 2: 168}     # MISSION.md, « Le délai se mesure » : 72 h en classe 1, une semaine en classe 2
-DEPARTS_MAX = 1               # par passage : chaque départ est un lancement de l'Ingénierie, dans son budget
+DEPARTS_MAX = 3               # par passage : chaque départ est un lancement de l'Ingénierie, dans son budget
 JOURS_MESURE = 28
 
 
@@ -67,6 +69,17 @@ def partir(maintenant, retenir=None):
                              f"{b['id']}" + (f" (issue #{numero})" if numero else ""), raison[:600])
         faits.append(f"{str(c.get('nom'))[:60]} part en essai pour {b['id']}")
     return faits, refus
+
+
+def comptes_affiliation(maintenant, demander=None):
+    """Demande au guichet les comptes d'affiliation dont le besoin a passé son délai sans option. Le Responsable du
+    revenu ne se réveille que le dimanche : sans ce passage, la demande attendrait la semaine suivante. Elle repart
+    des voies de son dernier passage ; le guichet n'écrit jamais deux fois la même. Renvoie les numéros."""
+    from agents import responsable_revenu
+    lignes = registre.lire_jsonl("revenu")
+    if not lignes:
+        return []
+    return (demander or responsable_revenu.demander_comptes_affiliation)(lignes[-1]["voies"], maintenant)
 
 
 def mesure(maintenant, jours=JOURS_MESURE):
@@ -117,6 +130,13 @@ def main():
         retards = phrases_retard(mesure(maintenant))
         for r in refus:
             print(f"REFUS {r}")
+        try:
+            comptes = comptes_affiliation(maintenant)
+        except Exception as e:  # noqa: BLE001 : le guichet injoignable n'arrête pas le départ en essai, redit au réveil suivant
+            comptes = []
+            print(f"GUICHET demande de compte d'affiliation non écrite : {type(e).__name__} {str(e)[:150]}")
+        if comptes:
+            faits.append(f"compte(s) d'affiliation demandé(s) au guichet ({len(comptes)})")
         info["resultat"] = (f"ok : {'; '.join(faits) or 'aucun départ en essai'}, {len(retards)} besoin(s) en retard "
                             f"sur leur cible" + (f", {len(refus)} départ(s) refusé(s)" if refus else ""))
         print(info["resultat"])

@@ -209,6 +209,32 @@ class Decision(unittest.TestCase):
         self.assertFalse([a for a in appels if a[0] == "decision"])
         self.assertTrue([a for a in appels if a[0] == "journal" and "conflit" in a[2].get("bloquant", "")])
 
+    def test_la_branche_est_remise_a_jour_puis_retestee_avant_la_fusion(self):
+        appels = []
+
+        def gh(*a, entree=None):
+            appels.append(a)
+            return "nouveau" if a[-1] == ".head.sha" else "ingenierie/demande-1-x"
+        for verts, attendu in ((True, "nouveau"), (False, "abc")):
+            with self.subTest(verts=verts), mock.patch.object(ingenierie, "_gh", gh), \
+                    mock.patch.object(ingenierie, "_tests_sur", lambda *a: verts):
+                sha, blocage = ingenierie.remettre_a_jour("40", "abc")
+                self.assertEqual(sha, "nouveau")
+                self.assertEqual(blocage is None, verts)
+        self.assertTrue([a for a in appels if "update-branch" in " ".join(a)])
+
+    def test_un_conflit_est_reconstruit_une_fois_puis_note_comme_bloquant(self):
+        def gh(*a, entree=None):
+            if "update-branch" in " ".join(a):
+                raise ingenierie.subprocess.CalledProcessError(1, "gh", stderr="merge conflict")
+            return "ingenierie/demande-1-x"
+        reconstructions = []
+        with mock.patch.object(ingenierie, "_gh", gh), \
+                mock.patch.object(ingenierie, "_reconstruire", lambda *a: reconstructions.append(a)):
+            sha, blocage = ingenierie.remettre_a_jour("40", "abc")
+        self.assertEqual(len(reconstructions), 1)
+        self.assertIn("conflit", blocage)
+
     def test_sans_vert_rien_n_est_fusionne_et_le_blocage_est_note(self):
         for env in ({"tests": "failure"}, {"verdict": "inconnu"}, {"protege": "true", "controle": "failure"}):
             with self.subTest(env=env):

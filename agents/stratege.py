@@ -139,20 +139,25 @@ def schema(postes, cles, ids_passes):
     """`postes` : identifiants des fiches (supérieur d'un poste proposé) ; `cles` : clés connues ; `ids_passes` :
     ses écarts passés, seuls à pouvoir être suivis."""
     texte = {"type": "string", "minLength": 1}
+    # Un « enum » vide ou à doublons rend le schéma invalide (panne du 16/11, 21:53) : sans valeur, pas d'« enum ».
+    postes, cles, ids_passes = sorted(set(postes)), sorted(set(cles)), sorted(set(ids_passes))
+    superieur = {"type": "string", "enum": postes} if postes else texte
+    cles_poste = ({"type": "array", "items": {"type": "string", "enum": cles}} if cles
+                  else {"type": "array", "maxItems": 0})
     poste = {"anyOf": [{"type": "null"}, {
         "type": "object", "additionalProperties": False, "required": ["id", "titre", "superieur", "mission", "moteur", "cles"],
         "properties": {"id": {"type": "string", "description": "minuscules et tirets, 3 à 40 caractères"}, "titre": texte,
-                       "superieur": {"type": "string", "enum": sorted(postes)},
+                       "superieur": superieur,
                        "mission": {"type": "string", "minLength": 1, "description": "deux phrases"},
                        "moteur": {"type": "string", "minLength": 1, "description": "script, modèle gratuit, ou Claude"},
-                       "cles": {"type": "array", "items": {"type": "string", "enum": sorted(cles)}}}}]}
+                       "cles": cles_poste}}]}
     besoin = {"anyOf": [{"type": "null"}, {
         "type": "object", "additionalProperties": False, "required": ["cle", "manque", "unite"],
         "properties": {"cle": {"type": "string", "description": "ce qui manque, en un mot : minuscules, chiffres, - ou _"},
                        "manque": {"type": "number", "description": "plus grand que 0"}, "unite": texte}}]}
     suivi = ({"type": "array", "maxItems": len(ids_passes), "items": {
         "type": "object", "additionalProperties": False, "required": ["id", "etat", "pourquoi"],
-        "properties": {"id": {"type": "string", "enum": sorted(ids_passes)},
+        "properties": {"id": {"type": "string", "enum": ids_passes},
                        "etat": {"type": "string", "enum": list(ETATS)}, "pourquoi": texte}}} if ids_passes
              else {"type": "array", "maxItems": 0})
     return {

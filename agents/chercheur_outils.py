@@ -32,11 +32,11 @@ RACINE = Path(__file__).resolve().parent.parent
 BOITE = RACINE / "ressources" / "boite-a-outils-jarvis.md"
 CATALOGUE = RACINE / "ressources" / "catalogue.md"
 CANDIDATS = registre.DOSSIER / "candidats.jsonl"
-MAX_CANDIDATS = 5
+MAX_CANDIDATS = 15
 GITHUB = ["remotion", "text to speech", "free llm api", "video generation", "youtube shorts automation", "local llm"]
 HACKER_NEWS = ["free LLM API", "open source TTS", "Remotion", "local LLM", "AI video generation", "free tier API"]
 AUTRES_POSTES = {"rendu", "son", "jules"}  # tâches sans fiche : rendu des vidéos, sons, travail manuel de Jules
-MAX_AMELIORATIONS = 5
+MAX_AMELIORATIONS = 15
 JETONS_SUJET = (300_000, 30_000)  # hypothèse : jetons d'entrée et de sortie pour écrire et coder un sujet
 
 
@@ -276,6 +276,19 @@ def consigne(donnees, postes_connus):
     )
 
 
+def forme_reponse(reponse):
+    """Le modèle répond parfois par une liste au lieu d'un objet : une liste est lue comme la liste des candidats.
+    Toute autre forme est rejetée avec un message au journal."""
+    if isinstance(reponse, dict):
+        return reponse
+    if isinstance(reponse, list):
+        print("RÉPONSE EN LISTE : lue comme la liste des candidats")
+        return {"candidats": reponse}
+    if reponse:
+        print(f"RÉPONSE REJETÉE : forme {type(reponse).__name__} au lieu d'un objet")
+    return {}
+
+
 def passage(essai):
     maintenant = datetime.now(timezone.utc)
     donnees, autorises, erreurs, prix = collecter(maintenant)
@@ -283,7 +296,7 @@ def passage(essai):
     ouverts = {b["id"] for b in donnees["besoins_ouverts"]}
     postes_connus = set(organisation.fiches()) | AUTRES_POSTES
     texte, modele, *_ = postes.demander("chercheur-outils", consigne(donnees, postes_connus))
-    reponse = modeles.extraire_json(texte) or {}
+    reponse = forme_reponse(modeles.extraire_json(texte))
     gardes, ecartes = valider(reponse, autorises, postes_connus, deja_proposes(), registre.refuses(), ouverts)
     deja = {(a.get("id"), normaliser(a.get("lien"))) for a in registre.lire_jsonl(analyste.AMELIORATIONS.stem)}
     ameliorations, refusees = valider_ameliorations(reponse, prix, autorises, set(organisation.fiches()), deja, ouverts)
