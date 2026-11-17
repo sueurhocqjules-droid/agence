@@ -69,6 +69,15 @@ module = "agence.gabarits"
 description = "les vidéos des chaînes Scale of Everything et 1 Second vs 1 Hour, sans appel Claude par sujet"
 secrets = []
 
+# Le diagnostic des chaînes (agence/diagnostic_chaines.py, demande #108) : lecture seule, compare les réglages de es et de pt
+# par l'API YouTube et écrit les différences au journal du chef de contenu. Les jetons YT_TOKEN_ES et YT_TOKEN_PT ne lui sont
+# pas encore accordés (autorisations.toml, fichier protégé) : lancé à la main, il lit les jetons locaux de chaines-studio.
+[diagnostic_chaines]
+proprietaire = "chef-contenu"
+module = "agence.diagnostic_chaines"
+description = "la comparaison en lecture seule des réglages des chaînes es et pt"
+secrets = []
+
 [prevu_realise]
 proprietaire = "analyste"
 module = "agents.prevu_realise"

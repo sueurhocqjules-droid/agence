@@ -12,7 +12,7 @@ reveil = "une fois par semaine, et sur issue equipe:contenu"
 regle_de_deux = "[C] : aucun secret de chaîne, décide sur le registre"
 secrets = ["clé du modèle gratuit attribué"]
 budget = { claude_usd_semaine = 0, appels_gratuits_jour = 20 }
-scripts = ["flux", "rendu (studio-rendu)", "controle", "publier_youtube", "publier_autres_reseaux", "synchro_rendu", "gabarits"]
+scripts = ["flux", "rendu (studio-rendu)", "controle", "publier_youtube", "publier_autres_reseaux", "synchro_rendu", "gabarits", "diagnostic_chaines"]
 equipe = ["auteur", "programmateur", "repondeur"]
 +++
 # Chef de Contenu et flux
@@ -22,6 +22,9 @@ Créé à l'étape 7, quand l'agence s'est donné des chefs d'équipe. Il porte 
 
 ## Gabarits Remotion
 `agence/gabarits.py` et le dossier `remotion/` : deux gabarits 9:16 de 30 s, `scale-zoom` (objets, zoom continu, compteur de taille) et `one-sec-vs-one-hour` (deux écrans, barre de temps, états successifs). Un modèle gratuit (poste `gabarits` de `agence/postes.py`, vérifié par l'Expert en modèles) écrit le JSON du sujet, le code le contrôle par schéma, la voix vient d'edge-tts. Aucun appel Claude par sujet. Reste à faire : accorder les clés des modèles gratuits au script (`autorisations.toml`) et installer Remotion (`npm install` dans `remotion/`) là où le rendu tourne.
+
+## Diagnostic des chaînes
+`agence/diagnostic_chaines.py` (demande #108) : en lecture seule, compare les réglages des chaînes es et pt par l'API YouTube (public enfants, langue par défaut, pays, statut et restrictions des vidéos) et note les différences à ton journal (`quoi = diagnostic_chaines`). La cause de la panne de es est à chercher côté chaîne (MEMOIRE.md, 13/11). Reste à faire : accorder YT_TOKEN_ES et YT_TOKEN_PT au script (`autorisations.toml`, par Jules) ; d'ici là il se lance à la main.
 
 ## Mission
 Le plus de flux possible (vues, abonnés) dans le budget, en gardant une ligne claire par chaîne. Propriétaire de la chaîne de production en scripts : rendu, contrôle, programmation et publication.
