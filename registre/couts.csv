@@ -296,3 +296,12 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-16T21:55:35+00:00,ingenierie,36,326269,0.2126,0,"ok : demande #94, 2 fichier(s), 0.21 $"
 2026-11-16T21:55:41+00:00,ingenierie,49,495282,0.2841,0,"ok : demande #96, 3 fichier(s), 0.28 $"
 2026-11-16T21:55:28+00:00,ingenierie,74,547150,0.3004,0,"ok : demande #93, 3 fichier(s), 0.30 $"
+2026-11-17T00:47:00+00:00,reponses,0,0,0,0,ok : 0 réponse(s) de Jules
+2026-11-17T00:47:21+00:00,stats,3,0,0,0,"ok : 72 vidéos, 24058 vues"
+2026-11-17T00:47:24+00:00,garde_fous,8,0,0,0,"ok : 31.14 $ cette semaine, 1 alerte(s) envoyée(s)"
+2026-11-17T00:47:32+00:00,courrier,1,0,0,0,ok : 0 mail nouveau
+2026-11-17T00:47:33+00:00,flux,262,0,0,0,"ok : 6 programmées, 0 rejetées, 12 en rendu, 6 diffusées, 0 erreurs de diffusion"
+2026-11-17T00:51:55+00:00,guetteur,3,0,0,1,"ok : 1 commentaire(s) nouveau(x), 0 occasion(s) ; seuil le plus proche : Every Second (en) : 18 714 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
+2026-11-17T00:51:58+00:00,delais,0,0,0,0,"ok : aucun départ en essai, 0 besoin(s) en retard sur leur cible"
+2026-11-17T00:51:58+00:00,contacts,0,0,0,0,ok : aucun message validé à envoyer
+2026-11-17T00:52:02+00:00,guichet,1,0,0,0,"ok : 14 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : urgent #75, urgent #76"

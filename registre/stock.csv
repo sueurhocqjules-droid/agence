@@ -83,3 +83,21 @@ domino-pt,pt,domino,en_rendu,,,2026-11-16T13:49:36+00:00,
 pizza-en,en,pizza,en_rendu,,,2026-11-16T13:49:36+00:00,
 pizza-es,es,pizza,en_rendu,,,2026-11-16T13:49:36+00:00,
 pizza-pt,pt,pizza,en_rendu,,,2026-11-16T13:49:36+00:00,
+domino-en,en,domino,programme,2026-11-19T17:00:00+00:00,EWYhx2erz6A,2026-11-17T00:47:41+00:00,"artefact 14232256124, {'duree_s': 63.1, 'son_moyen_db': -18.0, 'noir_s': 0}"
+domino-es,es,domino,programme,2026-11-20T01:00:00+00:00,QBvdi522-t0,2026-11-17T00:47:48+00:00,"artefact 14232575125, {'duree_s': 63.1, 'son_moyen_db': -18.0, 'noir_s': 0}"
+domino-pt,pt,domino,programme,2026-11-19T15:00:00+00:00,a4wvZ57NuX4,2026-11-17T00:47:55+00:00,"artefact 14232140835, {'duree_s': 63.1, 'son_moyen_db': -18.0, 'noir_s': 0}"
+pizza-en,en,pizza,programme,2026-11-20T17:00:00+00:00,8u7vuI--NEc,2026-11-17T00:48:01+00:00,"artefact 14231602697, {'duree_s': 62.31, 'son_moyen_db': -18.0, 'noir_s': 0}"
+pizza-es,es,pizza,programme,2026-11-21T01:00:00+00:00,Z2_zf4efWOo,2026-11-17T00:48:06+00:00,"artefact 14231092979, {'duree_s': 62.31, 'son_moyen_db': -18.0, 'noir_s': 0}"
+pizza-pt,pt,pizza,programme,2026-11-20T15:00:00+00:00,UzkafgrU_tM,2026-11-17T00:48:12+00:00,"artefact 14231058041, {'duree_s': 62.31, 'son_moyen_db': -18.0, 'noir_s': 0}"
+eye-en,en,eye,en_rendu,,,2026-11-17T00:51:54+00:00,
+eye-es,es,eye,en_rendu,,,2026-11-17T00:51:54+00:00,
+eye-pt,pt,eye,en_rendu,,,2026-11-17T00:51:54+00:00,
+press-en,en,press,en_rendu,,,2026-11-17T00:51:54+00:00,
+press-es,es,press,en_rendu,,,2026-11-17T00:51:54+00:00,
+press-pt,pt,press,en_rendu,,,2026-11-17T00:51:54+00:00,
+wifi-en,en,wifi,en_rendu,,,2026-11-17T00:51:54+00:00,
+wifi-es,es,wifi,en_rendu,,,2026-11-17T00:51:54+00:00,
+wifi-pt,pt,wifi,en_rendu,,,2026-11-17T00:51:54+00:00,
+magnet-en,en,magnet,en_rendu,,,2026-11-17T00:51:54+00:00,
+magnet-es,es,magnet,en_rendu,,,2026-11-17T00:51:54+00:00,
+magnet-pt,pt,magnet,en_rendu,,,2026-11-17T00:51:54+00:00,
