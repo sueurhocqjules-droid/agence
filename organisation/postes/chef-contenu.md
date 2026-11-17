@@ -30,7 +30,7 @@ Le plus de flux possible (vues, abonnés) dans le budget, en gardant une ligne c
 Stock et stats du registre, rapports de l'Auteur et du Programmateur, propositions de la Recherche validées par la Direction, issues `equipe:contenu`.
 
 ## Sorties
-Le nombre de sujets à écrire la semaine suivante (dans le budget), les retours à l'Auteur et au Programmateur, les réparations demandées quand un script échoue.
+Le nombre de sujets à écrire la semaine suivante (dans le budget), les retours à l'Auteur et au Programmateur, les réparations demandées quand un script échoue. Un envoi Instagram refusé arrive à son journal comme bloquant, avec le code et le message de Meta ; `flux` le retente au réveil suivant, 3 fois au plus par vidéo.
 
 ## Outils
 Lecture du registre, écriture des fiches de son équipe (Consignes, Retours).
