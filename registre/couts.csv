@@ -315,3 +315,16 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-17T11:25:06+00:00,contacts,0,0,0,0,ok : aucun message validé à envoyer
 2026-11-17T11:25:10+00:00,guichet,3,0,0,0,"ok : 14 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : récapitulatif"
 2026-11-17T12:12:21+00:00,reponses,84,0,0,0,ok : 12 réponse(s) de Jules
+2026-11-17T12:21:52+00:00,expert-modeles,303,0,0,5,ok : 4/5 modèles répondent
+2026-11-17T12:26:55+00:00,critique,0,0,0,0,"ok : 0 décision(s) jugée(s), 0 annulation(s), 0 essai(s) jugé(s), 10 leçon(s) en mémoire"
+2026-11-17T12:26:55+00:00,programmateur,2,0,0,1,ok : pas d'essai cette semaine
+2026-11-17T12:26:57+00:00,chef-contenu,6,0,0,1,ok : 5 sujets pour la semaine du 2026-11-23 (openai/gpt-oss-120b) : pour remettre le stock à 7 jours tout en capitalisant sur le format qui génère le plus de vues
+2026-11-17T12:27:03+00:00,responsable-revenu,5,0,0,1,"ok : 4 règle(s) confirmée(s) sur 6, 0 à relire, 3 voie(s) de revenu écrite(s)"
+2026-11-17T12:27:09+00:00,chercheur-outils,173,0,0,1,"ok : 0 candidat(s), 0 écarté(s), 0 amélioration(s) payante(s), 0 besoin(s) sur 4 avec une réponse, 129 liens collectés"
+2026-11-17T12:30:04+00:00,analyste,0,0,0,0,"ok : Référence « ne rien acheter » : 211 086 vues sur 6 mois (p10 60 664, p90 727 535), revenu 0.00 €, 7.0 sujets/semaine"
+2026-11-17T12:30:10+00:00,veilleur,33,0,0,1,"ok : 3 fiche(s) concept, 0 écartée(s), 30 outliers"
+2026-11-17T12:30:43+00:00,chef-recherche,105,0,0,1,"ok : 0 proposition(s), 0 écartée(s), sur 52 rapport(s)"
+2026-11-17T12:32:28+00:00,chef-operations,3,0,0,1,"ok : 66 % de réveils réussis, 1 retour(s), 3 réparation(s)"
+2026-11-17T12:32:31+00:00,stratege,46,45380,0.4223,0,"ok : 2 écart(s), 10 suivi(s), 0 refusé(s), 0.42 $"
+2026-11-17T12:33:17+00:00,responsable-organisation,34,0,0,1,"ok : 21 postes relus, 7 signal(aux), aucun changement"
+2026-11-17T12:33:52+00:00,direction,132,87209,0.8379,0,"ok : 39 appliqué(s), 1 refusé(s), 0.84 $"
