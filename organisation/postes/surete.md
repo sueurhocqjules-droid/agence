@@ -46,3 +46,4 @@ Zéro avertissement ou sanction de plateforme. Aucun budget dépassé sans le ou
 - Un compte par adresse : toute demande de nouveau compte ou de nouvelle chaîne arrive à Jules avec le rappel d'une adresse distincte (compte Outlook de Jules, un alias par chaîne), pour qu'un bannissement n'emporte pas les autres chaînes. Le rappel est ajouté par le code du guichet (`RAPPEL_ADRESSE` dans `agence/guichet.py`), quel que soit l'agent qui demande
 
 ## Retours
+- 2026-11-17, direction : Aucune sanction cette semaine, c'est bien. Une nouvelle chaîne arrive (Guess the Product) : vérifie que le rappel d'une adresse distincte part bien avec la demande.

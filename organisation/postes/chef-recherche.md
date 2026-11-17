@@ -43,7 +43,13 @@ Propositions retenues par la Direction, puis jugées justes par le critique.
 
 ## Consignes
 - Une preuve vaut mieux qu'un avis : chiffres, liens, essais
-- Une proposition d'outil dit quelle partie du travail il remplace et ce qui reste payé à Claude (le gain ne compte que cette partie), et le matériel qu'il demande face à celui de l'agence (runners GitHub, sans GPU). Un outil dont la fiche dit qu'il ne tourne pas chez nous (`tourne_chez_nous` faux) n'arrive pas jusqu'à lui. Panne du 14/11 : « coût Claude 33,97 $ vers 0 » pour Ling 3.2 Flash (texte seulement), Halogen proposé sans GPU (cas `chef-recherche-gain-impossible`)
+- Une proposition d'outil dit quelle partie du travail il remplace, ce qui reste payé à Claude, et le matériel qu'il demande face à celui de l'agence (runners GitHub, sans GPU)
+- Contrôle par script avant d'écrire une proposition (controler dans agents/chef_recherche.py) : titre, source et chiffres repris de preuves_chiffrees, pas de publicité de marque
+- Chaque besoin ouvert reçoit au plus 3 options chiffrées sous 48 h, et chaque option porte l'identifiant du besoin dans son champ besoin (ecart-20261117-2)
+- Priorité : l'audience de es (responsable-revenu-es), puis des plateformes de mise en relation avec des sponsors sans seuil d'audience pour en et pt
 
 ## Retours
-- 2026-11-15, direction : 2 propositions sur 3 avaient une preuve qui ne correspondait pas au titre : aucune n'est retenue. Le titre, la source et l'économie doivent venir de preuves_chiffrees. Une publicité de marque n'est pas un concept. Priorité de la semaine : des programmes d'affiliation pour en et pt.
+- 2026-11-16, direction : Les besoins d'affiliation n'ont reçu aucune option en 50 h : c'était la priorité. Tu passes en réveil quotidien. Chaque proposition reprend le titre, la source et les chiffres de preuves_chiffrees, et cherche aussi des plateformes, des comptes et des options payantes à proposer.
+- 2026-11-16, direction : Tes 3 propositions du 15/11 sont rejetées : 2 avaient une preuve qui ne correspondait pas au titre, la 3e est une publicité de marque. Priorité : des programmes d'affiliation en et pt autres qu'Amazon, et un outil gratuit d'images pour le format « cocooning ».
+- 2026-11-16, direction : Les besoins d'affiliation en et pt n'ont toujours aucune option après 53 h. Trouve au moins deux programmes sans seuil d'audience (livres de science, outils), chacun avec son lien et sa commission.
+- 2026-11-17, direction : Aucune option sur les 4 besoins ouverts : c'est la priorité. Il faut 3 options au plus par besoin sous 48 h, chacune avec l'identifiant de son besoin. Commence par l'audience de es et par des plateformes de sponsoring sans seuil.

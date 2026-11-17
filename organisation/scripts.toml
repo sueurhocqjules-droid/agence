@@ -20,7 +20,14 @@ secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT", "GH_TOKEN", "META_TOKEN"
 proprietaire = "surete"
 module = "agence.questions"
 description = "la lecture de tes réponses Telegram"
-secrets = ["TELEGRAM_BOT_TOKEN"]
+secrets = ["TELEGRAM_BOT_TOKEN", "FUSION_TOKEN", "ALARME_SECRET"]
+hors_pause = true
+
+[accords]
+proprietaire = "surete"
+module = "agence.accords"
+description = "les questions Telegram sur les PR qui touchent un fichier protégé"
+secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
 hors_pause = true
 
 [garde_fous]
@@ -52,6 +59,15 @@ proprietaire = "chef-operations"
 module = "agence.delais"
 description = "le départ en essai des besoins au délai dépassé et la mesure des délais"
 secrets = ["GH_TOKEN"]
+
+# Les gabarits Remotion (agence/gabarits.py) : un JSON de données par sujet écrit par un modèle gratuit (poste « gabarits »,
+# jamais Claude), contrôlé par schéma, voix edge-tts, rendu Remotion en 9:16 de 30 s. Les clés des modèles gratuits
+# ne lui sont pas encore accordées (autorisations.toml, fichier protégé) : lancé à la main, il lit le .env de Jarvis.
+[gabarits]
+proprietaire = "chef-contenu"
+module = "agence.gabarits"
+description = "les vidéos des chaînes Scale of Everything et 1 Second vs 1 Hour, sans appel Claude par sujet"
+secrets = []
 
 [prevu_realise]
 proprietaire = "analyste"
