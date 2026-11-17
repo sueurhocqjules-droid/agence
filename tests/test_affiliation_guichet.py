@@ -47,5 +47,19 @@ class DemandeAffiliation(unittest.TestCase):
         self.assertTrue(guichet.demande_de_compte(appels[0][0], kw["quoi"]))   # le rappel s'ajoute dans `demander`
 
 
+class ReveilFrequent(unittest.TestCase):
+    def test_le_passage_des_delais_demande_les_comptes_sans_attendre_le_dimanche(self):
+        from unittest import mock
+        from agence import delais
+        voies = [voie("en"), voie("pt")]
+        recu = []
+        with mock.patch.object(delais.registre, "lire_jsonl", return_value=[{"voies": voies}]):
+            numeros = delais.comptes_affiliation("T", demander=lambda v, m: recu.append((v, m)) or [11, 12])
+        self.assertEqual(numeros, [11, 12])
+        self.assertEqual(recu, [(voies, "T")])
+        with mock.patch.object(delais.registre, "lire_jsonl", return_value=[]):
+            self.assertEqual(delais.comptes_affiliation("T", demander=lambda v, m: self.fail()), [])
+
+
 if __name__ == "__main__":
     unittest.main()
