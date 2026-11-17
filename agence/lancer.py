@@ -90,10 +90,28 @@ def noter_journal(responsable, entree):
         f.write(json.dumps(entree, ensure_ascii=False) + "\n")
 
 
+CATEGORIES_ECHEC = (  # du plus précis au plus vague : la première qui correspond gagne
+    ("quota ou 429", re.compile(r"\b429\b|quota|rate.?limit|too many requests|resource.?exhausted", re.I)),
+    ("limite de 5 h", re.compile(r"5.?hours?\b.{0,40}limit|usage limit|limit.{0,60}reset", re.I)),
+    ("tours épuisés", re.compile(r"error_max_turns|max.?turns|tours? épuisés", re.I)),
+    ("conflit", re.compile(r"conflict|conflit", re.I)),
+    ("tests", re.compile(r"FAILED \(|\bFAIL:|\bERROR:|AssertionError|tests? en échec", re.I)),
+)
+
+
+def categorie_echec(sortie):
+    """La cause d'un échec, lue dans la sortie : quota ou 429, limite de 5 h, tours épuisés, conflit, tests, sinon autre."""
+    texte = "\n".join(sortie)
+    return next((nom for nom, motif in CATEGORIES_ECHEC if motif.search(texte)), "autre")
+
+
 def bloquant_echec(nom, code, sortie):
-    """Texte du bloquant d'un échec : la cause (les 20 dernières lignes de la sortie, erreurs comprises), pas un renvoi."""
-    fin = "\n".join(sortie[-20:])[-2000:]
-    return f"{nom} a échoué (code {code}) :\n{fin}" if fin.strip() else f"{nom} a échoué (code {code}), sortie vide"
+    """Texte du bloquant d'un échec : sa catégorie et les 20 dernières lignes de la sortie (erreurs comprises), pas un renvoi."""
+    fin = sortie[-20:]
+    texte = "\n".join(fin)[-2000:]
+    if not texte.strip():
+        return f"{nom} a échoué (code {code}), sortie vide"
+    return f"{nom} a échoué (code {code}), cause : {categorie_echec(fin)}. 20 dernières lignes :\n{texte}"
 
 
 def lancer(nom, arguments):
