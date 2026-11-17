@@ -102,5 +102,30 @@ class Hierarchie(unittest.TestCase):
             lancer.preparer("direction", POSTES, {})
 
 
+class CauseDEchec(unittest.TestCase):
+    """Chaque panne vue devient un cas : la catégorie écrite dans « bloquant » doit être la bonne."""
+    CAS = {
+        "quota ou 429": ["appel", "HTTP 429 Too Many Requests"],
+        "limite de 5 h": ["Claude usage limit reached", "your 5-hour limit resets at 3am"],
+        "tours épuisés": ["claude s'est arrêté (error_max_turns) : "],
+        "conflit": ["CONFLICT (content): Merge conflict in agence/x.py"],
+        "tests": ["FAIL: test_a (tests.test_x.T)", "FAILED (failures=1)"],
+        "autre": ["Traceback", "KeyError: 'x'"],
+    }
+
+    def test_chaque_categorie(self):
+        for attendue, lignes in self.CAS.items():
+            with self.subTest(attendue):
+                self.assertEqual(lancer.categorie_echec(lignes), attendue)
+
+    def test_bloquant_garde_la_categorie_et_20_lignes(self):
+        sortie = [f"ligne {i}" for i in range(30)] + ["HTTP 429"]
+        texte = lancer.bloquant_echec("ingenierie", 1, sortie)
+        self.assertIn("code 1", texte)
+        self.assertIn("quota ou 429", texte)
+        self.assertEqual(len(texte.splitlines()), 1 + 20)
+        self.assertNotIn("ligne 5\n", texte)
+
+
 if __name__ == "__main__":
     unittest.main()
