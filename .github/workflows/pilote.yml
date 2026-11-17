@@ -3,8 +3,9 @@
 # Règle de deux : le job « seance » exécute Claude et le code qu'il écrit, donc il n'a que des droits en lecture et
 # aucune clé lisible par ses commandes. Le tri (fichiers protégés retirés, tests) se fait dans une étape à part, sans
 # clé, après la fin de Claude. Seul le job « publier » écrit (registre, guichet, Telegram, studio) : il exécute le
-# pilote.py du main, applique le paquet, remet les fichiers protégés, fait passer le juge (conseil) puis relance le
-# Pilote s'il l'a demandé (mode continu).
+# pilote.py du main, garde les réglages libres, met le reste du code de côté dans une PR fusionnée seulement sur le
+# Oui de Jules (Telegram), fait passer le juge (conseil) puis relance le Pilote s'il l'a demandé (mode continu).
+# Le tableau de bord et le push tournent dans des étapes sans les clés Telegram, Gemini et Groq.
 name: Pilote
 
 on:
@@ -64,7 +65,7 @@ jobs:
           ffmpeg -version | head -1
           fc-list | grep -q "Noto Color Emoji" || echo "::warning::Police Noto Color Emoji absente de l'image"
           (cd chaines-studio && npm ci --no-audit --no-fund)
-          npm i -g --no-audit --no-fund @anthropic-ai/claude-code
+          npm i -g --no-audit --no-fund @anthropic-ai/claude-code@2.1.323   # version épinglée, montée à la main
           claude --version
           git config --global user.name "pilote-robot"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -75,8 +76,18 @@ jobs:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           GH_TOKEN: ${{ github.token }}          # lecture seule, retiré de l'environnement de Claude
           ATELIER_COUTS: chaines-studio/atelier/couts.csv
+          PILOTE_TRACE: ${{ runner.temp }}/trace/seance.jsonl   # tout ce que Claude a lu, pensé et lancé
           PYTHONUTF8: "1"
-        run: python -m agence.pilote seance
+        run: |
+          mkdir -p "$RUNNER_TEMP/trace"
+          python -m agence.pilote seance
+      - if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: trace
+          path: ${{ runner.temp }}/trace/
+          retention-days: 30
+          if-no-files-found: ignore
 
       - name: Tri (fichiers protégés retirés, tests, studio qui compile ; sans clé)
         id: trier
@@ -117,6 +128,7 @@ jobs:
       contents: write
       issues: write      # demandes au guichet écrites ou fermées par le Pilote
       actions: write     # relance du Pilote en mode continu
+      pull-requests: write   # code proposé par le Pilote, fusionné seulement sur le Oui de Jules (agence/accords.py)
     outputs:
       relancer: ${{ steps.agence.outputs.relancer }}
     steps:
@@ -131,7 +143,7 @@ jobs:
         with:
           name: paquet
           path: ${{ runner.temp }}/paquet
-      - name: Agence (patch sans fichiers protégés, juge, coût, guichet, message à Jules)
+      - name: Agence (réglages libres gardés, code proposé en PR, juge, guichet, message à Jules)
         id: agence
         env:
           GH_TOKEN: ${{ github.token }}
@@ -141,13 +153,21 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}         # juge de secours
           PYTHONUTF8: "1"
         run: |
-          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
           git config --global user.name "pilote-robot"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           python -m agence.pilote publier "$RUNNER_TEMP/paquet"
-          python -m agence.tableau || echo "::warning::Tableau de bord non écrit"
+      - name: Tableau de bord (sans clé)
+        env:
+          PYTHONUTF8: "1"
+        run: python -m agence.tableau || echo "::warning::Tableau de bord non écrit"
+      - name: Pousser la séance
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
           git add -A
-          git commit -q -m "Pilote : séance du $(date -u +%Y-%m-%d) $(date -u +%H)h"
+          git diff --cached --quiet && exit 0
+          git commit -q -m "Pilote : séance du $(date -u +%Y-%m-%d) $(date -u +%H)h (run $GITHUB_RUN_ID)"
           for essai in 1 2 3; do
             git -c http.https://github.com/.extraheader="$auth" pull -q --rebase origin main &&
               git -c http.https://github.com/.extraheader="$auth" push -q origin HEAD:main && exit 0

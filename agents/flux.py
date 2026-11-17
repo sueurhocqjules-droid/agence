@@ -38,6 +38,9 @@ RENDU = Path(os.environ.get("RENDU_DIR") or Path(__file__).resolve().parents[2] 
 PARIS = ZoneInfo("Europe/Paris")
 DELAI_MIN = timedelta(hours=2)    # jamais de sortie plus tôt : une date passée publierait aussitôt
 ENVOIS_MAX = 4                    # par chaîne et par passage (Studio bloquait au-delà de 3 ou 4 par jour)
+# Plafonds par jour, quoi que disent creneaux.toml et diffusion.toml (réglages du Pilote) : ce fichier est protégé
+SORTIES_JOUR_MAX = 4              # sorties YouTube par chaîne
+DIFFUSION_JOUR_MAX = 5            # diffusions par réseau et par chaîne
 RENDUS_MAX = 12                   # par passage, une machine par vidéo
 DIFFUSION = Path(__file__).resolve().parents[1] / "organisation" / "diffusion.toml"
 REELS_FACEBOOK_MAX_S = 90         # Reels des Pages : 3 à 90 s
@@ -57,6 +60,23 @@ def ordre_sujets():
 def lire_sujet(sujet):
     return (json.loads((RENDU / "sujets" / f"{sujet}.json").read_text(encoding="utf-8")),
             json.loads((RENDU / "sujets" / f"{sujet}.calcul.json").read_text(encoding="utf-8")))
+
+
+def sujets_lisibles(sujets, lire=lire_sujet):
+    """Les sujets complets (titre par chaîne, description par langue). Un sujet mal formé est sauté et dit, sans
+    arrêter la publication des autres."""
+    bons = []
+    for s in sujets:
+        try:
+            sujet_json, calcul_json = lire(s)
+            for langue in youtube.CHAINES:
+                if not (isinstance(sujet_json[langue]["titre"], str) and isinstance(calcul_json["descriptions"][langue], str)):
+                    raise TypeError("titre ou description qui n'est pas un texte")
+        except (OSError, ValueError, KeyError, TypeError) as e:
+            print(f"SUJET ILLISIBLE {s} : {type(e).__name__} {e}"[:300] + ", sauté")
+            continue
+        bons.append(s)
+    return bons
 
 
 def dernier_artefact(nom):
@@ -95,7 +115,11 @@ def pousser_file(noms):
 
 
 def creneaux(heures, pris, debut):
-    """Créneaux libres d'une chaîne (ses heures de sortie, à Paris) à partir de debut, dans l'ordre."""
+    """Créneaux libres d'une chaîne (ses heures de sortie, à Paris) à partir de debut, dans l'ordre. Heures invalides
+    ignorées, SORTIES_JOUR_MAX par jour au plus ; aucune heure valide : aucun créneau."""
+    heures = sorted({h for h in heures if type(h) is int and 0 <= h <= 23})[:SORTIES_JOUR_MAX]
+    if not heures:
+        return
     jour = debut.astimezone(PARIS).date()
     while True:
         for heure in sorted(heures):
@@ -148,9 +172,14 @@ def stock(nom, langue, sujet, etat, sortie="", video_id="", note=""):
 
 
 def cadence_diffusion():
-    """{reseau: sorties par jour}, réglé par le Programmateur."""
+    """{reseau: sorties par jour}, réglé par le Pilote, borné à DIFFUSION_JOUR_MAX (valeur illisible : 0)."""
     with open(DIFFUSION, "rb") as f:
-        return {reseau: r["par_jour"] for reseau, r in tomllib.load(f).items()}
+        reglage = tomllib.load(f)
+    cadence = {}
+    for reseau, r in reglage.items():
+        n = r.get("par_jour") if isinstance(r, dict) else None
+        cadence[reseau] = min(n, DIFFUSION_JOUR_MAX) if type(n) is int and n > 0 else 0
+    return cadence
 
 
 ESSAIS_INSTAGRAM_MAX = 3  # un envoi Instagram refusé est retenté au réveil suivant, 3 fois au plus
@@ -493,7 +522,7 @@ def fichier_controle(nom, dossier):
 def passage(essai):
     from googleapiclient.errors import HttpError
 
-    sujets = ordre_sujets()
+    sujets = sujets_lisibles(ordre_sujets())
     heures = mesures.heures_de_sortie()  # réglées par le Programmateur (organisation/creneaux.toml)
     maintenant = datetime.now(timezone.utc)
     clients = {l: youtube.client(l) for l in youtube.CHAINES}
@@ -531,7 +560,10 @@ def passage(essai):
                 continue
             titres, sorties, _ = etats[langue]
             debut = max([maintenant + DELAI_MIN] + [s + timedelta(minutes=1) for s in sorties])
-            quand = next(creneaux(heures[langue], sorties, debut))
+            quand = next(creneaux(heures.get(langue, []), sorties, debut), None)
+            if quand is None:
+                print(f"PAS DE CRÉNEAU {nom} : aucune heure de sortie valide pour {langue} dans creneaux.toml")
+                continue
             if essai:
                 print(f"ESSAI {nom} -> {quand:%d/%m %H:%M} Paris, {releve}")
                 continue

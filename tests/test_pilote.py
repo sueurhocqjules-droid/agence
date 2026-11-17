@@ -21,20 +21,176 @@ def cout(dollars, debut="2026-11-24T02:00:00+00:00"):
 
 
 class Proteges(unittest.TestCase):
-    def test_ce_qui_fixe_ses_limites_ou_le_controle_est_protege(self):
+    def test_ce_qui_fixe_ses_limites_ou_le_controle_est_interdit(self):
         for chemin in (".github/workflows/reveil.yml", "organisation/MISSION.md", "organisation/seuils.toml",
                        "organisation/autorisations.toml", "organisation/scripts.toml", "agence/pilote.py",
                        "agence/lancer.py", "agence/relecture.py", "agence/equipe.py", "agents/surete.py", "tests/test_pilote.py",
                        "agence/juge.py", "agence/tableau.py", "agence/guichet.py", "agence/registre.py", "agence/telegram.py",
+                       "agence/accords.py", "agence/questions.py",
                        "registre/couts.csv", "registre/revenu.jsonl", "registre/pauses.csv"):
+            self.assertEqual(pilote.sort(chemin), "interdit", chemin)
             self.assertTrue(pilote.protege(chemin), chemin)
 
-    def test_son_carnet_et_ses_outils_sont_a_lui(self):
-        for chemin in ("registre/pilote/carnet.md", "registre/pilote/rapport.json", "agents/flux.py",
-                       "organisation/rythme.toml", "organisation/PILOTE.md", "organisation/diffusion.toml",
-                       "tests/test_flux.py", "agence/gabarits.py", "agence/postes.py",
+    def test_son_carnet_ses_reglages_et_son_equipe_sont_libres(self):
+        for chemin in ("registre/pilote/carnet.md", "registre/pilote/rapport.json", "organisation/rythme.toml",
+                       "organisation/diffusion.toml", "organisation/creneaux.toml", "organisation/MEMOIRE.md",
                        "organisation/equipe.toml", "equipe/veille.py"):
+            self.assertEqual(pilote.sort(chemin), "libre", chemin)
             self.assertFalse(pilote.protege(chemin), chemin)
+
+    def test_le_code_qui_tourne_avec_des_cles_attend_le_oui_de_jules(self):
+        for chemin in ("agents/flux.py", "agents/courrier.py", "agence/gabarits.py", "agence/postes.py",
+                       "agence/threads.py", "organisation/PILOTE.md", "tests/test_flux.py", "nouveau/module.py",
+                       "requirements.txt"):
+            self.assertEqual(pilote.sort(chemin), "propose", chemin)
+            self.assertTrue(pilote.protege(chemin), chemin)
+
+    def test_un_prefixe_ne_deborde_pas(self):
+        self.assertEqual(pilote.sort("registre/pilote-faux.md"), "interdit")
+        self.assertEqual(pilote.sort("equipe-bis/x.py"), "propose")
+        self.assertEqual(pilote.sort(".github-bis/x"), "propose")
+
+
+class Garde(unittest.TestCase):
+    """Ce qui empêche le code du Pilote de tourner avec des clés sans le Oui de Jules."""
+
+    def depot(self, d):
+        git = lambda *a: subprocess.run(["git", "-C", d, *a], check=True, capture_output=True)
+        git("init", "-q")
+        git("config", "user.email", "t@t")
+        git("config", "user.name", "t")
+        return git
+
+    def test_un_renommage_compte_pour_ses_deux_chemins(self):
+        with tempfile.TemporaryDirectory() as d:
+            git = self.depot(d)
+            (Path(d) / "agence").mkdir()
+            (Path(d) / "agence" / "pilote.py").write_text("x = 1\n" * 20, encoding="utf-8")
+            git("add", ".")
+            git("commit", "-qm", "init")
+            (Path(d) / "equipe").mkdir()
+            git("mv", "agence/pilote.py", "equipe/cache.py")
+            chemins = pilote.changements(d)
+            self.assertIn("agence/pilote.py", chemins)
+            self.assertIn("equipe/cache.py", chemins)
+            self.assertTrue(any(pilote.interdit(c) for c in chemins))
+
+    def test_la_pr_porte_la_question_oui_non_et_le_juge(self):
+        appels, questions = [], []
+
+        def gh(*args):
+            appels.append(args)
+            return "https://github.com/x/agence/pull/42\n"
+
+        def poser(texte, si_oui, si_non, **k):
+            questions.append((texte, si_oui, si_non, k))
+
+        passage = {"debut": "2026-11-17T20:00:00+00:00", "run": "123"}
+        with mock.patch.object(pilote, "_git") as git:
+            n = pilote.proposer("p.patch", ["agents/flux.py"], passage, {"note": 6, "code": "a_revoir",
+                                                                       "code_detail": "boucle"}, gh=gh, poser=poser)
+        self.assertEqual(n, 42)
+        commandes = [c.args[1:] for c in git.call_args_list]
+        self.assertTrue(any(c[0] == "push" or "push" in c for c in commandes))
+        branche = next(c[c.index("-b") + 1] for c in commandes if "-b" in c)
+        self.assertTrue(branche.startswith("pilote/"))
+        creation = appels[0]
+        self.assertEqual(creation[:2], ("pr", "create"))
+        self.assertIn("guichet", creation)
+        corps = creation[creation.index("--body") + 1]
+        self.assertIn("agents/flux.py", corps)
+        self.assertIn("6/10", corps)
+        texte, oui, non, k = questions[0]
+        self.assertEqual((oui, non), ("accord:42", "refus:42"))
+        self.assertIn("boucle", k["conseil"])
+
+    def test_une_pr_hors_pilote_ou_avec_un_fichier_interdit_n_est_pas_fusionnee(self):
+        from agence import accords
+        bonne = {"state": "OPEN", "headRefName": "pilote/20261117-200000", "files": [{"path": "agents/flux.py"}]}
+        self.assertIsNone(accords.refus_de_fusion(bonne))
+        self.assertTrue(accords.refus_de_fusion({**bonne, "state": "MERGED"}))
+        self.assertTrue(accords.refus_de_fusion({**bonne, "headRefName": "main"}))
+        self.assertTrue(accords.refus_de_fusion({**bonne, "files": [{"path": "agents/flux.py"},
+                                                                    {"path": ".github/workflows/reveil.yml"}]}))
+
+    def test_sans_jeton_de_jules_rien_n_est_fusionne(self):
+        from agence import accords
+        with mock.patch.dict("os.environ", {}, clear=True), mock.patch.object(accords, "_gh") as gh:
+            with self.assertRaises(RuntimeError):
+                accords.accepter(42)
+            gh.assert_not_called()
+
+    def test_le_oui_fusionne_avec_le_jeton_de_jules_apres_controle(self):
+        from agence import accords
+        vue = json.dumps({"state": "OPEN", "headRefName": "pilote/x", "files": [{"path": "agents/flux.py"}]})
+        with mock.patch.dict("os.environ", {"FUSION_TOKEN": "j"}), \
+                mock.patch.object(accords, "_gh", side_effect=[vue, ""]) as gh:
+            accords.accepter(42)
+        fusion = gh.call_args_list[1]
+        self.assertEqual(fusion.args[:3], ("pr", "merge", "42"))
+        self.assertEqual(fusion.kwargs["jeton"], "j")
+
+    def test_le_oui_refuse_une_pr_qui_a_change_entre_temps(self):
+        from agence import accords
+        vue = json.dumps({"state": "OPEN", "headRefName": "pilote/x", "files": [{"path": "agence/pilote.py"}]})
+        with mock.patch.dict("os.environ", {"FUSION_TOKEN": "j"}), \
+                mock.patch.object(accords, "_gh", side_effect=[vue, ""]) as gh:
+            with self.assertRaises(RuntimeError):
+                accords.accepter(42)
+        self.assertEqual(gh.call_count, 1)
+
+    def test_seules_ces_reponses_telegram_sont_acceptees(self):
+        from agence import questions
+        questions.verifier("accord:12")
+        questions.verifier("refus:12")
+        for mauvais in ("accord:", "accord:12;rm", "accord:abc", "refus:-1", "fusion:12"):
+            with self.assertRaises(ValueError, msg=mauvais):
+                questions.verifier(mauvais)
+
+
+class Plafonds(unittest.TestCase):
+    """Bornes des réglages libres du Pilote, tenues par du code qu'il ne peut pas changer seul."""
+
+    def test_au_plus_quatre_sorties_par_jour_et_des_heures_valides(self):
+        from agents import flux
+        debut = datetime(2026, 11, 18, 0, tzinfo=timezone.utc)
+        heures = list(range(24)) + [25, -1, "8", 8.0, True]
+        premiers = [q for q, _ in zip(flux.creneaux(heures, set(), debut), range(10))]
+        jours = {}
+        for q in premiers:
+            jours.setdefault(q.date(), []).append(q.hour)
+        self.assertTrue(all(len(h) <= flux.SORTIES_JOUR_MAX for h in jours.values()))
+        self.assertEqual(flux.SORTIES_JOUR_MAX, 4)
+
+    def test_aucune_heure_valide_aucun_creneau(self):
+        from agents import flux
+        debut = datetime(2026, 11, 18, 0, tzinfo=timezone.utc)
+        self.assertEqual(list(flux.creneaux([24, "x", None], set(), debut)), [])
+        self.assertEqual(list(flux.creneaux([], set(), debut)), [])
+
+    def test_la_diffusion_est_bornee(self):
+        from agents import flux
+        with tempfile.TemporaryDirectory() as d:
+            reglage = Path(d) / "diffusion.toml"
+            reglage.write_text("[instagram]\npar_jour = 500\n[facebook]\npar_jour = 2\n[threads]\npar_jour = -3\n"
+                               "[tiktok]\npar_jour = \"beaucoup\"\n", encoding="utf-8")
+            with mock.patch.object(flux, "DIFFUSION", reglage):
+                self.assertEqual(flux.cadence_diffusion(), {"instagram": flux.DIFFUSION_JOUR_MAX, "facebook": 2,
+                                                            "threads": 0, "tiktok": 0})
+        self.assertEqual(flux.DIFFUSION_JOUR_MAX, 5)
+
+    def test_un_sujet_mal_forme_est_saute_les_autres_passent(self):
+        from agents import flux
+        from agence import youtube
+        bon = ({l: {"titre": "T"} for l in youtube.CHAINES}, {"descriptions": {l: "D" for l in youtube.CHAINES}})
+        sans_titre = ({l: {"titre": 3} for l in youtube.CHAINES}, bon[1])
+
+        def lire(s):
+            if s == "casse":
+                raise ValueError("json")
+            return {"bon": bon, "sans_titre": sans_titre}[s]
+
+        self.assertEqual(flux.sujets_lisibles(["bon", "casse", "sans_titre"], lire=lire), ["bon"])
 
 
 class Budget(unittest.TestCase):
@@ -188,7 +344,7 @@ class Appliquer(unittest.TestCase):
             patch.write_bytes(git("diff", "--cached", "--binary").stdout)
             git("reset", "-q", "--hard")
             git("clean", "-qfd")
-            remis = pilote.appliquer(d, patch, pilote.protege)
+            remis = pilote.appliquer(d, patch, pilote.interdit)
             self.assertEqual(sorted(remis), ["agence/pilote.py", "organisation/MISSION.md"])
             self.assertEqual((Path(d) / "agents/flux.py").read_text(encoding="utf-8"), "après\n")
             self.assertEqual((Path(d) / "organisation/MISSION.md").read_text(encoding="utf-8"), "avant\n")
@@ -290,6 +446,17 @@ class SeanceClaude(unittest.TestCase):
         self.assertFalse(r["ok"])
         self.assertIn("anti-emballement", r["erreur"])
         self.assertGreater(r["cout"], 0)
+
+    def test_le_flux_brut_est_recopie_dans_la_trace(self):
+        with tempfile.TemporaryDirectory() as d:
+            trace = Path(d) / "seance.jsonl"
+            with mock.patch.dict("os.environ", {"CLAUDE_CODE_OAUTH_TOKEN": "a", "PILOTE_TRACE": str(trace)}, clear=True):
+                pilote.seance_claude("consigne", 12.5, pilote.Veille(0, REGLAGES["emballement"], 15),
+                                     ouvrir=lambda c, **k: FauxClaude([{"type": "system"}, {"type": "result",
+                                                                       "subtype": "success", "result": "fini"}], 0),
+                                     horloge=lambda: 1)
+            lignes = trace.read_text(encoding="utf-8").splitlines()
+        self.assertEqual([json.loads(l)["type"] for l in lignes], ["system", "result"])
 
     def test_une_sortie_sans_resultat_est_un_echec_dit(self):
         r, _ = self.lancer([], code=1)

@@ -3,19 +3,26 @@ organisation/MISSION.md, puis un script qui garde ce qui est sûr et vert.
 
     python -m agence.pilote seance              séance Claude dans ce dépôt (et chaines-studio/ à côté)
     python -m agence.pilote trier               étape suivante, sans clé : tests verts ou code retiré, studio qui compile
-    python -m agence.pilote publier <paquet>    sur le main à jour : applique le paquet sans les fichiers protégés,
-                                                verdict du juge, coût, guichet, message à Jules, relance éventuelle
+    python -m agence.pilote publier <paquet>    sur le main à jour : garde ce qui est dans les dossiers du Pilote,
+                                                ouvre une PR soumise au Oui de Jules pour le reste, verdict du juge,
+                                                coût, guichet, message à Jules, relance éventuelle
     python -m agence.pilote studio              retire du patch du studio ce qui le pousse ou le publie
 
 Le workflow `.github/workflows/pilote.yml` enchaîne les quatre. `publier` est lancé depuis le main, avant le patch :
 ses modules (protégés) sont chargés avant, et les fichiers protégés du patch sont remis comme au main avant toute
 autre chose. Le code écrit par le Pilote n'exécute donc jamais le contrôle qui le juge.
 
+Liste blanche (audit du 17/11) : la séance lit le web, donc tout ce qu'elle écrit peut venir d'une injection. Elle ne
+garde seule que LIBRES (son carnet, son équipe qui tourne sans clé qui publie, ses réglages bornés par du code
+protégé). Le reste du dépôt est du code qui tourne avec des clés : il part en PR, fusionnée seulement sur un Oui de
+Jules par Telegram (agence/accords.py). INTERDITS ne part même pas en PR.
+
 Règle de deux : la séance lit le web [A] mais n'a aucun secret [B] (seul son propre jeton, illisible par ses
 commandes) et n'agit dehors [C] qu'à travers ce script. Quatre garde-fous, pas plus (MISSION.md) : aucune clé
 visible, fichiers protégés changés seulement sur un Oui de Jules, code gardé seulement si les tests passent, et
 l'anti-emballement (Veille, ci-dessous). La relecture du code par un modèle gratuit est un avis du juge, pas un tri.
 """
+import base64
 import json
 import os
 import queue
@@ -45,9 +52,20 @@ OUTILS = "Read,Edit,Write,Glob,Grep,Bash,WebSearch,WebFetch,TodoWrite,Agent"   #
 # Prix Opus publics par million de jetons, pour estimer le coût d'une séance coupée avant son résultat
 PRIX = {"input_tokens": 5, "output_tokens": 25, "cache_creation_input_tokens": 6.25, "cache_read_input_tokens": 0.5}
 ECRITURES = ("Edit", "Write", "NotebookEdit", "MultiEdit")
-# Jamais gardés depuis une séance : ce qui fixe ses propres limites et ce qui la contrôle. Une demande au guichet
-# les fait changer par Jules (avec Claude dans Jarvis).
-PROTEGES = (
+# Gardés sans accord : son carnet, son équipe (job à part, seulement les clés des modèles gratuits et YouTube en
+# lecture) et ses réglages, bornés par agents/flux.py (plafonds par jour) et lus avec tolérance.
+LIBRES = (
+    "registre/pilote/",
+    "equipe/",
+    "organisation/MEMOIRE.md",       # changement signalé à Jules dans le message de fin de séance
+    "organisation/equipe.toml",
+    "organisation/rythme.toml",
+    "organisation/diffusion.toml",
+    "organisation/creneaux.toml",
+)
+# Jamais gardés, même en PR : ce qui fixe ses propres limites et ce qui la contrôle. Une demande au guichet les fait
+# changer par Jules (avec Claude dans Jarvis).
+INTERDITS = (
     ".github/",
     "organisation/MISSION.md",
     "organisation/seuils.toml",
@@ -62,6 +80,8 @@ PROTEGES = (
     "agents/surete.py",
     # Modules chargés par `publier`, qui tourne avec le jeton d'écriture et Telegram
     "agence/__init__.py",
+    "agence/accords.py",
+    "agence/questions.py",
     "agence/guichet.py",
     "agence/organisation.py",
     "agence/registre.py",
@@ -84,8 +104,20 @@ def _sous(chemin, prefixes):
     return any(chemin == p or (p.endswith("/") and chemin.startswith(p)) for p in prefixes)
 
 
+def sort(chemin):
+    """« libre » (gardé), « propose » (PR soumise au Oui de Jules) ou « interdit » (jamais gardé)."""
+    if _sous(chemin, INTERDITS) or (chemin.startswith(REGISTRE) and not chemin.startswith(CARNET_REL)):
+        return "interdit"
+    return "libre" if _sous(chemin, LIBRES) else "propose"
+
+
 def protege(chemin):
-    return _sous(chemin, PROTEGES) or (chemin.startswith(REGISTRE) and not chemin.startswith(CARNET_REL))
+    """Tout ce que la séance ne garde pas seule."""
+    return sort(chemin) != "libre"
+
+
+def interdit(chemin):
+    return sort(chemin) == "interdit"
 
 
 def _git(dossier, *args, check=True):
@@ -99,9 +131,10 @@ def changements(dossier):
     sortie = _git(dossier, "status", "--porcelain", "--untracked-files=all")
     chemins = []
     for ligne in sortie.splitlines():
-        chemin = ligne[3:].split(" -> ")[-1].strip().strip('"')
-        if chemin:
-            chemins.append(chemin)
+        for chemin in ligne[3:].split(" -> "):     # un renommage compte pour ses deux chemins
+            chemin = chemin.strip().strip('"')
+            if chemin and chemin not in chemins:
+                chemins.append(chemin)
     return chemins
 
 
@@ -224,7 +257,8 @@ def demandes_ouvertes():
         demandes = guichet.ouvertes()
     except Exception as e:
         return f"illisibles ({type(e).__name__})"
-    return "\n".join(f"#{d['numero']} {d['titre']} (depuis le {d['date'][:10]})" for d in demandes) or "aucune"
+    return "\n".join(f"#{d['numero']} {'PR de ton code, attend le Oui de Jules : ' if d['pr'] else ''}{d['titre']} "
+                     f"(depuis le {d['date'][:10]})" for d in demandes) or "aucune"
 
 
 def _lire(chemin, defaut, n):
@@ -271,9 +305,9 @@ def arreter(proc):
         proc.wait()
 
 
-def seance_claude(texte, plafond, veille, ouvrir=subprocess.Popen, horloge=time.monotonic):
+def seance_claude(texte, plafond, veille, ouvrir=subprocess.Popen, horloge=time.monotonic, trace=None):
     """Lance Claude Code à la racine du dépôt, sous la Veille. Renvoie {ok, resume, cout, jetons, tours, erreur,
-    arret, utilisation, ecritures}."""
+    arret, utilisation, ecritures}. `trace` (ou PILOTE_TRACE) : fichier où recopier le flux brut (artefact du run)."""
     commande = ["claude", "-p", "--model", MODELE, "--output-format", "stream-json", "--verbose",
                 "--max-turns", str(TOURS_MAX), "--max-budget-usd", f"{plafond:.2f}", "--tools", OUTILS,
                 "--allowedTools", OUTILS, "--permission-mode", "dontAsk", "--strict-mcp-config",
@@ -282,6 +316,8 @@ def seance_claude(texte, plafond, veille, ouvrir=subprocess.Popen, horloge=time.
     env = lancer.env_cloisonne(os.environ, {"CLAUDE_CODE_OAUTH_TOKEN"}) | {"CLAUDE_CODE_SUBPROCESS_ENV_SCRUB": "1",
                                                                            "PYTHONUTF8": "1"}
     lignes, arret = queue.Queue(), None
+    trace = trace or os.environ.get("PILOTE_TRACE")
+    copie = open(trace, "a", encoding="utf-8") if trace else None
     with tempfile.TemporaryFile("w+", encoding="utf-8", errors="replace") as erreurs:
         proc = ouvrir(commande, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=erreurs, text=True,
                       encoding="utf-8", errors="replace", cwd=str(RACINE), env=env)
@@ -304,6 +340,8 @@ def seance_claude(texte, plafond, veille, ouvrir=subprocess.Popen, horloge=time.
                 ligne = ""
             if ligne is None:
                 break
+            if copie and ligne:
+                copie.write(ligne)
             evt = None
             if ligne.strip():
                 try:
@@ -319,6 +357,8 @@ def seance_claude(texte, plafond, veille, ouvrir=subprocess.Popen, horloge=time.
         proc.wait()
         erreurs.seek(0)
         stderr = erreurs.read()[-400:]
+    if copie:
+        copie.close()
     r = veille.resultat or {}
     usage = r.get("usage") or {}
     jetons = sum(int(u.get(k) or 0) for u in ([usage] if usage else veille.usages.values()) for k in PRIX)
@@ -348,21 +388,23 @@ def tests_verts():
 
 
 def trier_agence():
-    """Protégés retirés, code gardé seulement si les tests passent. Renvoie le bilan pour le passage."""
+    """Interdits retirés, code (libre ou proposé) gardé seulement si les tests passent. Renvoie le bilan."""
     bilan = {"proteges_retires": [], "code_retire": [], "tests": "aucun code"}
     chemins = changements(RACINE)
-    proteges = [c for c in chemins if protege(c)]
-    if proteges:
-        defaire(RACINE, proteges)
-        bilan["proteges_retires"] = proteges
-    code = [c for c in chemins if c not in proteges and (c.endswith(CODE) or c.startswith("tests/"))]
+    interdits = [c for c in chemins if interdit(c)]
+    if interdits:
+        defaire(RACINE, interdits)
+        bilan["proteges_retires"] = interdits
+    code = [c for c in chemins if c not in interdits and (c.endswith(CODE) or c.startswith("tests/"))]
     if code:
         ok, detail = tests_verts()
         bilan["tests"] = "verts" if ok else f"rouges, code retiré : {detail}"
         if not ok:
             defaire(RACINE, code)
             bilan["code_retire"] = code
-    bilan["gardes"] = [c for c in changements(RACINE) if not c.startswith("registre/pilote/passage")]
+    restants = [c for c in changements(RACINE) if not c.startswith("registre/pilote/passage")]
+    bilan["gardes"] = [c for c in restants if sort(c) == "libre"]
+    bilan["proposes"] = [c for c in restants if sort(c) == "propose"]
     return bilan
 
 
@@ -443,7 +485,8 @@ def seance():
     s = seance_claude(consigne(maintenant, plafond, depense, part, reglages, demandes_ouvertes()), plafond, veille)
     rapport = lire_rapport()
     RAPPORT.unlink(missing_ok=True)       # lu une fois : ne repart pas à la séance suivante
-    passage = {"debut": debut, "fin": registre.maintenant(), "cout_usd": s["cout"], "jetons": s["jetons"],
+    passage = {"debut": debut, "fin": registre.maintenant(), "run": os.environ.get("GITHUB_RUN_ID", ""),
+               "cout_usd": s["cout"], "jetons": s["jetons"],
                "tours": s["tours"], "erreur": s["erreur"], "arret": s["arret"], "utilisation": s["utilisation"],
                "ecritures": s["ecritures"], "resume": s["resume"][-3000:], **rapport, "trie": False}
     PASSAGE.write_text(json.dumps(passage, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -495,6 +538,13 @@ def message_jules(passage, message, verdict=None):
     retire = passage.get("proteges_retires", []) + passage.get("code_retire", [])
     if retire:
         lignes.append(f"Non gardé ({len(retire)} fichiers) : {', '.join(retire[:5])}")
+    if passage.get("pr"):
+        lignes.append(f"Code proposé ({len(passage.get('proposes', []))} fichiers) : PR #{passage['pr']}, "
+                      "fusionnée seulement sur ton Oui (question à part).")
+    elif passage.get("proposition"):
+        lignes.append(passage["proposition"][:300])
+    if "organisation/MEMOIRE.md" in passage.get("gardes", []):
+        lignes.append("Le Pilote a changé sa mémoire (organisation/MEMOIRE.md), relue à chaque séance.")
     if str(passage.get("studio", "")).startswith("retiré"):
         lignes.append("Vidéos de la séance retirées : le studio ne compilait pas.")
     if verdict:
@@ -564,10 +614,61 @@ def noter(passage, verdict=None):
                                  "bloquant": passage.get("erreur")})
 
 
+def _auth_github():
+    jeton = os.environ.get("GH_TOKEN", "")
+    return "AUTHORIZATION: basic " + base64.b64encode(f"x-access-token:{jeton}".encode()).decode()
+
+
+def mettre_de_cote(chemins, patch):
+    """Écrit dans `patch` les changements de ces chemins (indexés par appliquer), puis les remet comme au main."""
+    proc = subprocess.run(["git", "-C", str(RACINE), "diff", "--cached", "--binary", "HEAD", "--", *chemins],
+                          capture_output=True, check=True)
+    Path(patch).write_bytes(proc.stdout)
+    defaire(RACINE, chemins)
+
+
+def proposer(patch, chemins, passage, verdict, gh=None, poser=None):
+    """Ouvre une PR avec les changements hors des dossiers du Pilote, puis pose la question Oui/Non à Jules.
+    Rien de la PR ne s'exécute avant le Oui : une PR ouverte avec le jeton du workflow ne lance aucun workflow, et
+    ce script ne charge que le code du main. Renvoie le numéro de la PR."""
+    from agence import questions
+    gh = gh or guichet._gh
+    poser = poser or questions.poser
+    branche = f"pilote/{datetime.now(timezone.utc):%Y%m%d-%H%M%S}"
+    with tempfile.TemporaryDirectory() as d:
+        arbre = Path(d) / "pr"
+        _git(RACINE, "worktree", "add", "-q", "-b", branche, str(arbre), "HEAD")
+        try:
+            _git(arbre, "apply", "--index", str(patch))
+            _git(arbre, "commit", "-q", "-m", f"Pilote : proposition de la séance du {passage['debut'][:16]}")
+            _git(arbre, "-c", f"http.https://github.com/.extraheader={_auth_github()}", "push", "-q", "origin", branche)
+        finally:
+            _git(RACINE, "worktree", "remove", "--force", str(arbre), check=False)
+    note = "?" if not verdict or verdict.get("note") is None else verdict["note"]
+    avis = str((verdict or {}).get("code_detail") or (verdict or {}).get("resume") or "pas d'avis")
+    corps = (f"Changements de la séance du Pilote du {passage['debut'][:16]} UTC (run {passage.get('run') or '?'}) "
+             "hors de ses dossiers : ce code tourne ensuite avec les clés de l'agence, il attend donc le Oui de Jules "
+             "sur Telegram.\n\nFichiers :\n" + "\n".join(f"- `{c}`" for c in chemins[:100]) +
+             f"\n\nJuge ({note}/10) : {guichet.sans_mention(avis, 1500)}")
+    url = gh("pr", "create", "-R", guichet.DEPOT, "--base", "main", "--head", branche, "--label", guichet.ETIQUETTE,
+             "--title", f"Pilote : code proposé le {passage['debut'][:10]} ({len(chemins)} fichiers)",
+             "--body", corps).strip()
+    numero = int(url.rstrip("/").rsplit("/", 1)[-1])
+    conseil = f"avis du juge {note}/10"
+    if verdict and verdict.get("code") == "a_revoir":
+        conseil += f", code à revoir : {str(verdict.get('code_detail', ''))[:300]}"
+    poser(f"Je fusionne le code proposé par le Pilote (PR #{numero}, {len(chemins)} fichiers) ? {url}",
+          f"accord:{numero}", f"refus:{numero}", par=POSTE,
+          pourquoi="Ce code tourne ensuite avec les clés de l'agence (publication, mails) : il lui faut ton accord. "
+                   f"Fichiers : {', '.join(chemins[:6])}" + (" …" if len(chemins) > 6 else ""),
+          conseil=conseil)
+    return numero
+
+
 def publier(paquet):
     paquet = Path(paquet)
     try:
-        remis = appliquer(RACINE, paquet / "agence.patch", protege)
+        remis = appliquer(RACINE, paquet / "agence.patch", interdit)
     except RuntimeError as e:
         print(f"::error::{e}")
         telegram.envoyer(f"Pilote : la séance n'a pas pu être publiée ({e}). Rien n'a été gardé.")
@@ -575,14 +676,24 @@ def publier(paquet):
     if not PASSAGE.exists():
         print("::error::passage.json absent du paquet")
         return 1
+    proposes = [c for c in changements(RACINE) if sort(c) == "propose"]
+    if proposes:
+        mettre_de_cote(proposes, paquet / "proposition.patch")
     passage = json.loads(PASSAGE.read_text(encoding="utf-8"))
     passage["proteges_retires"] = sorted(set(passage.get("proteges_retires", [])) | set(remis))
+    passage["proposes"] = proposes
     verdict = None
     try:
         from agence import juge
         verdict = juge.juger(passage, paquet / "agence.patch")
     except Exception as e:     # le juge conseille, il ne bloque jamais la publication
         print(f"Juge : {type(e).__name__}: {e}")
+    if proposes:
+        try:
+            passage["pr"] = proposer(paquet / "proposition.patch", proposes, passage, verdict)
+        except Exception as e:  # PR ou question ratée : le code proposé est perdu, Jules le sait
+            print(f"::warning::Proposition non ouverte : {type(e).__name__}: {e}")
+            passage["proposition"] = f"Code proposé ({len(proposes)} fichiers) perdu : PR non ouverte ({type(e).__name__})."
     noter(passage, verdict)
     passage["juge"] = (verdict or {}).get("note")
     PASSAGE.write_text(json.dumps(passage, ensure_ascii=False, indent=1), encoding="utf-8")

@@ -38,6 +38,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ALARME_SECRET: ${{ secrets.ALARME_SECRET }}   # lecture des clics gardés par le Worker
+          FUSION_TOKEN: ${{ secrets.FUSION_TOKEN }}     # Oui de Jules : fusion d'une PR du Pilote (agence/accords.py)
           PYTHONUTF8: "1"
         run: python -m agence.lancer reponses relever
       - name: Commiter le registre

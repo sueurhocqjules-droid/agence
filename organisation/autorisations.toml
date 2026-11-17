@@ -16,6 +16,7 @@
 YT_TOKEN_EN = ["stats", "flux"]
 YT_TOKEN_ES = ["stats", "flux"]
 YT_TOKEN_PT = ["stats", "flux"]
+YT_TOKEN_SCALE = ["stats", "flux"]   # Scale of Everything (17/11)
 YOUTUBE_API_KEY = ["guetteur"]
 META_TOKEN = ["flux"]
 BUFFER_API_KEY = ["flux"]
@@ -28,3 +29,4 @@ GROQ_API_KEY = ["courrier", "guetteur", "gabarits"]
 GEMINI_API_KEY = ["courrier", "guetteur", "gabarits"]
 OPENROUTER_API_KEY = ["courrier", "guetteur", "gabarits"]
 ALARME_SECRET = ["reponses"]
+FUSION_TOKEN = ["reponses"]          # fusion des PR du Pilote sur le Oui de Jules (agence/accords.py, 17/11)

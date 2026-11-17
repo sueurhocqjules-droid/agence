@@ -20,7 +20,7 @@ secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT", "YT_TOKEN_SCALE", "GH_TO
 proprietaire = "pilote"
 module = "agence.questions"
 description = "la lecture de tes réponses Telegram"
-secrets = ["TELEGRAM_BOT_TOKEN", "ALARME_SECRET"]
+secrets = ["TELEGRAM_BOT_TOKEN", "ALARME_SECRET", "FUSION_TOKEN"]  # FUSION_TOKEN : Oui de Jules sur une PR du Pilote
 hors_pause = true
 
 [garde_fous]

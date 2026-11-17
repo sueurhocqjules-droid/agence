@@ -33,9 +33,16 @@ def quand(texte):
 
 
 def heures_de_sortie():
-    """Heures de sortie (Paris) par chaîne, réglées par le Programmateur."""
-    with open(organisation.DOSSIER / "creneaux.toml", "rb") as f:
-        return {langue: r["heures"] for langue, r in tomllib.load(f).items()}
+    """Heures de sortie (Paris) par chaîne, réglées par le Pilote. Fichier ou chaîne illisible : aucune heure (la
+    chaîne ne reçoit rien, les autres continuent ; agents/flux.py borne et filtre les heures)."""
+    try:
+        with open(organisation.DOSSIER / "creneaux.toml", "rb") as f:
+            reglage = tomllib.load(f)
+    except (OSError, tomllib.TOMLDecodeError) as e:
+        print(f"creneaux.toml illisible ({type(e).__name__}) : aucune sortie programmée")
+        return {}
+    return {langue: r["heures"] for langue, r in reglage.items()
+            if isinstance(r, dict) and isinstance(r.get("heures"), list)}
 
 
 def charger(atelier=None):
@@ -138,7 +145,7 @@ def stock_programme(stock, stats, a):
 
 
 def jours_de_stock(stock, stats, heures, a, chaine=None):
-    jours = {langue: n / len(heures[langue]) for langue, n in stock_programme(stock, stats, a).items()}
+    jours = {langue: n / max(1, len(heures.get(langue) or [])) for langue, n in stock_programme(stock, stats, a).items()}
     return round(jours[chaine] if chaine else min(jours.values()), 1)
 
 

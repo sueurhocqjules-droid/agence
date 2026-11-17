@@ -6,7 +6,7 @@
                                      [--conseil "<ce qui aide Jules à choisir>"] [--par <agent>]
 
 Une action est `rien`, `pause:<cible>` ou `reprise:<cible>`, avec une cible connue : agent, script, `tout`
-ou `chaine:<langue>`.
+ou `chaine:<langue>`, ou `accord:<n>` / `refus:<n>` sur une PR de code du Pilote (agence/accords.py).
 Rien d'autre ne peut sortir d'un clic. Questions dans registre/questions.csv
 (la dernière ligne d'une question fait foi).
 
@@ -39,14 +39,19 @@ def verifier(action):
     if action == "rien":
         return
     genre, _, cible = action.partition(":")
+    if genre in ("accord", "refus") and cible.isdigit():
+        return
     if genre not in ("pause", "reprise") or cible not in cibles_connues():
-        raise ValueError(f"Action refusée : {action!r} (rien, pause:<cible> ou reprise:<cible>)")
+        raise ValueError(f"Action refusée : {action!r} (rien, pause:<cible>, reprise:<cible>, accord:<n> ou refus:<n>)")
 
 
 def appliquer(action, raison):
     verifier(action)
     genre, _, cible = action.partition(":")
-    if action != "rien":
+    if genre in ("accord", "refus"):
+        from agence import accords
+        (accords.accepter if genre == "accord" else accords.refuser)(int(cible))
+    elif action != "rien":
         registre.pause(cible, "jules", raison, action=genre)
 
 
@@ -76,6 +81,10 @@ def en_clair(action):
     if action == "rien":
         return "rien ne change"
     genre, _, cible = action.partition(":")
+    if genre == "accord":
+        return f"je fusionne la PR #{cible}, son code tournera au prochain réveil"
+    if genre == "refus":
+        return f"je ferme la PR #{cible}, le Pilote le verra à sa séance suivante"
     return f"{'je relance' if genre == 'reprise' else 'je mets en pause'} {decrire(cible)}"
 
 
