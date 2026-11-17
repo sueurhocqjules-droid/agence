@@ -55,7 +55,7 @@ jobs:
     needs: garde
     if: needs.garde.outputs.lancer == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 55
     steps:
       # Cloisonnement : le jeton du dépôt n'est pas laissé dans .git/config, seule l'étape de commit le reçoit
       - uses: actions/checkout@v7
@@ -113,6 +113,7 @@ jobs:
           YT_TOKEN_EN: ${{ secrets.YT_TOKEN_EN }}
           YT_TOKEN_ES: ${{ secrets.YT_TOKEN_ES }}
           YT_TOKEN_PT: ${{ secrets.YT_TOKEN_PT }}
+          YT_TOKEN_SCALE: ${{ secrets.YT_TOKEN_SCALE }}   # Scale of Everything (17/11), à brancher par le Pilote
           PYTHONUTF8: "1"
         run: python -m agence.lancer stats
       # Après les stats (une vidéo rejetée met sa chaîne en pause), avant le flux (qui respecte cette pause)
@@ -144,6 +145,7 @@ jobs:
           YT_TOKEN_EN: ${{ secrets.YT_TOKEN_EN }}
           YT_TOKEN_ES: ${{ secrets.YT_TOKEN_ES }}
           YT_TOKEN_PT: ${{ secrets.YT_TOKEN_PT }}
+          YT_TOKEN_SCALE: ${{ secrets.YT_TOKEN_SCALE }}   # Scale of Everything (17/11), à brancher par le Pilote
           GH_TOKEN: ${{ github.token }}   # lecture des artefacts du dépôt public studio-rendu
           META_TOKEN: ${{ secrets.META_TOKEN }}   # utilisateur système Meta : 3 comptes Instagram, 3 Pages
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}   # Buffer (offre Free) : publication TikTok sur les 3 comptes
@@ -246,3 +248,75 @@ jobs:
           SOURCE: ${{ (github.event_name == 'schedule' || inputs.programme) && 'réveil' || 'réveil à la main' }}
           PYTHONUTF8: "1"
         run: python -m agence.alarme signe "$SOURCE"
+
+  # Équipe du Pilote : ses propres scripts (equipe/, organisation/equipe.toml), sans Claude. Job à part, en lecture
+  # seule : aucune clé d'écriture sur la machine (ni jeton du dépôt, ni clé de studio-rendu). Seul ce qu'ils écrivent
+  # dans registre/equipe/ est gardé, par le job suivant, qui n'exécute pas leur code.
+  equipe:
+    needs: [garde, agents]
+    if: ${{ !cancelled() && needs.garde.outputs.lancer == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          ref: main     # avec le registre que le job agents vient de pousser
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - run: pip install -q -r requirements.txt
+      - name: Équipe du Pilote
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          PYTHONUTF8: "1"
+        run: |
+          python -m agence.equipe
+          mkdir -p registre/equipe
+      - uses: actions/upload-artifact@v7
+        with:
+          name: equipe
+          path: registre/equipe/
+          include-hidden-files: true
+          retention-days: 2
+
+  equipe-registre:
+    needs: [garde, equipe]
+    if: ${{ !cancelled() && needs.equipe.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          ref: main
+      - uses: actions/download-artifact@v8
+        with:
+          name: equipe
+          path: ${{ runner.temp }}/equipe
+      - name: Garder registre/equipe/ seulement
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git config user.name "agence-robot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -rf registre/equipe && mkdir -p registre/equipe
+          cp -r "$RUNNER_TEMP/equipe/." registre/equipe/
+          find registre/equipe -type l -delete
+          git add registre/equipe
+          git diff --cached --quiet && exit 0
+          git commit -q -m "Équipe du Pilote : $(date -u +%Y-%m-%dT%H:%MZ)"
+          for essai in 1 2 3; do
+            git -c http.https://github.com/.extraheader="$auth" pull -q --rebase origin main &&
+              git -c http.https://github.com/.extraheader="$auth" push -q origin HEAD:main && exit 0
+            sleep 5
+          done
+          exit 1

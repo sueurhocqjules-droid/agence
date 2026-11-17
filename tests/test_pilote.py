@@ -21,14 +21,15 @@ class Proteges(unittest.TestCase):
     def test_ce_qui_fixe_ses_limites_ou_le_controle_est_protege(self):
         for chemin in (".github/workflows/reveil.yml", "organisation/MISSION.md", "organisation/seuils.toml",
                        "organisation/autorisations.toml", "organisation/scripts.toml", "agence/pilote.py",
-                       "agence/lancer.py", "agence/relecture.py", "agents/surete.py", "tests/test_pilote.py",
+                       "agence/lancer.py", "agence/relecture.py", "agence/equipe.py", "agents/surete.py", "tests/test_pilote.py",
                        "registre/couts.csv", "registre/revenu.jsonl", "registre/pauses.csv"):
             self.assertTrue(pilote.protege(chemin), chemin)
 
     def test_son_carnet_et_ses_outils_sont_a_lui(self):
         for chemin in ("registre/pilote/carnet.md", "registre/pilote/rapport.json", "agents/flux.py",
                        "organisation/rythme.toml", "organisation/PILOTE.md", "organisation/diffusion.toml",
-                       "tests/test_flux.py", "agence/gabarits.py"):
+                       "tests/test_flux.py", "agence/gabarits.py",
+                       "organisation/equipe.toml", "equipe/veille.py"):
             self.assertFalse(pilote.protege(chemin), chemin)
 
 

@@ -44,6 +44,8 @@ PROTEGES = (
     "agence/pilote.py",
     "agence/lancer.py",
     "agence/relecture.py",
+    "agence/equipe.py",
+    "tests/test_equipe.py",
     "agents/surete.py",
     "tests/test_pilote.py",
 )

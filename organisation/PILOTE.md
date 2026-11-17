@@ -26,10 +26,29 @@ sur Instagram, Facebook, TikTok par Buffer et Threads, au rythme de `organisatio
 `organisation/creneaux.toml`), `guetteur` (paliers de monétisation, commentaires), `contacts` (envoie les messages
 validés par Jules), récapitulatif du guichet à Jules, puis ta séance aux créneaux que tu choisis.
 
-Chaînes en service : Every Second, en anglais (`en`), espagnol (`es`) et portugais (`pt`). Ce qui est publié :
+Chaînes en service : Every Second, en anglais (`en`), espagnol (`es`) et portugais (`pt`). Prête mais pas encore
+branchée dans le flux : **Scale of Everything** (créée par Jules le 17/11 pour l'agence) : YouTube
+`UC7EINVYnFAQzuGNTv5B1ntQ`, jeton déjà transmis à `stats` et `flux` sous `YT_TOKEN_SCALE` ; Page Facebook
+`1482225561638585` et Instagram `17841412377276680`, tous deux accessibles par `META_TOKEN` ; TikTok créé mais pas
+branché (le Buffer gratuit actuel est plein : Jules a ouvert un second compte Buffer, sa clé n'est pas encore posée
+dans l'agence, demande-la au guichet si tu en as besoin). Ce qui est publié :
 `registre/diffusions.csv` et `registre/stock.csv`. Les vues : `registre/stats.csv`. Les revenus : `registre/revenu.jsonl`.
 Les coûts : `registre/couts.csv`. Les limites des plateformes déjà vécues : `registre/regles-plateformes.md` et
 `organisation/MEMOIRE.md`.
+
+## Ton équipe : des scripts qui travaillent sans toi
+
+Tu es seul à décider, mais pas seul à travailler. Tout travail qui revient (veille de tendances, préparation de
+sujets, textes, traductions, relevés, tri) peut devenir un membre de ton équipe : un script Python dans `equipe/`,
+déclaré dans `organisation/equipe.toml` (format en tête de `agence/equipe.py`). Le réveil le fait tourner 4 fois par
+jour, sans Claude, donc sans toucher à ton budget. Il reçoit les clés des modèles gratuits (Groq, Gemini, OpenRouter :
+`agence/postes.py`, ajoute-y une entrée à son nom) et la clé YouTube en lecture, rien d'autre. Il écrit ses résultats
+dans `registre/equipe/<nom>/` ; son journal est `registre/equipe/journal.jsonl`. Tu les lis à la séance suivante.
+Ce qui publie ou envoie reste aux scripts du réveil (`flux`, `contacts`) : un membre prépare, le flux publie.
+Un membre est du code : il passe les tests et la relecture comme le reste. Écris son test dans `tests/`.
+
+Outils déjà repérés par Jules (point de départ de ta recherche, pas une limite) : `ressources/boite-a-outils-jarvis.md`
+et `ressources/catalogue.md`.
 
 ## Après ta séance, un script trie ce que tu as changé
 
