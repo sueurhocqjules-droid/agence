@@ -52,6 +52,10 @@ jobs:
           FFMPEG_SHA256: e940c45bf07cdf0c95e279a81c5f559ff5dfe88f0f395613bfbbd68566771a45
         run: |
           pip install -q -r requirements.txt numpy
+          # Bac à sable de Bash dans Claude Code sous Linux : bubblewrap + socat (absents le 17/11 : séance sans terminal)
+          sudo apt-get install -y -qq bubblewrap socat > /dev/null
+          sudo sysctl -q -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          bwrap --ro-bind / / --dev /dev true && socat -V | head -1
           curl -fsSL --retry 3 -o "$RUNNER_TEMP/$FFMPEG" "$OUTILS/$FFMPEG"
           echo "$FFMPEG_SHA256  $RUNNER_TEMP/$FFMPEG" | sha256sum -c -
           sudo tar -xJf "$RUNNER_TEMP/$FFMPEG" -C /usr/local/bin --strip-components=2 --wildcards "*/bin/ffmpeg" "*/bin/ffprobe"
