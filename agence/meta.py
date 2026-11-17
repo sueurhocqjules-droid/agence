@@ -27,9 +27,10 @@ LEGENDE_MAX = 2200  # limite d'Instagram
 
 
 class ErreurMeta(RuntimeError):
-    def __init__(self, message, code=None):
+    def __init__(self, message, code=None, reponse=None):
         super().__init__(message)
         self.code = code
+        self.reponse = reponse  # réponse d'erreur complète de l'API (message, code, sous-code, trace), si lue
 
 
 def jeton():
@@ -67,8 +68,11 @@ def appel(methode, chemin, params=None, cle=None, corps=None, entetes=None):
             erreur = json.loads(e.read()).get("error", {})
         except ValueError:
             erreur = {}
+        if not isinstance(erreur, dict):
+            erreur = {"message": str(erreur)}
         cible = chemin.split("?")[0] if not chemin.startswith("https://") else "envoi du fichier"
-        raise ErreurMeta(f"{methode} {cible} : {erreur.get('message') or e.reason}", erreur.get("code")) from None
+        raise ErreurMeta(f"{methode} {cible} : {erreur.get('message') or e.reason}", erreur.get("code"),
+                         erreur or None) from None
 
 
 def liste(chemin, params, cle=None, maximum=200):

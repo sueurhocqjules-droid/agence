@@ -182,6 +182,15 @@ def a_diffuser(sujets, titres_publics, deja, sautes, langue):
             and t not in deja and f"{s}-{langue}" not in sautes]
 
 
+def noter_refus_instagram(nom, erreur):
+    """Un envoi Instagram refusé remonte comme bloquant au journal du chef de contenu, avec la réponse complète de
+    l'API : la Direction lit les bloquants, et sans la cause on ne peut rien corriger."""
+    reponse = getattr(erreur, "reponse", None) or {"message": str(erreur)}
+    lancer.noter_journal("chef-contenu", {"date": registre.maintenant(), "quoi": "diffusion", "resultat": "erreur",
+                                          "bloquant": f"Instagram a refusé {nom} : "
+                                                      f"{json.dumps(reponse, ensure_ascii=False)}"})
+
+
 def diffuser(essai, sujets, etats, pauses, dossier, maintenant, fichiers=None):
     """Reels Instagram et Facebook des vidéos déjà publiques sur YouTube. Renvoie (publiées, erreurs, à rendre).
     fichiers : rendus déjà téléchargés et contrôlés ({nom: (fichier, durée) ou None}), partagés avec TikTok."""
@@ -245,6 +254,8 @@ def diffuser(essai, sujets, etats, pauses, dossier, maintenant, fichiers=None):
                     print(f"ERREUR {reseau} {nom} : {e}")
                     diffusion(reseau, langue, nom, "erreur", note=f"code {e.code or '?'} : {e}"[:300])
                     erreurs.append(f"{reseau}:{nom}")
+                    if reseau == "instagram":
+                        noter_refus_instagram(nom, e)
                     break  # limite atteinte ou accès coupé : plus rien sur ce compte pour ce passage
                 diffusion(reseau, langue, nom, "publie", media_id)
                 publiees.append(f"{reseau}:{nom}")
