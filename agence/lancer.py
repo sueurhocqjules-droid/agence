@@ -158,9 +158,18 @@ def lancer(nom, arguments):
     if en_trop:
         entree["secrets_en_trop"] = en_trop
     if proc.returncode:
+        entree["cause"] = cause_echec(sortie)
         entree["bloquant"] = bloquant_echec(nom, proc.returncode, sortie)
     noter_journal(responsable, entree)
     return proc.returncode
+
+
+def cause_echec(lignes):
+    """La dernière ligne qui dit quelque chose (pas un bout de trace Python : indentée, ou faite de ^ et ~)."""
+    for ligne in reversed(lignes):
+        if ligne.strip() and not ligne.startswith((" ", "\t")) and set(ligne.strip()) - set("^~"):
+            return ligne.strip()[:250]
+    return "sortie vide"
 
 
 def main():

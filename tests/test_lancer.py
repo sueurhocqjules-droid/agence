@@ -127,5 +127,21 @@ class CauseDEchec(unittest.TestCase):
         self.assertNotIn("ligne 5\n", texte)
 
 
+class CauseEchec(unittest.TestCase):
+    def test_derniere_ligne_utile_d_une_trace(self):
+        lignes = ["Traceback (most recent call last):", '  File "x.py", line 1, in f', "    return run(...)",
+                  "           ~~~~^^^^", "subprocess.CalledProcessError: Command 'git' returned non-zero exit status 1.",
+                  "                             ^^^^"]
+        self.assertEqual(lancer.cause_echec(lignes),
+                         "subprocess.CalledProcessError: Command 'git' returned non-zero exit status 1.")
+
+    def test_message_de_git_garde(self):
+        self.assertEqual(lancer.cause_echec(["git push a échoué : remote: Permission denied"]),
+                         "git push a échoué : remote: Permission denied")
+
+    def test_sortie_vide(self):
+        self.assertEqual(lancer.cause_echec([]), "sortie vide")
+
+
 if __name__ == "__main__":
     unittest.main()
