@@ -1,0 +1,20 @@
+{
+ "id": "temoin-stratege-schema-invalide",
+ "poste": "stratege",
+ "panne": "16/11/2026 à 21:53 : le Stratège a échoué (code 1, RuntimeError JSON schema invalide, demande #93). Un schéma de réponse qui porte une liste « enum » vide est refusé par Claude : ce témoin doit être refusé. Réparé par agents/stratege.schema, qui n'écrit plus d'enum vide ni en double.",
+ "sortie": {
+  "schema": "{\"superieur\": {\"type\": \"string\", \"enum\": []}}"
+ },
+ "attendu": "echec",
+ "criteres": [
+  {
+   "id": "aucun-enum-vide",
+   "type": "code",
+   "verif": "sans",
+   "sur": "schema",
+   "motifs": [
+    "\"enum\": \\[\\]"
+   ]
+  }
+ ]
+}

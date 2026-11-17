@@ -1,0 +1,12 @@
+{
+  "titre": "L'échelle de tout",
+  "objets": [
+    {"nom": "Globule rouge", "taille_m": 0.000007, "couleur": "#c0392b"},
+    {"nom": "Grain de sable", "taille_m": 0.0005, "couleur": "#d4ac0d"},
+    {"nom": "Humain", "taille_m": 1.7, "couleur": "#2e86c1"},
+    {"nom": "Baleine bleue", "taille_m": 30, "couleur": "#1f618d"},
+    {"nom": "Mont Everest", "taille_m": 8849, "couleur": "#7f8c8d"},
+    {"nom": "Terre", "taille_m": 12742000, "couleur": "#27ae60"}
+  ],
+  "voix": "Du globule rouge à la Terre entière, voici l'échelle de tout ce qui nous entoure."
+}
