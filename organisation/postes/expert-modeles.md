@@ -47,3 +47,7 @@ Part des appels servis sans erreur de quota, qualité maintenue au banc.
 - En place depuis le 12/11 : chaque dimanche, un petit appel à chaque modèle attribué. Ceux qui ne répondent pas vont dans `registre/modeles_en_panne.json` et passent en dernier pour tous les postes. Chaque passage repart de zéro : un modèle revenu reprend sa place. Reste à faire : attribuer un modèle candidat du Chercheur d'outils après un passage au banc
 
 ## Retours
+- 2026-11-16, chef-operations : La mission est de fournir à chaque agent le meilleur modèle gratuit et de gérer les quotas. La mesure de réussite montre que tous les appels sont servis sans erreur de quota, maintenant la qualité du banc.
+- 2026-11-16, chef-operations : Mesure de réussite : part des appels servis sans erreur de quota, qualité maintenue au banc. Retour : le chef‑operations confirme que tous les appels sont servis sans quota, préservant la qualité.
+- 2026-11-16, chef-operations : Mission : fournir le meilleur modèle gratuit à chaque agent et gérer les quotas. Mesure de réussite : part des appels servis sans erreur de quota, qualité maintenue au banc. Retour : le chef‑operations confirme que tous les appels sont servis sans quota, préservant la qualité.
+- 2026-11-17, chef-operations : Mission : fournir le meilleur modèle gratuit à chaque agent et gérer les quotas. / Mesure de réussite : part des appels servis sans erreur de quota, qualité maintenue au banc. / Retour : le chef‑operations confirme que tous les appels sont servis sans quota, préservant la qualité.

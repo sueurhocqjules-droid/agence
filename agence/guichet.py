@@ -161,9 +161,21 @@ def derogation(lundi, seuils=None):
     return prevu if 0 <= (jour - prevu).days < 7 else None
 
 
-def signaler_pr(pr, quoi, pourquoi, debloque, lien, cout="0 €", detail="", gh=None):
-    """Une PR qui attend Jules (fichier protégé) arrive au guichet : étiquette et commentaire au format fixe."""
+def message_pr(pr, demande, debloque, lien):
+    """Le message du récapitulatif pour une PR qui attend Jules : lien, demande d'origine, ce qu'elle débloque, consigne."""
+    return (f"PR #{pr} en attente de toi (fichier protégé)\n{lien}\nDemande d'origine : #{demande}\n"
+            f"Elle débloque : {sans_mention(debloque, 300)}\nÀ faire : ajouter l'étiquette accord-jules, puis fusionner.")
+
+
+def signaler_pr(pr, quoi, pourquoi, debloque, lien, cout="0 €", detail="", gh=None, demande="", deposer=True):
+    """Une PR qui attend Jules (fichier protégé) arrive au guichet : étiquette et commentaire au format fixe, et un
+    message déposé au prochain récapitulatif du jour (une seule fois par PR, pas seulement au journal)."""
     gh = gh or _gh
+    etat = lire_etat()
+    if deposer and int(pr) not in etat.get("signalees", []):
+        etat.setdefault("signalees", []).append(int(pr))
+        etat.setdefault("prs_a_dire", {})[str(pr)] = message_pr(pr, demande or "inconnue", debloque, lien)
+        ETAT.write_text(json.dumps(etat, ensure_ascii=False) + "\n", encoding="utf-8")
     gh("pr", "edit", str(pr), "-R", DEPOT, "--add-label", ETIQUETTE)
     gh("pr", "comment", str(pr), "-R", DEPOT, "--body-file", "-",
        entree=f"**Demande au guichet**\n\n{corps(quoi, pourquoi, lien, debloque, cout)}"
@@ -190,9 +202,9 @@ def _ligne(d):
     return f"{'URGENT ' if d['urgent'] else ''}#{d['numero']} {d['titre']}\n{d['lien']}"
 
 
-def message_recap(demandes, contacts, cles, illisibles=()):
+def message_recap(demandes, contacts, cles, illisibles=(), prs=()):
     """Le récapitulatif du jour, ou None s'il n'y a rien à dire."""
-    morceaux = []
+    morceaux = list(prs)
     if demandes:
         morceaux.append(f"Guichet : {len(demandes)} demande(s) ouverte(s)\n" + "\n".join(_ligne(d) for d in demandes))
     if contacts:
@@ -216,7 +228,8 @@ def passage(maintenant, etat, demandes, contacts, cles, envoyer, illisibles=()):
     connus = {d["numero"] for d in demandes}
     demandes = list(demandes) + [n for n in etat.get("nouvelles", []) if n["numero"] not in connus]
     demandes.sort(key=lambda d: (not d["urgent"], d["date"]))
-    etat = {"recap": etat.get("recap", ""), "urgents": list(etat.get("urgents", []))}   # « nouvelles » : vidées ici
+    etat = {"recap": etat.get("recap", ""), "urgents": list(etat.get("urgents", [])),   # « nouvelles » : vidées ici
+            "signalees": list(etat.get("signalees", [])), "prs_a_dire": dict(etat.get("prs_a_dire", {}))}
     envoyes = []
     ouverts = {d["numero"] for d in demandes}
     for d in demandes:
@@ -227,10 +240,11 @@ def passage(maintenant, etat, demandes, contacts, cles, envoyer, illisibles=()):
     etat["urgents"] = [n for n in etat["urgents"] if n in ouverts]
     ici = maintenant.astimezone(PARIS)
     if ici.hour >= HEURE_RECAP and etat["recap"] != f"{ici:%Y-%m-%d}":
-        texte = message_recap(demandes, contacts, cles, illisibles)
+        texte = message_recap(demandes, contacts, cles, illisibles, list(etat["prs_a_dire"].values()))
         if texte:
             envoyer(texte)
             envoyes.append("récapitulatif")
+            etat["prs_a_dire"] = {}   # dit une fois : la PR reste ensuite une simple ligne des demandes ouvertes
         etat["recap"] = f"{ici:%Y-%m-%d}"
     return etat, envoyes
 
