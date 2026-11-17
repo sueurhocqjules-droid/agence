@@ -50,7 +50,7 @@ Vues et abonnés gagnés par semaine sur toutes les chaînes, rapportés au coû
 - Les sujets des nouvelles chaînes Scale of Everything et 1 Second vs 1 Hour passent par leur gabarit et un modèle gratuit, jamais par le budget de l'Auteur
 
 ## Retours
-- 2026-11-15, direction : Stock à 3 jours, avec 8 sujets payés pour 22 nécessaires : garde la cadence que le stock permet. Deux outils gratuits partent en essai pour baisser le coût d'un sujet. Les erreurs d'envoi sur Instagram (4 sur 22) doivent remonter comme bloquant : c'est commandé à l'Ingénierie.
 - 2026-11-16, direction : Le stock est remonté à 5 jours, c'est bien. Vise 7 jours avec les sujets écrits par Ling 3.2 Flash dès que l'essai est fusionné. Les sujets du type absurde avec un vrai calcul marchent : garde-les en priorité.
 - 2026-11-16, direction : Le stock est à 5 jours sur les 3 chaînes, la cible reste 7. Mets l'escargot et la glace au plan du 23/11 : ils suivent la ligne. Vérifie que le répondeur passe bien au réveil (écart ecart-20261116-4).
 - 2026-11-16, direction : Stock à 5 jours, la cible reste 7. Ajoute au plan le barrage (débit par seconde) et le personnage de film chiffré. La sortie es passe à 18 h UTC : vérifie que le programmateur l'applique.
+- 2026-11-17, direction : Le stock est à 10 jours, c'est bien. Une décision de la Direction s'applique même si tu la juges inutile : es passe à 18 h UTC. Mets au plan l'escargot, Sisyphe et Gauss.
