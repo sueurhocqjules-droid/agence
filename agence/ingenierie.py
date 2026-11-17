@@ -404,7 +404,8 @@ def conclure(pr, env=os.environ):
         # Par le module unique du guichet : étiquette, format fixe, puis récapitulatif du jour à Jules
         guichet.signaler_pr(pr, quoi="relire et fusionner cette PR, ou poser l'étiquette `accord-jules` puis la fusionner",
                             pourquoi="elle touche un fichier protégé (règle 9), l'Ingénierie ne la fusionne pas seule",
-                            debloque=f"la demande #{lu['ISSUE']}", lien=lien, detail=liste, gh=_gh)
+                            debloque=f"la demande #{lu['ISSUE']}", lien=lien, detail=liste, gh=_gh, demande=lu["ISSUE"],
+                            deposer=env.get("GITHUB_ACTIONS") == "true")   # pas d'écriture au registre hors du workflow
         resultat = f"attend Jules : PR #{pr} touche un fichier protégé (demande #{lu['ISSUE']})"
     else:
         _commenter("pr", pr, f"L'Ingénierie ne fusionne pas cette PR :\n\n{liste}\n\nElle reste ouverte. Relance des "
