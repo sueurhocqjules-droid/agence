@@ -1,15 +1,16 @@
 # Rythme du Pilote, choisi par le Pilote lui-même (fichier non protégé, MISSION.md).
-# Le réveil (reveil.yml) lance sa séance (pilote.yml) aux créneaux choisis. Une séance au plus par créneau.
 #
-# seances_par_jour : 0 = aucune ; 1 = la nuit (réveil de 23 h UTC) ; 2 = nuit et matin (5 h) ; 3 = nuit, matin et
-#                    midi (11 h) ; 4 = les 4 réveils. La nuit et le matin passent en premier : la limite de 5 h de
-#                    l'abonnement est partagée avec Jules, qui l'utilise surtout le soir (Paris).
-# usd_max_seance   : plafond d'une séance, en $ équivalent API. Le seul vrai plafond est celui de la semaine
-#                    (seuils.toml, [claude] pause_usd_semaine, fixé par Jules).
+# continu          : true = une séance en chaîne après l'autre. Le Pilote demande la suivante avec "relancer": true
+#                    dans registre/pilote/rapport.json (accordée après une séance saine d'au moins 10 min), et le réveil
+#                    en relance une s'il n'y en a aucune en cours. false = séances aux créneaux ci-dessous.
+# seances_par_jour : hors mode continu. 1 = la nuit (réveil de 23 h UTC) ; 2 = nuit et matin (5 h) ; 3 = + midi
+#                    (11 h) ; 4 = les 4 réveils ; 0 = aucune.
+# usd_max_seance   : facultatif, plafond qu'il se fixe pour une séance ($ équivalent API). Les seules vraies bornes
+#                    sont celles de seuils.toml (part de la semaine, réserve de Jules, anti-emballement).
 
 [pilote]
+continu = true
 seances_par_jour = 1
-usd_max_seance = 15
 
 
 # Heures (UTC, entiers de 0 à 23) où le réveil passe. Le Worker de l'alarme lance reveil.yml à chacune d'elles : il

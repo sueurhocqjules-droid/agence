@@ -1,8 +1,10 @@
 # Séance du Pilote : le seul agent qui décide (organisation/PILOTE.md). Lancée par le réveil aux créneaux que le
 # Pilote choisit (organisation/rythme.toml), ou à la main : gh workflow run pilote.yml
 # Règle de deux : le job « seance » exécute Claude et le code qu'il écrit, donc il n'a que des droits en lecture et
-# aucune clé lisible par ses commandes. Le tri (tests, relecture par un modèle gratuit) se fait dans une étape à part,
-# après la fin de Claude. Seul le job « publier », sans modèle, écrit : registre, guichet, Telegram, studio.
+# aucune clé lisible par ses commandes. Le tri (fichiers protégés retirés, tests) se fait dans une étape à part, sans
+# clé, après la fin de Claude. Seul le job « publier » écrit (registre, guichet, Telegram, studio) : il exécute le
+# pilote.py du main, applique le paquet, remet les fichiers protégés, fait passer le juge (conseil) puis relance le
+# Pilote s'il l'a demandé (mode continu).
 name: Pilote
 
 on:
@@ -18,7 +20,7 @@ concurrency:
 jobs:
   seance:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 360
     permissions:
       contents: read
       issues: read     # demandes du guichet déjà ouvertes, données au Pilote en début de séance
@@ -76,13 +78,10 @@ jobs:
           PYTHONUTF8: "1"
         run: python -m agence.pilote seance
 
-      - name: Tri (tests, relecture par un modèle gratuit, studio qui compile)
+      - name: Tri (fichiers protégés retirés, tests, studio qui compile ; sans clé)
         id: trier
         if: ${{ always() && steps.seance.outputs.faite == 'oui' }}
         env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           PYTHONUTF8: "1"
         run: python -m agence.pilote trier
 
@@ -117,6 +116,9 @@ jobs:
     permissions:
       contents: write
       issues: write      # demandes au guichet écrites ou fermées par le Pilote
+      actions: write     # relance du Pilote en mode continu
+    outputs:
+      relancer: ${{ steps.agence.outputs.relancer }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -129,20 +131,21 @@ jobs:
         with:
           name: paquet
           path: ${{ runner.temp }}/paquet
-      - name: Agence (carnet, scripts gardés, coût, guichet, message à Jules)
+      - name: Agence (patch sans fichiers protégés, juge, coût, guichet, message à Jules)
+        id: agence
         env:
           GH_TOKEN: ${{ github.token }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}     # juge gratuit
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}         # juge de secours
           PYTHONUTF8: "1"
         run: |
           auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
           git config --global user.name "pilote-robot"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [ -s "$RUNNER_TEMP/paquet/agence.patch" ]; then
-            git apply --index "$RUNNER_TEMP/paquet/agence.patch" || git apply --index --3way "$RUNNER_TEMP/paquet/agence.patch"
-          fi
-          python -m agence.pilote noter
+          python -m agence.pilote publier "$RUNNER_TEMP/paquet"
+          python -m agence.tableau || echo "::warning::Tableau de bord non écrit"
           git add -A
           git commit -q -m "Pilote : séance du $(date -u +%Y-%m-%d) $(date -u +%H)h"
           for essai in 1 2 3; do
@@ -161,8 +164,10 @@ jobs:
       - name: Studio (nouveaux sujets)
         if: ${{ needs.seance.outputs.studio == 'oui' }}
         run: |
+          (cd chaines-studio && { git apply --index "$RUNNER_TEMP/paquet/studio.patch" || git apply --index --3way "$RUNNER_TEMP/paquet/studio.patch"; })
+          PYTHONUTF8=1 python -m agence.pilote studio
           cd chaines-studio
-          git apply --index "$RUNNER_TEMP/paquet/studio.patch" || git apply --index --3way "$RUNNER_TEMP/paquet/studio.patch"
+          git add -A
           git diff --cached --quiet && exit 0
           git commit -q -m "Pilote : sujets du $(date -u +%Y-%m-%d)"
           git pull -q --rebase && git push -q
@@ -181,3 +186,16 @@ jobs:
           git add -A
           git diff --cached --quiet || git commit -q -m "Moteur : sujets du Pilote"
           git push -q
+
+  relance:
+    needs: publier
+    if: ${{ needs.publier.outputs.relancer == 'oui' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      - name: Séance suivante (le Pilote l'a demandée, séance saine d'au moins 10 min)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pilote.yml -R "$GITHUB_REPOSITORY"

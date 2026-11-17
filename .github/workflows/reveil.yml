@@ -197,6 +197,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PYTHONUTF8: "1"
         run: |
+          continu=$(python -c "import tomllib; print(tomllib.load(open('organisation/rythme.toml','rb')).get('pilote', {}).get('continu') is True)" || echo False)
+          if [ "$continu" = True ]; then
+            # Mode continu : les séances s'enchaînent d'elles-mêmes ; le réveil relance seulement si la chaîne s'est
+            # arrêtée (arrêt anti-emballement, échec, séance sans demande de relance).
+            actives=$(gh run list -w pilote.yml -L 20 --json status --jq '[.[] | select(.status != "completed")] | length' || echo 1)
+            if [ "${actives:-1}" -eq 0 ]; then gh workflow run pilote.yml && echo "Séance du Pilote relancée (mode continu)"
+            else echo "Séance du Pilote déjà en cours (mode continu)"; fi
+            exit 0
+          fi
           n=$(python -c "import tomllib; print(int(tomllib.load(open('organisation/rythme.toml','rb')).get('pilote', {}).get('seances_par_jour', 1)))" || echo 1)
           h=$((10#$(date -u +%H)))
           if   [ $h -ge 5 ]  && [ $h -lt 11 ]; then creneau=matin
@@ -226,6 +235,12 @@ jobs:
             *" $creneau "*) gh workflow run pilote.yml && echo "Séance du Pilote lancée ($creneau, $n par jour)" ;;
             *) echo "Pas de séance à ce créneau ($creneau, $n par jour)" ;;
           esac
+      - name: Tableau de bord (registre/tableau.md, lu par le Pilote, le juge et Jules)
+        if: ${{ !cancelled() }}
+        timeout-minutes: 2
+        env:
+          PYTHONUTF8: "1"
+        run: python -m agence.tableau || echo "::warning::Tableau de bord non écrit"
       - name: Commiter le registre
         if: always()
         env:

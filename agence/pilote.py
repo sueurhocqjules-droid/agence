@@ -56,6 +56,7 @@ PROTEGES = (
     "agence/pilote.py",
     "agence/lancer.py",
     "agence/juge.py",
+    "agence/tableau.py",          # mesures lues par le juge et par Jules, lancé avec des clés
     "agence/relecture.py",
     "agence/equipe.py",
     "agents/surete.py",
@@ -70,6 +71,7 @@ PROTEGES = (
     "tests/test_equipe.py",
     "tests/test_surete.py",
     "tests/test_juge.py",
+    "tests/test_tableau.py",
 )
 # Le registre est écrit par les scripts du réveil : la séance n'y écrit que dans registre/pilote/ (son carnet)
 REGISTRE, CARNET_REL = "registre/", "registre/pilote/"
@@ -432,7 +434,7 @@ def seance():
     plafond, depense, part = plafond_seance(maintenant, registre.lire("couts"), surete.couts_atelier(), reglages,
                                             rythme())
     if plafond < 1:
-        print(f"Budget de la semaine atteint : {depense:.2f} $ sur {part:.0f} $, pas de séance")
+        print(f"Budget de la semaine atteint : {depense:.2f} $ sur {part or 0:.0f} $, pas de séance")
         return 0
     CARNET.mkdir(parents=True, exist_ok=True)
     RAPPORT.unlink(missing_ok=True)
@@ -496,7 +498,7 @@ def message_jules(passage, message, verdict=None):
     if str(passage.get("studio", "")).startswith("retiré"):
         lignes.append("Vidéos de la séance retirées : le studio ne compilait pas.")
     if verdict:
-        lignes.append(f"Juge ({verdict.get('note', '?')}/10) : {str(verdict.get('resume', ''))[:600]}")
+        lignes.append(f"Juge ({'?' if verdict.get('note') is None else verdict['note']}/10) : {str(verdict.get('resume', ''))[:600]}")
         if verdict.get("code") == "a_revoir":
             lignes.append(f"⚠️ Code gardé à revoir : {str(verdict.get('code_detail', ''))[:500]}")
     return "\n\n".join(lignes)[:3500]

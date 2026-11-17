@@ -25,14 +25,14 @@ class Proteges(unittest.TestCase):
         for chemin in (".github/workflows/reveil.yml", "organisation/MISSION.md", "organisation/seuils.toml",
                        "organisation/autorisations.toml", "organisation/scripts.toml", "agence/pilote.py",
                        "agence/lancer.py", "agence/relecture.py", "agence/equipe.py", "agents/surete.py", "tests/test_pilote.py",
-                       "agence/juge.py", "agence/guichet.py", "agence/registre.py", "agence/telegram.py",
+                       "agence/juge.py", "agence/tableau.py", "agence/guichet.py", "agence/registre.py", "agence/telegram.py",
                        "registre/couts.csv", "registre/revenu.jsonl", "registre/pauses.csv"):
             self.assertTrue(pilote.protege(chemin), chemin)
 
     def test_son_carnet_et_ses_outils_sont_a_lui(self):
         for chemin in ("registre/pilote/carnet.md", "registre/pilote/rapport.json", "agents/flux.py",
                        "organisation/rythme.toml", "organisation/PILOTE.md", "organisation/diffusion.toml",
-                       "tests/test_flux.py", "agence/gabarits.py", "agence/postes.py", "agence/tableau.py",
+                       "tests/test_flux.py", "agence/gabarits.py", "agence/postes.py",
                        "organisation/equipe.toml", "equipe/veille.py"):
             self.assertFalse(pilote.protege(chemin), chemin)
 
