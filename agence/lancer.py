@@ -7,6 +7,7 @@
 3. Refuse si son budget est atteint : dollars Claude de la semaine, appels gratuits du jour (champ budget de la fiche)
 4. Le lance avec ses seuls secrets : toute variable d'allure secrète qu'il n'a pas déclarée est retirée
 5. Note le passage au journal du responsable (registre/journal/<agent>.jsonl), et tout refus au journal d'audit
+   Un échec (code non nul) met les 20 dernières lignes de la sortie dans le bloquant
 """
 import json
 import os
@@ -105,8 +106,12 @@ def categorie_echec(sortie):
 
 
 def bloquant_echec(nom, code, sortie):
+    """Texte du bloquant d'un échec : sa catégorie et les 20 dernières lignes de la sortie (erreurs comprises), pas un renvoi."""
     fin = sortie[-20:]
-    return f"{nom} a échoué (code {code}), cause : {categorie_echec(fin)}. 20 dernières lignes :\n" + "\n".join(fin)
+    texte = "\n".join(fin)[-2000:]
+    if not texte.strip():
+        return f"{nom} a échoué (code {code}), sortie vide"
+    return f"{nom} a échoué (code {code}), cause : {categorie_echec(fin)}. 20 dernières lignes :\n{texte}"
 
 
 def lancer(nom, arguments):

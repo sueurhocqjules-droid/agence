@@ -4,4 +4,6 @@ __pycache__/
 *.mp4
 out/
 nightwork/
+remotion/node_modules/
+remotion/public/voix-*.mp3
 .claude/settings.local.json

@@ -255,3 +255,79 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-16T19:16:30+00:00,ingenierie,60,612681,0.2826,0,"ok : demande #59, 4 fichier(s), 0.28 $"
 2026-11-16T19:26:30+00:00,ingenierie,79,690771,0.3392,0,echec : la séance n'a rien changé dans le dépôt
 2026-11-16T19:26:34+00:00,ingenierie,130,1011013,0.5594,0,"ok : demande #62, 8 fichier(s), 0.56 $"
+2026-11-16T20:29:28+00:00,expert-modeles,276,0,0,5,ok : 4/5 modèles répondent
+2026-11-16T20:34:04+00:00,critique,0,0,0,0,"ok : 0 décision(s) jugée(s), 0 annulation(s), 0 essai(s) jugé(s), 9 leçon(s) en mémoire"
+2026-11-16T20:34:04+00:00,programmateur,1,0,0,1,ok : pas d'essai cette semaine
+2026-11-16T20:34:05+00:00,chef-contenu,3,0,0,1,ok : 8 sujets pour la semaine du 2026-11-23 (openai/gpt-oss-120b) : maximiser les vues avec le budget disponible en reproduisant le format qui a déjà prouvé son efficacité
+2026-11-16T20:34:09+00:00,responsable-revenu,5,0,0,1,"ok : 4 règle(s) confirmée(s) sur 6, 0 à relire, 3 voie(s) de revenu écrite(s)"
+2026-11-16T20:34:14+00:00,chercheur-outils,143,0,0,1,"ok : 0 candidat(s), 0 écarté(s), 0 amélioration(s) payante(s), 0 besoin(s) sur 4 avec une réponse, 129 liens collectés"
+2026-11-16T20:36:40+00:00,analyste,0,0,0,0,"ok : Référence « ne rien acheter » : 182 417 vues sur 6 mois (p10 51 135, p90 640 237), revenu 0.00 €, 7.0 sujets/semaine"
+2026-11-16T20:36:45+00:00,veilleur,31,0,0,1,"ok : 9 fiche(s) concept, 0 écartée(s), 30 outliers"
+2026-11-16T20:37:17+00:00,chef-recherche,75,0,0,1,"ok : 0 proposition(s), 0 écartée(s), sur 44 rapport(s)"
+2026-11-16T20:38:32+00:00,chef-operations,3,0,0,1,"ok : 78 % de réveils réussis, 1 retour(s), 6 réparation(s)"
+2026-11-16T20:38:36+00:00,stratege,62,44220,0.432,0,"ok : 5 écart(s), 8 suivi(s), 0 refusé(s), 0.43 $"
+2026-11-16T20:39:38+00:00,responsable-organisation,46,0,0,1,"ok : 21 postes relus, 6 signal(aux), aucun changement"
+2026-11-16T20:40:25+00:00,direction,193,94033,0.9461,0,"ok : 65 appliqué(s), 1 refusé(s), 0.95 $"
+2026-11-16T20:43:33+00:00,ingenierie,12,61363,0.0949,0,echec : la séance n'a rien changé dans le dépôt
+2026-11-16T20:43:33+00:00,ingenierie,22,127626,0.1622,0,echec : la séance n'a rien changé dans le dépôt
+2026-11-16T20:44:00+00:00,ingenierie,13,83446,0.0957,0,echec : la séance n'a rien changé dans le dépôt
+2026-11-16T20:44:14+00:00,ingenierie,45,430050,0.2598,0,"ok : demande #83, 3 fichier(s), 0.26 $"
+2026-11-16T20:43:41+00:00,ingenierie,52,380701,0.2498,0,"ok : demande #78, 3 fichier(s), 0.25 $"
+2026-11-16T20:44:02+00:00,ingenierie,50,331391,0.1975,0,"ok : demande #77, 2 fichier(s), 0.20 $"
+2026-11-16T20:43:51+00:00,ingenierie,73,972162,0.3913,0,"ok : demande #80, 3 fichier(s), 0.39 $"
+2026-11-16T20:43:48+00:00,ingenierie,103,936182,0.4312,0,"ok : demande #79, 3 fichier(s), 0.43 $"
+2026-11-16T20:43:57+00:00,ingenierie,131,784016,0.5068,0,"ok : demande #81, 14 fichier(s), 0.51 $"
+2026-11-16T20:44:06+00:00,ingenierie,46,409204,0.2598,0,"ok : demande #84, 5 fichier(s), 0.26 $"
+2026-11-16T21:48:23+00:00,critique,0,0,0,0,"ok : 0 décision(s) jugée(s), 0 annulation(s), 0 essai(s) jugé(s), 9 leçon(s) en mémoire"
+2026-11-16T21:48:23+00:00,programmateur,2,0,0,1,ok : pas d'essai cette semaine
+2026-11-16T21:48:26+00:00,chef-contenu,7,0,0,1,ok : 2 sujets pour la semaine du 2026-11-23 (openai/gpt-oss-120b) : Deux sujets supplémentaires permettent d'atteindre le stock minimal de 7 jours tout en restant dans le budget de 30 $.
+2026-11-16T21:48:33+00:00,responsable-revenu,10,0,0,1,"ok : 4 règle(s) confirmée(s) sur 6, 0 à relire, 3 voie(s) de revenu écrite(s)"
+2026-11-16T21:48:44+00:00,chercheur-outils,116,0,0,1,echec : AttributeError: 'list' object has no attribute 'get'
+2026-11-16T21:50:42+00:00,analyste,0,0,0,0,"ok : Référence « ne rien acheter » : 182 417 vues sur 6 mois (p10 51 135, p90 640 237), revenu 0.00 €, 7.0 sujets/semaine"
+2026-11-16T21:50:47+00:00,veilleur,27,0,0,1,"ok : 5 fiche(s) concept, 0 écartée(s), 28 outliers"
+2026-11-16T21:51:14+00:00,chef-recherche,110,0,0,1,"ok : 0 proposition(s), 0 écartée(s), sur 49 rapport(s)"
+2026-11-16T21:53:04+00:00,chef-operations,3,0,0,1,"ok : 79 % de réveils réussis, 1 retour(s), 1 réparation(s)"
+2026-11-16T21:53:07+00:00,stratege,1,0,0,0,echec : RuntimeError: claude a échoué (code 1) : Error: --json-schema is not a valid JSON Schema: data/properties/suivi/items/properties/id/enum must NOT have duplicate items (items ## 7 and 8 are ide
+2026-11-16T21:53:08+00:00,responsable-organisation,24,0,0,1,"ok : 21 postes relus, 7 signal(aux), aucun changement"
+2026-11-16T21:53:32+00:00,direction,104,80809,0.7573,0,"ok : 33 appliqué(s), 0 refusé(s), 0.76 $"
+2026-11-16T21:55:36+00:00,ingenierie,26,275896,0.1872,0,echec : la séance n'a rien changé dans le dépôt
+2026-11-16T21:54:12+00:00,ingenierie,37,234886,0.1215,0,"ok : demande #55, 2 fichier(s), 0.12 $"
+2026-11-16T21:55:35+00:00,ingenierie,97,866312,0.4664,0,"ok : demande #97, 7 fichier(s), 0.47 $"
+2026-11-16T21:55:35+00:00,ingenierie,36,326269,0.2126,0,"ok : demande #94, 2 fichier(s), 0.21 $"
+2026-11-16T21:55:41+00:00,ingenierie,49,495282,0.2841,0,"ok : demande #96, 3 fichier(s), 0.28 $"
+2026-11-16T21:55:28+00:00,ingenierie,74,547150,0.3004,0,"ok : demande #93, 3 fichier(s), 0.30 $"
+2026-11-17T00:47:00+00:00,reponses,0,0,0,0,ok : 0 réponse(s) de Jules
+2026-11-17T00:47:21+00:00,stats,3,0,0,0,"ok : 72 vidéos, 24058 vues"
+2026-11-17T00:47:24+00:00,garde_fous,8,0,0,0,"ok : 31.14 $ cette semaine, 1 alerte(s) envoyée(s)"
+2026-11-17T00:47:32+00:00,courrier,1,0,0,0,ok : 0 mail nouveau
+2026-11-17T00:47:33+00:00,flux,262,0,0,0,"ok : 6 programmées, 0 rejetées, 12 en rendu, 6 diffusées, 0 erreurs de diffusion"
+2026-11-17T00:51:55+00:00,guetteur,3,0,0,1,"ok : 1 commentaire(s) nouveau(x), 0 occasion(s) ; seuil le plus proche : Every Second (en) : 18 714 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
+2026-11-17T00:51:58+00:00,delais,0,0,0,0,"ok : aucun départ en essai, 0 besoin(s) en retard sur leur cible"
+2026-11-17T00:51:58+00:00,contacts,0,0,0,0,ok : aucun message validé à envoyer
+2026-11-17T00:52:02+00:00,guichet,1,0,0,0,"ok : 14 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : urgent #75, urgent #76"
+2026-11-17T11:23:01+00:00,reponses,1,0,0,0,ok : 0 réponse(s) de Jules
+2026-11-17T11:23:05+00:00,stats,3,0,0,0,"ok : 78 vidéos, 24899 vues"
+2026-11-17T11:23:08+00:00,garde_fous,8,0,0,0,"ok : 40.60 $ cette semaine, 0 alerte(s) envoyée(s)"
+2026-11-17T11:23:16+00:00,courrier,2,0,0,1,"ok : 2 mail(s) : 0 collaboration, 1 plateforme, 0 sanction, 1 autre ; 0 transmis"
+2026-11-17T11:23:18+00:00,flux,104,0,0,0,"ok : 12 programmées, 0 rejetées, 12 en rendu, 0 diffusées, 0 erreurs de diffusion"
+2026-11-17T11:25:02+00:00,guetteur,4,0,0,1,"ok : 1 commentaire(s) nouveau(x), 0 occasion(s) ; seuil le plus proche : Every Second (en) : 19 517 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
+2026-11-17T11:25:06+00:00,delais,0,0,0,0,"ok : aucun départ en essai, 0 besoin(s) en retard sur leur cible"
+2026-11-17T11:25:06+00:00,contacts,0,0,0,0,ok : aucun message validé à envoyer
+2026-11-17T11:25:10+00:00,guichet,3,0,0,0,"ok : 14 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : récapitulatif"
+2026-11-17T12:12:21+00:00,reponses,84,0,0,0,ok : 12 réponse(s) de Jules
+2026-11-17T12:21:52+00:00,expert-modeles,303,0,0,5,ok : 4/5 modèles répondent
+2026-11-17T12:26:55+00:00,critique,0,0,0,0,"ok : 0 décision(s) jugée(s), 0 annulation(s), 0 essai(s) jugé(s), 10 leçon(s) en mémoire"
+2026-11-17T12:26:55+00:00,programmateur,2,0,0,1,ok : pas d'essai cette semaine
+2026-11-17T12:26:57+00:00,chef-contenu,6,0,0,1,ok : 5 sujets pour la semaine du 2026-11-23 (openai/gpt-oss-120b) : pour remettre le stock à 7 jours tout en capitalisant sur le format qui génère le plus de vues
+2026-11-17T12:27:03+00:00,responsable-revenu,5,0,0,1,"ok : 4 règle(s) confirmée(s) sur 6, 0 à relire, 3 voie(s) de revenu écrite(s)"
+2026-11-17T12:27:09+00:00,chercheur-outils,173,0,0,1,"ok : 0 candidat(s), 0 écarté(s), 0 amélioration(s) payante(s), 0 besoin(s) sur 4 avec une réponse, 129 liens collectés"
+2026-11-17T12:30:04+00:00,analyste,0,0,0,0,"ok : Référence « ne rien acheter » : 211 086 vues sur 6 mois (p10 60 664, p90 727 535), revenu 0.00 €, 7.0 sujets/semaine"
+2026-11-17T12:30:10+00:00,veilleur,33,0,0,1,"ok : 3 fiche(s) concept, 0 écartée(s), 30 outliers"
+2026-11-17T12:30:43+00:00,chef-recherche,105,0,0,1,"ok : 0 proposition(s), 0 écartée(s), sur 52 rapport(s)"
+2026-11-17T12:32:28+00:00,chef-operations,3,0,0,1,"ok : 66 % de réveils réussis, 1 retour(s), 3 réparation(s)"
+2026-11-17T12:32:31+00:00,stratege,46,45380,0.4223,0,"ok : 2 écart(s), 10 suivi(s), 0 refusé(s), 0.42 $"
+2026-11-17T12:33:17+00:00,responsable-organisation,34,0,0,1,"ok : 21 postes relus, 7 signal(aux), aucun changement"
+2026-11-17T12:33:52+00:00,direction,132,87209,0.8379,0,"ok : 39 appliqué(s), 1 refusé(s), 0.84 $"
+2026-11-17T12:36:21+00:00,ingenierie,27,182020,0.1447,0,"ok : demande #106, 1 fichier(s), 0.14 $"
+2026-11-17T12:36:29+00:00,ingenierie,75,425099,0.3144,0,"ok : demande #108, 4 fichier(s), 0.31 $"
+2026-11-17T12:36:35+00:00,ingenierie,87,736906,0.4104,0,"ok : demande #109, 6 fichier(s), 0.41 $"

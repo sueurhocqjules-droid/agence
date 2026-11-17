@@ -63,6 +63,9 @@ def _chef_recherche(entree, repondre):
     texte = repondre("chef-recherche", chef_recherche.consigne(
         {"rapports": [{"type": t, **f} for t, f in par_lien.values()], "mesures_maintenant": avant}))
     gardes, ecartes = chef_recherche.valider(modeles.extraire_json(texte) or {}, par_lien, avant)
+    if entree.get("controle"):   # les cas d'avant le contrôle par script (15/11) n'en dépendent pas
+        gardes, refus = chef_recherche.controler(gardes, par_lien)
+        ecartes += refus
     return {"propositions": gardes, "ecartees": ecartes}
 
 
@@ -279,6 +282,30 @@ def passer(cas, direct=True, juge=juger):
     return verdict, details
 
 
+def lien_du_run():
+    """Adresse du run GitHub en cours (vide hors GitHub)."""
+    serveur, depot, numero = (os.environ.get(k) for k in ("GITHUB_SERVER_URL", "GITHUB_REPOSITORY", "GITHUB_RUN_ID"))
+    return f"{serveur}/{depot}/actions/runs/{numero}" if serveur and depot and numero else ""
+
+
+def noter_panne(lignes, bilan):
+    """Un banc rouge laisse sa cause au journal du Chef des opérations, comme bloquant : les dernières lignes de
+    sortie et le lien du run (demande #96 : une panne sans trace ne se répare pas)."""
+    lien = lien_du_run()
+    rouges, en_rouge = [], False
+    for l in lignes:   # seulement les cas rouges et leur détail (le détail est en retrait)
+        en_rouge = l.startswith("ROUGE") or (en_rouge and l.startswith(" "))
+        if en_rouge:
+            rouges.append(l.strip())
+    entree = {"date": registre.maintenant(), "quoi": "banc-agents", "resultat": "echec", "code": 1,
+              "sortie": "\n".join((rouges or lignes)[-8:])[-800:],
+              "bloquant": f"{bilan}" + (f", voir {lien}" if lien else "")}
+    dossier = registre.DOSSIER / "journal"
+    dossier.mkdir(parents=True, exist_ok=True)
+    with open(dossier / "chef-operations.jsonl", "a", encoding="utf-8") as f:
+        f.write(json.dumps(entree, ensure_ascii=False) + "\n")
+
+
 def main(args):
     sys.stdout.reconfigure(encoding="utf-8")
     direct = "--sans-modele" not in args
@@ -308,6 +335,7 @@ def main(args):
         with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
             f.write(f"### {bilan}\n\n```\n" + "\n".join(lignes) + "\n```\n")
     if rouges or not joues:
+        noter_panne(lignes, bilan)
         sys.exit(1)
 
 

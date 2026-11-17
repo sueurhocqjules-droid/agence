@@ -31,7 +31,7 @@ Réparations demandées, retours à son équipe, rapport d'une ligne à la Direc
 
 ## Outils
 Lecture du registre et de l'état des réveils. Trois scripts du socle tournent à chaque réveil, sans modèle :
-- `delais` (`agence/delais.py`) : « Décider vite » appliqué par le code. Un besoin écrit depuis plus de 48 h fait partir en essai, chez l'Ingénierie, sa première option gratuite et sans compte (un départ par réveil au plus, jamais une option avec compte ou payante). Il mesure aussi le délai entre un besoin écrit et sa mise en service (cible 72 h en classe 1, une semaine en classe 2) : les besoins en retard figurent dans le rapport du dimanche (`delais_besoins`) et au bilan du lundi
+- `delais` (`agence/delais.py`) : « Décider vite » appliqué par le code. Un besoin écrit depuis plus de 48 h fait partir en essai, chez l'Ingénierie, sa première option gratuite et sans compte (un départ par réveil au plus, jamais une option avec compte ou payante). Au même réveil, il demande au guichet les comptes d'affiliation (Amazon US pour `en`, Brésil pour `pt`) dont le besoin du Responsable du revenu a passé 48 h sans option : ce poste ne se réveille que le dimanche. Il mesure aussi le délai entre un besoin écrit et sa mise en service (cible 72 h en classe 1, une semaine en classe 2) : les besoins en retard figurent dans le rapport du dimanche (`delais_besoins`) et au bilan du lundi
 - `guichet` (`agence/guichet.py`) : le seul module par lequel un agent demande à Jules ce que l'agence ne peut pas faire seule (`guichet.demander`, format fixe : quoi, pourquoi, lien, ce que ça débloque, coût). Récapitulatif Telegram une fois par jour, message immédiat pour une demande `urgent`
 - `contacts` (`agence/contacts.py`) : un agent met un premier message en attente (`contacts.preparer`, issue `contact`), il part au réveil qui suit la pose de l'étiquette `valide` par Jules. Sans le droit d'envoi (`GMAIL_SEND_TOKEN`), rien ne part et le script le demande au guichet
 
@@ -47,5 +47,7 @@ Part des réveils réussis, zéro panne non signalée, coût des scripts, délai
 ## Consignes
 
 ## Retours
-- 2026-11-15, direction : 80 % de réveils réussis, mais 4 pannes sans trace (3 au banc). Une panne doit toujours laisser sa cause au journal : c'est commandé. Suis le délai des 4 besoins ouverts, aucun n'est encore en retard.
 - 2026-11-16, direction : 79 % de réveils réussis et 4 pannes sans trace. Suis la PR #39 (la cause écrite au journal). Le délai des besoins compte : programmateur-sujets passe 72 h demain.
+- 2026-11-16, direction : 78 % de réveils réussis et 3 pannes du banc sans trace. Suis cette semaine le taux d'échec de l'Ingénierie (24 sur 53) et le délai de programmateur-sujets, qui dépasse 72 h demain.
+- 2026-11-16, direction : 79 % de réveils réussis. Le Stratège et le Chercheur d'outils ont planté et 2 runs du banc n'ont pas de trace : c'est commandé à l'Ingénierie. Suis leur réparation et le délai de programmateur-sujets.
+- 2026-11-17, direction : 66 % de réveils réussis : c'est en baisse. Les PR #39, #86 et #99 sont accordées, vérifie que chaque panne laisse sa cause. Suis la mise en service de programmateur-sujets.

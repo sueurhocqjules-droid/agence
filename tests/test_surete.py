@@ -80,16 +80,22 @@ class Questions(unittest.TestCase):
         self.assertEqual((etat["a"]["etat"], etat["b"]["etat"]), ("repondue", "ouverte"))
 
     def releve(self, envoi):
-        with tempfile.TemporaryDirectory() as d,                 mock.patch.object(questions, "DECALAGE", Path(d, "telegram.json")),                 mock.patch.object(questions.registre, "lire", return_value=[]),                 mock.patch.object(questions, "telegram") as tg:
-            tg.clics.return_value = (43, [(42, "c1", "q:1111-2140-1:oui", 7, envoi)])
+        """(réponses prises, clics marqués lus au Worker) pour un clic sur une question absente du registre."""
+        clic = {"update_id": 42, "clic_id": "c1", "donnee": "q:1111-2140-1:oui", "message_id": 7, "envoi": envoi,
+                "texte": "Je fusionne ?"}
+        with mock.patch.object(questions.registre, "lire", return_value=[]), \
+                mock.patch.object(questions, "telegram"), \
+                mock.patch.object(questions, "alarme") as worker:
+            worker.clics_recus.return_value = [clic]
             prises = questions.relever()
-            return prises, json.loads(questions.DECALAGE.read_text())["decalage"]
+            lus = [i for appel in worker.clics_lus.call_args_list for i in appel.args[0]]
+            return prises, lus
 
     def test_clic_recent_sur_question_inconnue_garde(self):
-        self.assertEqual(self.releve(time.time() - 60), (0, 42))
+        self.assertEqual(self.releve(time.time() - 60), (0, []))
 
     def test_clic_ancien_sur_question_inconnue_oublie(self):
-        self.assertEqual(self.releve(time.time() - 7 * 3600), (0, 43))
+        self.assertEqual(self.releve(time.time() - 7 * 3600), (0, [42]))
 
     def test_message_dit_pourquoi_et_quand(self):
         texte = questions.message("Je reprends ?", "YouTube a refusé la vidéo X", "reprise:chaine:pt", "rien", "surete",

@@ -53,5 +53,7 @@ Le revenu en € (objectif 1). En attendant : chaque chaîne a sa voie et son be
 - Une voie qui crée du service client ou des pertes passe après les autres
 
 ## Retours
-- 2026-11-15, direction : Voies bien chiffrées. Confirme cette semaine à leur source officielle les règles tiktok_recompenses et meta_monetisation. Ajoute pour chaque chaîne la distance aux seuils de ces réseaux dès que leurs stats sont branchées.
 - 2026-11-16, direction : Les voies sont bien chiffrées. Les comptes d'affiliation partent au guichet cette semaine. Confirme tiktok_recompenses et meta_monetisation à leur source, et rappelle que sur un Short, le lien cliquable va dans le profil.
+- 2026-11-16, direction : Les voies en et pt sont justes. Vérifie que les comptes Amazon partent au guichet avant le 18/11. tiktok_recompenses et meta_monetisation sont toujours à vérifier : confirme-les à leur source cette semaine.
+- 2026-11-16, direction : Les voies sont justes, mais rien n'est ouvert. tiktok_recompenses et meta_monetisation sont toujours à vérifier : confirme-les cette semaine à leur source officielle.
+- 2026-11-17, direction : Avec 20 000 vues par semaine, le sponsoring sera lent : garde l'affiliation en voie parallèle. tiktok_recompenses et meta_monetisation sont toujours à confirmer à leur source.

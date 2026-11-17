@@ -37,3 +37,5 @@
 {"date": "2026-11-15T21:45:41+00:00", "id": "1a1df47090051f75", "fil": "1a1df41dc1fd64fa", "recu": "2026-11-15T12:55:32+00:00", "categorie": "plateforme", "chaine": "es", "expediteur": "mail.threads.net", "plateforme": true}
 {"date": "2026-11-15T21:45:41+00:00", "id": "1a1e02f4c36aebc7", "fil": "1a1e02f4c36aebc7", "recu": "2026-11-15T17:09:17+00:00", "categorie": "plateforme", "chaine": null, "expediteur": "service.tiktok.com", "plateforme": true}
 {"date": "2026-11-16T13:36:38+00:00", "id": "1a1e4269a98d9390", "fil": "1a1e4269a98d9390", "recu": "2026-11-16T11:38:17+00:00", "categorie": "plateforme", "chaine": null, "expediteur": "buffer.com", "plateforme": false}
+{"date": "2026-11-17T11:23:18+00:00", "id": "1a1e8b9ffd7e8ad6", "fil": "1a1e8b9ffd7e8ad6", "recu": "2026-11-17T08:57:44+00:00", "categorie": "plateforme", "chaine": "en", "expediteur": "service.tiktok.com", "plateforme": true}
+{"date": "2026-11-17T11:23:18+00:00", "id": "1a1e91a2230fb7e2", "fil": "1a1e91a2230fb7e2", "recu": "2026-11-17T10:42:46+00:00", "categorie": "autre", "chaine": null, "expediteur": "openrouter.ai", "plateforme": false}
