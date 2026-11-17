@@ -9,6 +9,7 @@ Lancement : python -m agence.lancer garde_fous   (ou python -m agents.surete --e
 4. Pannes : un même programme en échec plusieurs passages d'affilée, alerte.
 5. Portée : une chaîne que YouTube ne diffuse presque pas (comparée à ses sœurs sur les mêmes sujets) ou dont les vues
    s'effondrent d'une semaine à l'autre (mesures.signaux_portee), alerte une fois par semaine tant que ça dure.
+6. Journal de l'Auteur : chaque séance de l'atelier est recopiée au registre (agence/auteur.py), une seule fois.
 Une alerte ne part qu'une fois : sa clé est notée dans registre/alertes.csv.
 """
 import csv
@@ -21,7 +22,7 @@ import tomllib
 from datetime import datetime, timezone
 from pathlib import Path
 
-from agence import lancer, mesures, organisation, questions, registre, telegram
+from agence import auteur, lancer, mesures, organisation, questions, registre, telegram
 
 DEPOTS_PRIVES = ["sueurhocqjules-droid/agence"]  # chaines-studio : la clé de lecture ne donne pas accès à l'API des runs
 
@@ -265,6 +266,10 @@ def main():
     with registre.seance("garde_fous") as info:
         info["resultat"], ratees = passage(essai=False)
         print(info["resultat"])
+        try:   # le journal de l'Auteur ne doit jamais empêcher les garde-fous
+            print(f"Journal de l'Auteur : {len(auteur.noter_seances())} séance(s) notée(s)")
+        except (OSError, ValueError, KeyError) as e:
+            print(f"Journal de l'Auteur non écrit : {type(e).__name__}: {e}")
     if ratees:
         sys.exit(1)  # Telegram injoignable : le réveil passe au rouge, l'alerte repart au suivant
 

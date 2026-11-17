@@ -29,7 +29,7 @@ Créé à l'étape 6, avant les chefs : une agence qui publie seule peut perdre 
 Drapeaux de pause dans `registre/pauses.csv`, respectés par le lanceur et par tous les scripts de publication. Alerte immédiate à Jules et à la Direction. Le contrôle d'un outil avant sa fusion par la Maintenance (nouveaux appels réseau, lecture de secrets).
 
 ## Outils
-Script `garde_fous` (`agents/surete.py` : compteur, seuils, sanctions, pannes) et `reponses` (`agence/questions.py` : lit les clics Oui/Non de Jules sur Telegram et applique l'action prévue). Les deux échappent à une pause générale (`hors_pause`), pour qu'une pause puisse toujours être levée.
+Script `garde_fous` (`agents/surete.py` : compteur, seuils, sanctions, pannes, et le journal des séances de l'Auteur par `agence/auteur.py`) et `reponses` (`agence/questions.py` : lit les clics Oui/Non de Jules sur Telegram et applique l'action prévue). Les deux échappent à une pause générale (`hors_pause`), pour qu'une pause puisse toujours être levée.
 
 ## Secrets et permissions
 Le jeton du bot Telegram, et le jeton GitHub du réveil en lecture des runs (minutes du mois). Aucun jeton de chaîne : une pause de chaîne est respectée par le flux. Ne publie rien.
