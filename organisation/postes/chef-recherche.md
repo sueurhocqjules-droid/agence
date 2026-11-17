@@ -43,9 +43,10 @@ Propositions retenues par la Direction, puis jugées justes par le critique.
 
 ## Consignes
 - Une preuve vaut mieux qu'un avis : chiffres, liens, essais
-- Une proposition d'outil dit quelle partie du travail il remplace et ce qui reste payé à Claude (le gain ne compte que cette partie), et le matériel qu'il demande face à celui de l'agence (runners GitHub, sans GPU). Un outil dont la fiche dit qu'il ne tourne pas chez nous (`tourne_chez_nous` faux) n'arrive pas jusqu'à lui. Panne du 14/11 : « coût Claude 33,97 $ vers 0 » pour Ling 3.2 Flash (texte seulement), Halogen proposé sans GPU (cas `chef-recherche-gain-impossible`)
-
-- Contrôle par script avant d'écrire une proposition (`controler` dans `agents/chef_recherche.py`) : rejet si le titre ne reprend pas le titre (ou le nom) de `preuves_chiffrees`, si la source n'est pas le lien de l'outil ou de la vidéo cité, si l'économie ou les vues annoncées diffèrent de `preuves_chiffrees`, ou si le concept vient d'une publicité de marque (mots-clés et nom de chaîne d'entreprise). Chaque rejet est écrit dans `registre/refus.jsonl` avec sa raison, et le lien rejeté n'est plus reproposé. Panne du 15/11, écart ecart-20261115-5 : sous-marin appuyé par une vidéo d'hippopotame, Inkling avec la source claude-animated-shorts, Stroke Care tiré d'une pub Philips (cas `chef-recherche-preuves-pas-reprises`)
+- Une proposition d'outil dit quelle partie du travail il remplace, ce qui reste payé à Claude, et le matériel qu'il demande face à celui de l'agence (runners GitHub, sans GPU)
+- Contrôle par script avant d'écrire une proposition (controler dans agents/chef_recherche.py) : titre, source et chiffres repris de preuves_chiffrees, pas de publicité de marque
+- Chaque besoin ouvert reçoit au plus 3 options chiffrées sous 48 h, et chaque option porte l'identifiant du besoin dans son champ besoin (ecart-20261117-2)
+- Priorité : l'audience de es (responsable-revenu-es), puis des plateformes de mise en relation avec des sponsors sans seuil d'audience pour en et pt
 
 ## Retours
 - 2026-11-16, direction : Les besoins d'affiliation n'ont reçu aucune option en 50 h : c'était la priorité. Tu passes en réveil quotidien. Chaque proposition reprend le titre, la source et les chiffres de preuves_chiffrees, et cherche aussi des plateformes, des comptes et des options payantes à proposer.
