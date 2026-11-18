@@ -354,6 +354,28 @@ class Relance(unittest.TestCase):
         self.assertFalse(pilote.relancer(self.passage(45, relancer=False)))
 
 
+class Reprise(unittest.TestCase):
+    LIMITE = "séance arrêtée (success) : You've hit your 5-hour limit · resets 7:20am (UTC)"
+
+    def passage(self, fin, erreur=LIMITE):
+        return {"debut": "2026-11-18T05:59:29+00:00", "fin": fin, "erreur": erreur}
+
+    def test_reprend_2_minutes_apres_la_remise_a_zero(self):
+        self.assertEqual(pilote.reprise(self.passage("2026-11-18T05:59:31+00:00"), True), "2026-11-18T07:22:00+00:00")
+
+    def test_heure_de_l_apres_midi_et_passage_de_minuit(self):
+        self.assertEqual(pilote.reprise(self.passage("2026-11-18T10:00:00+00:00", "x 5-hour limit · resets 1pm (UTC)"),
+                                        True), "2026-11-18T13:02:00+00:00")
+        self.assertEqual(pilote.reprise(self.passage("2026-11-18T22:30:00+00:00", "x 5-hour limit · resets 12am (UTC)"),
+                                        True), "2026-11-19T00:02:00+00:00")
+
+    def test_rien_hors_mode_continu_autre_erreur_ou_remise_trop_loin(self):
+        self.assertEqual(pilote.reprise(self.passage("2026-11-18T05:59:31+00:00"), False), "")
+        self.assertEqual(pilote.reprise(self.passage("2026-11-18T05:59:31+00:00", "arrêt anti-emballement : x"), True), "")
+        self.assertEqual(pilote.reprise(self.passage("2026-11-18T05:59:31+00:00", None), True), "")
+        self.assertEqual(pilote.reprise(self.passage("2026-11-18T07:30:00+00:00"), True), "")
+
+
 class Appliquer(unittest.TestCase):
     def test_le_patch_passe_sans_les_chemins_interdits(self):
         with tempfile.TemporaryDirectory() as d, tempfile.TemporaryDirectory() as ailleurs:

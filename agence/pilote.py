@@ -26,6 +26,7 @@ import base64
 import json
 import os
 import queue
+import re
 import shutil
 import subprocess
 import sys
@@ -33,7 +34,7 @@ import tempfile
 import threading
 import time
 import tomllib
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from agence import guichet, lancer, organisation, registre, telegram
@@ -596,6 +597,26 @@ def relancer(passage):
     return bool(passage.get("relancer")) and not passage.get("erreur") and duree_s(passage) >= 600
 
 
+LIMITE_5H = re.compile(r"5-hour limit.*?resets\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)\s*\(UTC\)", re.I)
+
+
+def reprise(passage, continu):
+    """En mode continu, une séance arrêtée par la limite de 5 h de l'abonnement reprend à la remise à zéro (« resets
+    7:20am (UTC) »), 2 minutes après, au lieu d'attendre le réveil suivant (jusqu'à 6 h de perdues, vécu le 18/11).
+    Renvoie l'heure de reprise (ISO, UTC) ou "" : pas de mode continu, autre erreur, ou remise à plus de 5 h 30."""
+    m = LIMITE_5H.search(passage.get("erreur") or "")
+    if not continu or not m:
+        return ""
+    heure = int(m[1]) % 12 + (12 if m[3].lower() == "pm" else 0)
+    fin = datetime.fromisoformat(passage["fin"]).astimezone(timezone.utc)
+    remise = fin.replace(hour=heure, minute=int(m[2] or 0), second=0, microsecond=0)
+    if remise <= fin:
+        remise += timedelta(days=1)
+    if remise - fin > timedelta(hours=5, minutes=30):
+        return ""
+    return (remise + timedelta(minutes=2)).isoformat(timespec="seconds")
+
+
 def noter(passage, verdict=None):
     """Coût, journal, demandes au guichet et message à Jules, à partir du passage de la séance."""
     ouvertes = []
@@ -727,7 +748,11 @@ def publier(paquet):
     noter(passage, verdict)
     passage["juge"] = (verdict or {}).get("note")
     PASSAGE.write_text(json.dumps(passage, ensure_ascii=False, indent=1), encoding="utf-8")
-    _sortie_github(relancer="oui" if relancer(passage) else "non")
+    try:
+        continu = rythme().get("continu") is True
+    except (OSError, tomllib.TOMLDecodeError):
+        continu = False
+    _sortie_github(relancer="oui" if relancer(passage) else "non", reprise=reprise(passage, continu))
     return 0
 
 

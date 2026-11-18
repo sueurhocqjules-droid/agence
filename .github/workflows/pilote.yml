@@ -131,6 +131,7 @@ jobs:
       pull-requests: write   # code proposé par le Pilote, fusionné seulement sur le Oui de Jules (agence/accords.py)
     outputs:
       relancer: ${{ steps.agence.outputs.relancer }}
+      reprise: ${{ steps.agence.outputs.reprise }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -223,3 +224,24 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run pilote.yml -R "$GITHUB_REPOSITORY"
+
+  # Mode continu : une séance arrêtée par la limite de 5 h de l'abonnement reprend à la remise à zéro, sans attendre
+  # le réveil suivant (jusqu'à 6 h de perdues, vécu le 18/11). L'attente occupe un runner (minutes gratuites, dépôt
+  # public) et garde le run ouvert : le réveil voit une séance en cours et n'en lance pas une deuxième.
+  reprise:
+    needs: publier
+    if: ${{ needs.publier.outputs.reprise != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    permissions:
+      actions: write
+    steps:
+      - name: Attendre la remise à zéro de la limite de 5 h, puis relancer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPRISE: ${{ needs.publier.outputs.reprise }}
+        run: |
+          attente=$(( $(date -u -d "$REPRISE" +%s) - $(date -u +%s) ))
+          echo "Reprise à $REPRISE (dans ${attente} s)"
+          [ "$attente" -gt 0 ] && sleep "$attente"
+          gh workflow run pilote.yml -R "$GITHUB_REPOSITORY"
