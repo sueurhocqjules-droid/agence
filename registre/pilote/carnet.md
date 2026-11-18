@@ -69,3 +69,29 @@ _Réécrit le 2026-11-17 vers 23 h UTC (séance 5, en cours)._
 - Décision : demande Collabstr (profil gratuit, chaîne en, offre « intégration Short » ~25 $) ; attendu faible
   (0 à 1 deal avant le 18/12). Stock vidéo écarté pour l'instant : il faudrait une variante 16:9 sans texte de
   chaque scène (gros travail studio) pour ~0-30 $ en un mois. À revoir si Ko-fi et Collabstr restent à 0 au 5/12.
+
+## Séance 9 (18/11 09:30 UTC)
+
+- Jules (JULES.md 18/11) : il ouvre Ko-fi (#121) ; il demande une vraie recherche d'outils (aucune demande de ma part
+  jusqu'ici). Lancé : recherche d'outils gratuits (calcul, modèles, vidéo, diffusion) + recherche des places de vente
+  d'affiches avec trafic propre (impression à la demande, Pinterest).
+- Studio : 38 sujets (ant gardé en séance 8 ; popcorn, hail, raindrop, tree, bubble perdus).
+- Lancé aussi un atelier (popcorn, hail, bubble). Affiches vérifiées (exemple-paper-en.jpg) : nettes, 3240 x 4640,
+  réutilisables telles quelles en impression à la demande si une place de marché gratuite convient.
+- Recherches du 18/11 (sous-agents) : outils : Pinterest seul lien cliquable automatisable (RSS depuis un site
+  revendiqué, 200 épingles/jour ; API v5 en pratique fermée) ; Bluesky scriptable (mot de passe d'application) ;
+  Publer Free (3 comptes) ; Cloudflare Workers AI 10 000 neurons/jour, Mistral Experiment sans carte ; GitHub
+  Models retiré le 30/07/2026 ; Gumroad seuil 100 $. Ventes d'affiches : Redbubble (gratuit, PayPal, seuil 20 $),
+  Displate (gratuit, 4,50-14,50 $ par vente, seuil 50 $, 2900x4060), TeePublic ; Etsy et Teachers Pay Teachers
+  payants (TPT 29 $ depuis 10/2026). Rien de tout ça n'encaisse avant le 18/12 sauf Ko-fi (paiement direct PayPal).
+- Décision : 1) Pinterest = vitrine vers Ko-fi (épingles des affiches) ; 2) Redbubble = trafic d'acheteurs propre,
+  revenu qui grandit après le 18/12 ; affiches rendues en 4050 x 5800 (copie du studio, scale 1.25) pour 38 sujets.
+  Bluesky et le site pour le RSS Pinterest : après, si Pinterest prend (il faut une PR flux + un secret).
+- Fait : 38 affiches en 4050 x 5800 (`boutique/affiches-4k-en.zip`, aperçu `apercu-38-en.jpg`, textes
+  `annonces-en.md`) ; site vitrine statique `registre/pilote/site/` (une page par affiche, vidéo intégrée pour 22,
+  rss.xml, sitemap) généré par `registre/pilote/outils/site.py <url> <affiches> <sortie>`, base
+  https://every-second-posters.pages.dev (Cloudflare Pages : commercial permis, GitHub Pages non). Bouton Ko-fi
+  ajouté automatiquement dès que `[boutique] lien` est rempli : régénérer le site et le faire renvoyer par Jules.
+- Paris (mesure au 5/12) : Pinterest RSS → ≥ 38 épingles publiées et ≥ 1 clic vers le site (stats Pinterest via
+  Jules) ; Redbubble : ≥ 12 affiches en ligne, 0 à 2 ventes avant le 18/12 (paiement après, seuil 20 $).
+  Incertain : Pinterest accepte-t-il de revendiquer un sous-domaine pages.dev ? Sinon épingles à la main.

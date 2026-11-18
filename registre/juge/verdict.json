@@ -1,17 +1,20 @@
 {
- "note": 2,
- "resume": "Aucun revenu n’a été généré ; le lien Ko‑fi n’a pas été ajouté aux profils et la chaîne espagnole n’a pas été vérifiée. Le carnet a été mis à jour mais aucune modification de code ou diffusion n’est attestée.",
- "raisonnement": "La séance a seulement mis à jour le carnet et le passage.json, sans modification de code ni diffusion. Aucun lien Ko‑fi n’a été réellement ajouté aux profils et aucune vérification de la chaîne espagnole n’est documentée. Aucun revenu n’est enregistré et l’audience reste stable. Les affirmations de l’agent sur des actions concrètes (ajout de lien, examen de chaîne, nouvelles vidéos) ne sont pas soutenues par les faits. Le travail se limite à de la documentation interne.",
+ "note": 4,
+ "resume": "Création d'un site vitrine avec 38 affiches 4K et génération du zip, mais aucune vente ni trafic mesuré à ce jour.",
+ "raisonnement": "Le pilote a généré de nombreux fichiers (site statique, affiches 4K, zip) et a modifié la mémoire. Aucun revenu n'est enregistré et aucune hausse d'audience n'est démontrée. Les affirmations sur le bouton Ko‑fi et les métriques Pinterest/Redbubble ne sont pas vérifiées. Le code ajouté (site.py) utilise subprocess mais ne montre pas de fuite de clé ou d'envoi réseau.",
  "affirmations_non_prouvees": [
-  "Le lien Ko‑fi a été ajouté aux profils des chaînes",
-  "Un examen de la chaîne espagnole a été réalisé",
-  "Six nouvelles vidéos ont été programmées et publiées"
+  "Bouton Ko‑fi ajouté automatiquement dès que `[boutique] lien` est rempli",
+  "Pinterest RSS publiera ≥ 38 épingles et générera au moins 1 clic",
+  "Redbubble affichera ≥ 12 affiches et réalisera 0 à 2 ventes avant le 18/12"
  ],
- "code": "aucun",
+ "code": "ok",
  "code_detail": "",
- "signaux": [],
+ "signaux": [
+  "registre/pilote/outils/site.py : lance des commandes ou du code dynamique : import subprocess",
+  "registre/pilote/outils/site.py : lance des commandes ou du code dynamique : subprocess.run([\"ffmpeg\", \"-v\", \"error\", \"-y\", \"-i\", str(Path(affiches) / f\"{nom}-en.jpg\"),"
+ ],
  "modele": "openai/gpt-oss-120b",
- "date": "2026-11-18T09:28:48+00:00",
- "seance": "2026-11-18T09:13:16+00:00",
+ "date": "2026-11-18T09:54:13+00:00",
+ "seance": "2026-11-18T09:30:42+00:00",
  "erreurs": []
 }
