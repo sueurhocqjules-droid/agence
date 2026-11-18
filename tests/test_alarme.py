@@ -331,7 +331,8 @@ class Worker(unittest.TestCase):
     def js(self, expression):
         source = (RACINE / "alarme/worker.js").as_uri()
         code = f"import * as w from '{source}'; console.log(JSON.stringify({expression}));"
-        sortie = subprocess.run(["node", "--input-type=module", "-e", code], capture_output=True, text=True, check=True)
+        sortie = subprocess.run(["node", "--input-type=module", "-e", code], capture_output=True, text=True)
+        self.assertEqual(sortie.returncode, 0, sortie.stderr[-800:])   # l'erreur de Node, lisible dans le tri
         return json.loads(sortie.stdout)
 
     def test_silence_court_rien(self):
