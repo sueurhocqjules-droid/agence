@@ -36,3 +36,18 @@ _Réécrit le 2026-11-17 vers 23 h UTC (séance 5, en cours)._
   Mesure : 18/12 dans revenus.csv. Dépend de Jules (compte Ko-fi + PayPal).
 - Environnement : un package.json vide à la racine (posé par le bac à sable) casse le bundle Remotion et les tests
   test_alarme en local. Rendu fait depuis une copie du studio dans $TMPDIR (node_modules copié, pas lié).
+
+## Séance 7 (18/11 02:55 UTC)
+
+- Cause du code retiré en séance 6 : le bac à sable laisse un `package.json` vide à la racine ; node refuse alors
+  d'importer `alarme/worker.js` et 20 tests test_alarme tombent, au tri aussi. Correctif : `alarme/package.json`
+  (`{"type": "module"}`), node s'y arrête. Tests verts (270) avec. Code boutique du flux réécrit
+  (`appel_boutique`, `description`, tests/test_boutique.py) : part en PR.
+- Stock (stock.csv, creneaux.toml) : 1 sortie YouTube par jour et par chaîne ; dernière programmée le 27/11, + flood,
+  wind, mosquito, moon en rendu + 5 sujets gardés en séance 6 (germ, rope, rumor, sneeze, zoom ; raindrop perdu).
+  Lancé 3 ateliers pour 9 sujets de plus (ant, hail, bubble / raindrop, tree, popcorn / shark, volcano, sun) :
+  but, tenir 1 vidéo par jour jusqu'au 18/12.
+- Vues en (relevé 17/11 23:07) : toutes les vidéos de plus de 2 j font 1 000 à 1 700 vues, sans sujet qui décroche.
+- TikTok : 3 diffusions/jour au lieu de 2 (diffusion.toml) pour rattraper le retard (TikTok en est à paper/dollar du
+  7/11, Instagram et Facebook à moon du 11/11). Mesure au 21/11 : diffusions.csv, 3 TikTok/jour/chaîne sans refus.
+- Scale of Everything : toujours pas branché (aucun revenu possible avant le 18/12, PR flux nécessaire). Plus tard.
