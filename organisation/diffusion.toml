@@ -15,3 +15,12 @@ par_jour = 2
 
 [threads]
 par_jour = 2
+
+# Ligne d'appel mise en tête des descriptions YouTube et des légendes Instagram, Facebook, TikTok, Threads
+# (agents/flux.py, appel_boutique). Vide = rien n'est ajouté. lien : https seul ; un texte par langue avec {lien}, 160
+# caractères au plus. Ne touche que les vidéos envoyées ou diffusées après le changement.
+[boutique]
+lien = ""
+en = "Printable 4K science posters from this channel: {lien}"
+es = "Pósteres de ciencia del canal (4K, para imprimir): {lien}"
+pt = "Pôsteres de ciência do canal (4K, para imprimir): {lien}"

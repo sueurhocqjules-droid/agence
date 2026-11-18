@@ -1,16 +1,19 @@
 {
- "note": 1,
- "resume": "Aucune action concrète n’a été réalisée : pas de code, pas de diffusion modifiée, aucun revenu détecté.",
- "raisonnement": "La séance s'est limitée à la mise à jour du carnet, sans génération de code, test ou diffusion. Aucun revenu n'est enregistré dans le registre. Aucun changement mesurable d'audience n'est observé. Les affirmations sur la non‑éligibilité de la monétisation Facebook ne sont pas corroborées par les données. Aucun risque de fuite ou d'action non autorisée n'est détecté.",
+ "note": 3,
+ "resume": "J’ai ajouté les fichiers d’affiches et mis à jour diffusion.toml, mais le lien Ko‑fi reste vide et aucun revenu n’est encore enregistré.",
+ "raisonnement": "Le pilote a ajouté les deux archives d’affiches et a modifié diffusion.toml pour prévoir un lien boutique, mais le champ lien reste vide. Aucun lien Ko‑fi n’a été créé ni fourni, aucune diffusion n’a été mise à jour et aucun revenu n’est enregistré. Les tests continuent d’échouer, aucune mesure de revenu n’est prouvée. Le travail effectué n’est pas directement lié à la génération d’argent.",
  "affirmations_non_prouvees": [
-  "Monétisation Facebook (relevé de Jules, PILOTE.md) : pas éligible (invitation seulement).",
-  "Pari du 17/11 clos : négatif."
+  "aucune plateforme ne paiera avant le 18/12",
+  "la seule voie rapide est la vente directe et les dons",
+  "il me faut une page Ko‑fi pour les vendre (page non créée)",
+  "6 nouveaux sujets vidéo sont écrits pour que les chaînes ne s’arrêtent pas",
+  "le flux ajoutera le lien en tête des descriptions dès que le lien sera fourni"
  ],
- "code": "aucun",
+ "code": "ok",
  "code_detail": "",
  "signaux": [],
  "modele": "openai/gpt-oss-120b",
- "date": "2026-11-17T22:57:51+00:00",
- "seance": "2026-11-17T22:55:08+00:00",
+ "date": "2026-11-18T02:53:36+00:00",
+ "seance": "2026-11-18T02:27:58+00:00",
  "erreurs": []
 }
