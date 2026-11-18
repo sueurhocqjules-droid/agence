@@ -1,4 +1,4 @@
-# Tableau de bord (18/11/2026 05:19 UTC)
+# Tableau de bord (18/11/2026 05:20 UTC)
 
 Écrit par les scripts à partir du registre. Ne pas modifier à la main.
 
@@ -33,18 +33,18 @@
 
 ## Séances du Pilote (7 jours)
 
-- 7 séance(s), 2 sans erreur, 1 arrêtée(s) par l'anti-emballement
+- 8 séance(s), 2 sans erreur, 1 arrêtée(s) par l'anti-emballement
 - Code gardé : 14 fichier(s), retiré par le tri : 2
-  - 2026-11-17T22:18 : echec, 0.0 $, juge 1/10
   - 2026-11-17T22:38 : echec, 0.0 $, juge 1/10
   - 2026-11-17T22:57 : echec, 1.5747 $, juge 1/10
   - 2026-11-18T02:52 : ok, 14.6492 $, juge 3/10
   - 2026-11-18T03:03 : echec, 4.7884 $, juge 6/10
+  - 2026-11-18T05:20 : echec, 0.0 $, juge 2/10
 
 ## Derniers avis du juge
 
-- 2026-11-17T22:19 (openai/gpt-oss-120b) 1/10, code aucun : Aucune action concrète n’a été réalisée : aucune diffusion modifiée, aucun code testé, aucun revenu détecté.
 - 2026-11-17T22:39 (openai/gpt-oss-120b) 1/10, code aucun : La séance n’a produit aucun code ni diffusion ; l’authentification OAuth a échoué, aucun revenu ou audience n’a été généré.
 - 2026-11-17T22:57 (openai/gpt-oss-120b) 1/10, code aucun : Aucune action concrète n’a été réalisée : pas de code, pas de diffusion modifiée, aucun revenu détecté.
 - 2026-11-18T02:53 (openai/gpt-oss-120b) 3/10, code ok : J’ai ajouté les fichiers d’affiches et mis à jour diffusion.toml, mais le lien Ko‑fi reste vide et aucun revenu n’est encore enregistré.
 - 2026-11-18T03:03 (openai/gpt-oss-120b) 6/10, code ok : Correction du package.json et ajout d’une fonction d’appel boutique validés par des tests verts. Aucun revenu n’est encore perçu, l’audience reste stable.
+- 2026-11-18T05:20 (openai/gpt-oss-120b) 2/10, code aucun : Aucune modification de code n’a été enregistrée, aucun revenu ou audience n’a changé malgré les affirmations de corrections et de nouvelles diffusions.

@@ -363,3 +363,4 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-18T05:19:14+00:00,guetteur,2,0,0,0,"ok : 0 commentaire(s) nouveau(x), 0 occasion(s) ; seuil le plus proche : Every Second (en) : 19 768 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
 2026-11-18T05:19:17+00:00,contacts,0,0,0,0,ok : aucun message validé à envoyer
 2026-11-18T05:19:18+00:00,guichet,0,0,0,0,"ok : 1 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : récapitulatif"
+2026-11-18T05:20:06+00:00,pilote,4,0,0.0,0,echec : séance arrêtée (success) : You've hit your 5-hour limit · resets 7:20am (UTC)
