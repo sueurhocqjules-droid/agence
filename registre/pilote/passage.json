@@ -1,25 +1,65 @@
 {
- "debut": "2026-11-18T05:59:29+00:00",
- "fin": "2026-11-18T05:59:31+00:00",
- "run": "44247921385",
- "cout_usd": 0.0,
- "jetons": 0,
- "tours": 1,
- "erreur": "séance arrêtée (success) : You've hit your 5-hour limit · resets 7:20am (UTC)",
+ "debut": "2026-11-18T09:13:16+00:00",
+ "fin": "2026-11-18T09:28:17+00:00",
+ "run": "44273642922",
+ "cout_usd": 8.1855,
+ "jetons": 337886,
+ "tours": 5,
+ "erreur": null,
  "arret": null,
- "utilisation": 0.19,
- "ecritures": 0,
- "resume": "You've hit your 5-hour limit · resets 7:20am (UTC)",
- "message_jules": "",
- "demandes": [],
+ "utilisation": 0.23,
+ "ecritures": 11,
+ "resume": "Rapport valide. J'attends les deux ateliers de sujets.",
+ "message_jules": "Séance 8 : les 2 séances de ce matin ont été coupées par la limite de 5 h (rien fait). Je relance 6 sujets vidéo (ant, popcorn, hail, raindrop, tree, bubble) pour tenir 1 vidéo par jour au-delà du 18/12, et une recherche sur les places de marché de sponsoring gratuites. Revenu : 0 €. La boutique Ko-fi (#121) reste la seule voie de vente prête ; deux demandes rapides : le lien Ko-fi dans les profils (seul endroit cliquable depuis un Short), et un coup d'œil à la chaîne espagnole qui ne reçoit aucune vue.",
+ "demandes": [
+  {
+   "titre": "Après #121 : mettre le lien Ko-fi dans les profils des chaînes",
+   "quoi": "Une fois la page Ko-fi ouverte (#121) : 1) YouTube Studio de Every Second, puis A Cada Segundo : Personnalisation > Informations de base > Liens > Ajouter un lien, titre « 4K science posters » (pt : « Pôsteres 4K »), URL de la page Ko-fi, cocher « afficher sur la bannière ». 2) Instagram de chaque chaîne : Modifier le profil > Liens > ajouter l'URL Ko-fi. 3) Page Facebook de chaque chaîne : Paramètres > Infos > Site web = URL Ko-fi. 4) Donner l'URL au guichet : je la pose dans diffusion.toml [boutique] et elle part en tête de toutes les descriptions.",
+   "pourquoi": "Un lien dans la description d'un Short n'est pas cliquable : le lien du profil est le seul chemin d'un spectateur (13 000 vues/semaine en anglais, 5 000 en portugais) vers la boutique.",
+   "debloque": "Les premières ventes et dons possibles de la boutique (objectif : 1 € avant le 18/12).",
+   "lien": "https://studio.youtube.com",
+   "cout": "0 €",
+   "urgent": false
+  },
+  {
+   "titre": "Regarder pourquoi la chaîne espagnole Cada Segundo n'a aucune vue",
+   "quoi": "Dans YouTube Studio de Cada Segundo (2 minutes) : 1) Paramètres > Chaîne > Paramètres avancés : « Conçue pour les enfants » doit être sur Non. 2) Paramètres > Chaîne > Admissibilité aux fonctionnalités : la chaîne est-elle validée par téléphone, y a-t-il une restriction ? 3) Contenu : une vidéo publique au hasard, colonne Restrictions (droits d'auteur, « contenu réutilisé », limité ?). 4) Tableau de bord : un avertissement ou une alerte ? Répondre au guichet avec ce que vous voyez (une capture suffit).",
+   "pourquoi": "32 vidéos publiques ont fait 7 vues en tout, quand les mêmes vidéos font 5 000 vues/semaine en portugais et 13 000 en anglais : la cause est la chaîne, pas les sujets (MEMOIRE.md, 13/11).",
+   "debloque": "Soit une correction simple qui rend des milliers de vues à la chaîne, soit la décision d'arrêter l'espagnol et de libérer ses créneaux.",
+   "lien": "https://studio.youtube.com",
+   "cout": "0 €",
+   "urgent": false
+  },
+  {
+   "titre": "Créer un profil créateur gratuit sur Collabstr (Every Second)",
+   "quoi": "1) https://collabstr.com > « Join as Creator », avec l'adresse de la chaîne Every Second (pas la vôtre). 2) Relier YouTube (Every Second) et, si possible, l'Instagram et le TikTok de la chaîne. 3) Catégories : Education, Science & Technology. Bio : « Faceless science Shorts: one absurd rule applied every second, real numbers and sources. ~13,000 views/week (English), ~5,000/week Brazilian Portuguese channel. » 4) Une offre (package) : « 1 product mention in a YouTube Short (on screen + description) » à 25 $, et « 1 Short dedicated to your product » à 60 $. 5) Paiement : PayPal de la chaîne. Collabstr prend 15 % sur la commande, rien à payer d'avance.",
+   "pourquoi": "Seule place de marché de marques sans minimum d'abonnés (Insense, Aspire, Meta en demandent 1 000, YouTube exige le programme partenaire). Une seule commande dépasse déjà le premier euro.",
+   "debloque": "Des marques peuvent trouver la chaîne et commander sans démarchage ; je prépare la vidéo dès qu'une commande arrive.",
+   "lien": "https://collabstr.com",
+   "cout": "0 € (15 % prélevés seulement sur une commande)",
+   "urgent": false
+  }
+ ],
  "fermer": [],
- "relancer": false,
+ "relancer": true,
  "trie": true,
  "proteges_retires": [],
  "code_retire": [],
  "tests": "aucun code",
- "gardes": [],
+ "gardes": [
+  "registre/pilote/carnet.md"
+ ],
  "proposes": [],
- "studio": "rien de neuf",
+ "studio": "gardé",
+ "studio_fichiers": [
+  "public/sons/ant.wav",
+  "scripts/calcul_ant.py",
+  "src/scenes/ant/Scene.tsx",
+  "src/scenes/ant/index.tsx",
+  "src/scenes/ant/temps.ts",
+  "src/sujets.ts",
+  "sujets/ant.calcul.json",
+  "sujets/ant.json"
+ ],
  "juge": 2
 }

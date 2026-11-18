@@ -366,3 +366,4 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-18T05:20:06+00:00,pilote,4,0,0.0,0,echec : séance arrêtée (success) : You've hit your 5-hour limit · resets 7:20am (UTC)
 2026-11-18T05:58:17+00:00,reponses,2,0,0,0,ok : 1 réponse(s) de Jules
 2026-11-18T05:59:29+00:00,pilote,2,0,0.0,0,echec : séance arrêtée (success) : You've hit your 5-hour limit · resets 7:20am (UTC)
+2026-11-18T09:13:16+00:00,pilote,901,337886,8.1855,0,ok

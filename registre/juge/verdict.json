@@ -1,19 +1,17 @@
 {
  "note": 2,
- "resume": "Aucune modification de code n’a été enregistrée, aucune diffusion ni revenu n’a changé durant la séance.",
- "raisonnement": "La séance n'a produit aucun fichier de code conservé ni aucune écriture ou requête. Le diff ne montre que la mise à jour du fichier passage.json, aucune modification de diffusion.toml ou du package.json. Aucun revenu ni aucune variation d'audience n'est détecté dans le tableau de bord. Les affirmations du carnet concernant des ajouts de boutique, corrections de code ou augmentation de diffusions ne sont pas corroborées par les faits. Ainsi, aucun progrès mesurable vers l'objectif financier n'a été réalisé.",
+ "resume": "Aucun revenu n’a été généré ; le lien Ko‑fi n’a pas été ajouté aux profils et la chaîne espagnole n’a pas été vérifiée. Le carnet a été mis à jour mais aucune modification de code ou diffusion n’est attestée.",
+ "raisonnement": "La séance a seulement mis à jour le carnet et le passage.json, sans modification de code ni diffusion. Aucun lien Ko‑fi n’a été réellement ajouté aux profils et aucune vérification de la chaîne espagnole n’est documentée. Aucun revenu n’est enregistré et l’audience reste stable. Les affirmations de l’agent sur des actions concrètes (ajout de lien, examen de chaîne, nouvelles vidéos) ne sont pas soutenues par les faits. Le travail se limite à de la documentation interne.",
  "affirmations_non_prouvees": [
-  "J’ai ajouté les fichiers d’affiches et mis à jour diffusion.toml",
-  "Correction du package.json et ajout d’une fonction d’appel boutique",
-  "Le lien Ko‑fi est réglable et attend au moins 1 € de vente",
-  "Stock : 1 sortie YouTube par jour et programmation jusqu’au 27/11",
-  "TikTok : 3 diffusions/jour par chaîne sans refus"
+  "Le lien Ko‑fi a été ajouté aux profils des chaînes",
+  "Un examen de la chaîne espagnole a été réalisé",
+  "Six nouvelles vidéos ont été programmées et publiées"
  ],
  "code": "aucun",
  "code_detail": "",
  "signaux": [],
  "modele": "openai/gpt-oss-120b",
- "date": "2026-11-18T05:59:51+00:00",
- "seance": "2026-11-18T05:59:29+00:00",
+ "date": "2026-11-18T09:28:48+00:00",
+ "seance": "2026-11-18T09:13:16+00:00",
  "erreurs": []
 }

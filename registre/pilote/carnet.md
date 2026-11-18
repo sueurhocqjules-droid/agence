@@ -51,3 +51,21 @@ _Réécrit le 2026-11-17 vers 23 h UTC (séance 5, en cours)._
 - TikTok : 3 diffusions/jour au lieu de 2 (diffusion.toml) pour rattraper le retard (TikTok en est à paper/dollar du
   7/11, Instagram et Facebook à moon du 11/11). Mesure au 21/11 : diffusions.csv, 3 TikTok/jour/chaîne sans refus.
 - Scale of Everything : toujours pas branché (aucun revenu possible avant le 18/12, PR flux nécessaire). Plus tard.
+
+## Séance 8 (18/11 09:13 UTC)
+
+- Séances de 05:20 et 05:59 : arrêtées net par la limite de 5 h de l'abonnement (0 $, rien écrit). Les 9 sujets
+  lancés en séance 7 (ant, hail, bubble, raindrop, tree, popcorn, shark, volcano, sun) sont perdus : le studio n'a
+  que 37 sujets (dernier commit « sujets du 2026-11-18 » : germ, rope, rumor, sneeze, zoom).
+- Tableau du 18/11 05:59 : 0 € ; vues 7 j en 13 298, pt 5 155, es 7. Stock : 16 programmés par chaîne jusqu'au
+  27/11, le reste (21 sujets) en rendu : à 1 par jour, ~fin au 18/12.
+- Code boutique (appel_boutique) déjà dans main ; il attend le lien Ko-fi (#121).
+- Leçon : la limite de 5 h tombe sans prévenir. Écrire le carnet tôt, peu de sous-agents en même temps.
+- Recherche sponsoring/stock (sous-agent, 18/11) : places de marché de marques à seuil 1 000 abonnés (Insense,
+  Aspire, Meta) ou YPP (YouTube) : hors d'atteinte. Ouvert sans seuil : Collabstr (gratuit, 15 % sur commande,
+  PayPal) ; Passionfroot = outil, pas de marques apportées. Stock vidéo (Adobe 35 %, Pond5 40 %, Shutterstock
+  15 %+ en FTPS) : sans seuil d'audience mais clips sans texte en 16:9 exigés, débutants à ~0-13 $ en 3 mois.
+  Pub Shorts YouTube : 10 M vues/90 j dès le 1/2/2027 (Tubefilter 10/08/2026). Aucun nouveau programme sans seuil.
+- Décision : demande Collabstr (profil gratuit, chaîne en, offre « intégration Short » ~25 $) ; attendu faible
+  (0 à 1 deal avant le 18/12). Stock vidéo écarté pour l'instant : il faudrait une variante 16:9 sans texte de
+  chaque scène (gros travail studio) pour ~0-30 $ en un mois. À revoir si Ko-fi et Collabstr restent à 0 au 5/12.
