@@ -354,6 +354,19 @@ class Relance(unittest.TestCase):
         self.assertFalse(pilote.relancer(self.passage(45, relancer=False)))
 
 
+class MotsDeJules(unittest.TestCase):
+    def test_la_consigne_porte_les_mots_de_jules(self):
+        with tempfile.TemporaryDirectory() as d:
+            chemin = Path(d) / "JULES.md"
+            chemin.write_text("## 18/11\n\nCherche des outils.", encoding="utf-8")
+            with mock.patch.object(pilote, "JULES", chemin):
+                texte = pilote.consigne(datetime(2026, 11, 18, tzinfo=timezone.utc), 10, 1, 100, REGLAGES)
+        self.assertIn("Cherche des outils.", texte)
+
+    def test_le_pilote_ne_peut_pas_les_changer(self):
+        self.assertIn("organisation/JULES.md", pilote.INTERDITS)
+
+
 class Reprise(unittest.TestCase):
     LIMITE = "séance arrêtée (success) : You've hit your 5-hour limit · resets 7:20am (UTC)"
 

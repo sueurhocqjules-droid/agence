@@ -46,6 +46,7 @@ CARNET = RACINE / "registre" / "pilote"
 RAPPORT = CARNET / "rapport.json"              # écrit par la séance : message à Jules, demandes au guichet
 PASSAGE = CARNET / "passage.json"              # écrit par ce script : coût et sort des changements
 VERDICT = RACINE / "registre" / "juge" / "verdict.json"   # avis du juge sur la séance précédente
+JULES = RACINE / "organisation" / "JULES.md"   # mots de Jules au Pilote, écrits par Jules (ou Claude dans Jarvis)
 MODELE = "claude-opus-5-5"
 TOURS_MAX = 5000                               # garde-fou technique, pas une limite de travail
 DUREE_MAX_S = 320 * 60                         # un job GitHub s'arrête à 6 h : de quoi trier et publier après
@@ -69,6 +70,7 @@ LIBRES = (
 INTERDITS = (
     ".github/",
     "organisation/MISSION.md",
+    "organisation/JULES.md",
     "organisation/seuils.toml",
     "organisation/autorisations.toml",
     "organisation/scripts.toml",
@@ -288,6 +290,10 @@ Budget Claude : {budget}.
 Cette séance s'arrête d'elle-même à {plafond:.2f} $, après {DUREE_MAX_S // 60} minutes, si la même action échoue
 {em['echecs_identiques_max']} fois de suite, ou après {em['minutes_sans_ecrire_max']} minutes sans écrire de fichier :
 note tes trouvailles au fil de l'eau dans ton carnet, et garde de quoi écrire ton rapport avant la fin.
+
+Mots de Jules (organisation/JULES.md, le plus récent en haut). C'est lui qui t'écrit : tiens-en compte dans cette
+séance et dis dans ton message de fin ce que tu en as fait.
+{_lire(JULES, "aucun", 4000)}
 
 Demandes au guichet qui attendent Jules (ne les redemande pas, ferme celles qui ne servent plus) :
 {ouvertes[:3000]}
