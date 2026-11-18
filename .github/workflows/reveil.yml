@@ -251,7 +251,7 @@ jobs:
           auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
           git add registre
           git diff --cached --quiet || git commit -q -m "Registre : réveil du $(date -u +%Y-%m-%dT%H:%MZ)"
-          git -c http.https://github.com/.extraheader="$auth" pull -q --rebase
+          git -c http.https://github.com/.extraheader="$auth" pull -q --rebase -X theirs   # conflit : ce run gagne
           git -c http.https://github.com/.extraheader="$auth" push -q
       # Alarme hors de GitHub (Worker Cloudflare, alarme/worker.js) : sans signe de vie pendant 24 h, Jules est prévenu
       # sur Telegram. Ne casse jamais le réveil ; ne fait rien tant que ALARME_SECRET n'est pas posé
@@ -337,8 +337,12 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -q -m "Équipe du Pilote : $(date -u +%Y-%m-%dT%H:%MZ)"
           for essai in 1 2 3; do
-            git -c http.https://github.com/.extraheader="$auth" pull -q --rebase origin main &&
+            # -X theirs : sur un conflit (tableau.md, réécrit par chaque run), la version de ce run, la plus récente, gagne
+            if git -c http.https://github.com/.extraheader="$auth" pull -q --rebase -X theirs origin main; then
               git -c http.https://github.com/.extraheader="$auth" push -q origin HEAD:main && exit 0
+            else
+              git rebase --abort 2>/dev/null || true
+            fi
             sleep 5
           done
           exit 1

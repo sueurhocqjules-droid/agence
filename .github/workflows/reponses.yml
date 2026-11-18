@@ -51,7 +51,7 @@ jobs:
           auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
           git add registre
           git diff --cached --quiet || git commit -q -m "Registre : réponses de Jules du $(date -u +%Y-%m-%dT%H:%MZ)"
-          git -c http.https://github.com/.extraheader="$auth" pull -q --rebase
+          git -c http.https://github.com/.extraheader="$auth" pull -q --rebase -X theirs   # conflit : ce run gagne
           git -c http.https://github.com/.extraheader="$auth" push -q
       # Mode continu : un Oui de Jules relance tout de suite une séance, qui repart du code fusionné, au lieu
       # d'attendre la fin de la chaîne ou le réveil (avis extérieur du 17/11 : la PR ne doit pas freiner le Pilote).

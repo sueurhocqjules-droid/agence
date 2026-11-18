@@ -169,8 +169,12 @@ jobs:
           git diff --cached --quiet && exit 0
           git commit -q -m "Pilote : séance du $(date -u +%Y-%m-%d) $(date -u +%H)h (run $GITHUB_RUN_ID)"
           for essai in 1 2 3; do
-            git -c http.https://github.com/.extraheader="$auth" pull -q --rebase origin main &&
+            # -X theirs : sur un conflit (tableau.md, réécrit par chaque run), la version de ce run, la plus récente, gagne
+            if git -c http.https://github.com/.extraheader="$auth" pull -q --rebase -X theirs origin main; then
               git -c http.https://github.com/.extraheader="$auth" push -q origin HEAD:main && exit 0
+            else
+              git rebase --abort 2>/dev/null || true
+            fi
             sleep 5
           done
           echo "::error::Séance non poussée après 3 essais"; exit 1
