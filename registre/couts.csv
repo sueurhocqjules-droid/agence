@@ -355,3 +355,11 @@ debut,agent,duree_s,jetons_claude,dollars_equiv,appels_gratuits,resultat
 2026-11-17T23:11:38+00:00,guichet,0,0,0,0,"ok : 0 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : rien"
 2026-11-18T02:27:58+00:00,pilote,1484,4634210,14.6492,0,ok
 2026-11-18T02:55:25+00:00,pilote,480,0,4.7884,0,"echec : séance arrêtée (success) : ⚠ Permission mode forced to default — CLAUDE_CODE_SUBPROCESS_ENV_SCRUB is set (allowed_non_write_users hardening). Declare allowedTools explicitly, or set CLAUDE_COD"
+2026-11-18T05:07:53+00:00,reponses,0,0,0,0,ok : 0 réponse(s) de Jules
+2026-11-18T05:07:53+00:00,stats,3,0,0,0,"ok : 96 vidéos, 25248 vues"
+2026-11-18T05:07:57+00:00,garde_fous,0,0,0,0,"ok : 72.53 $ cette semaine, 0 alerte(s) envoyée(s)"
+2026-11-18T05:07:57+00:00,courrier,2,0,0,1,"ok : 1 mail(s) : 0 collaboration, 1 plateforme, 0 sanction, 0 autre ; 0 transmis"
+2026-11-18T05:07:59+00:00,flux,676,0,0,0,"ok : 0 programmées, 0 rejetées, 12 en rendu, 15 diffusées, 0 erreurs de diffusion"
+2026-11-18T05:19:14+00:00,guetteur,2,0,0,0,"ok : 0 commentaire(s) nouveau(x), 0 occasion(s) ; seuil le plus proche : Every Second (en) : 19 768 vues Shorts sur 90 jours sur 3 000 000, YouTube, palier fans (dons, Shopping)"
+2026-11-18T05:19:17+00:00,contacts,0,0,0,0,ok : aucun message validé à envoyer
+2026-11-18T05:19:18+00:00,guichet,0,0,0,0,"ok : 1 demande(s) ouverte(s), 0 contact(s) à valider, envoyé : récapitulatif"
