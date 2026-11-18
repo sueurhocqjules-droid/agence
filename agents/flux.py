@@ -46,6 +46,34 @@ DIFFUSION = Path(__file__).resolve().parents[1] / "organisation" / "diffusion.to
 REELS_FACEBOOK_MAX_S = 90         # Reels des Pages : 3 à 90 s
 
 
+APPEL_MAX = 160                   # ligne d'appel vers la boutique, en tête des descriptions
+
+
+def appel_boutique(langue, chemin=DIFFUSION):
+    """Ligne d'appel vers la boutique ([boutique] de diffusion.toml) dans la langue, ou "" : lien vide ou pas en
+    https, texte absent, sans {lien} ou de plus de APPEL_MAX caractères, réglage illisible."""
+    try:
+        with open(chemin, "rb") as f:
+            reglage = tomllib.load(f).get("boutique")
+    except (OSError, tomllib.TOMLDecodeError):
+        return ""
+    if not isinstance(reglage, dict):
+        return ""
+    lien, modele = reglage.get("lien"), reglage.get(langue)
+    if not (isinstance(lien, str) and re.fullmatch(r"https://[^\s{}]+", lien)
+            and isinstance(modele, str) and "{lien}" in modele):
+        return ""
+    texte = modele.replace("{lien}", lien).strip()
+    return texte if len(texte) <= APPEL_MAX and "\n" not in texte else ""
+
+
+def description(calcul_json, langue):
+    """Description d'une vidéo pour YouTube et les réseaux : la ligne d'appel boutique (s'il y en a une), puis le texte du sujet."""
+    texte = calcul_json["descriptions"][langue]
+    appel = appel_boutique(langue)
+    return f"{appel}\n\n{texte}" if appel else texte
+
+
 def gh(*args, binaire=False):
     sortie = subprocess.run(["gh", *args], capture_output=True, check=True, text=not binaire)
     return sortie.stdout
@@ -148,7 +176,7 @@ def envoyer(client, fichier, sujet_json, calcul_json, langue, quand):
     from googleapiclient.http import MediaFileUpload
 
     corps = {
-        "snippet": {"title": sujet_json[langue]["titre"], "description": calcul_json["descriptions"][langue]},
+        "snippet": {"title": sujet_json[langue]["titre"], "description": description(calcul_json, langue)},
         "status": {
             "privacyStatus": "private",  # reste privée jusqu'à publishAt
             "publishAt": quand.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -276,12 +304,12 @@ def diffuser(essai, sujets, etats, pauses, dossier, maintenant, fichiers=None):
                     restant -= 1
                     continue
                 sujet_json, calcul_json = lire_sujet(sujet)
-                titre, description = sujet_json[langue]["titre"], calcul_json["descriptions"][langue]
+                titre, texte = sujet_json[langue]["titre"], description(calcul_json, langue)
                 try:
                     if reseau == "instagram":
-                        media_id = meta.publier_instagram(comptes_ig[langue], heberger(fichier), titre, description)
+                        media_id = meta.publier_instagram(comptes_ig[langue], heberger(fichier), titre, texte)
                     else:
-                        media_id = meta.publier_facebook(meta.PAGES[langue], cle_page, fichier, titre, description)
+                        media_id = meta.publier_facebook(meta.PAGES[langue], cle_page, fichier, titre, texte)
                 except meta.ErreurMeta as e:
                     print(f"ERREUR {reseau} {nom} : {e}")
                     diffusion(reseau, langue, nom, "erreur", note=f"code {e.code or '?'} : {e}"[:300])
@@ -368,7 +396,7 @@ def diffuser_threads(essai, sujets, etats, pauses, dossier, maintenant, fichiers
             sujet_json, calcul_json = lire_sujet(sujet)
             try:
                 media_id = threads.publier(comptes[langue], heberger(fichier), sujet_json[langue]["titre"],
-                                           calcul_json["descriptions"][langue])
+                                           description(calcul_json, langue))
             except threads.ErreurThreads as e:
                 print(f"ERREUR threads {nom} : {e}")
                 diffusion("threads", langue, nom, "erreur", note=str(e)[:300])
@@ -455,7 +483,7 @@ def diffuser_tiktok(essai, sujets, etats, pauses, dossier, maintenant, fichiers=
         if langue in bloquees:
             continue
         sujet_json, calcul_json = lire_sujet(sujet)
-        texte = buffer.legende(sujet_json[langue]["titre"], calcul_json["descriptions"][langue])
+        texte = buffer.legende(sujet_json[langue]["titre"], description(calcul_json, langue))
         try:
             # isAiGenerated : seulement pour des personnes ou scènes réalistes générées par IA ; les vidéos du moteur
             # sont des animations calculées. Un futur concept qui en montre pose "ia_realiste": true dans son sujet
