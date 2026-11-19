@@ -64,3 +64,9 @@
 {"date": "2026-11-19T17:08:33+00:00", "quoi": "flux", "resultat": "refuse", "bloquant": "en pause (pilote, par jules : Jules veut discuter avant la suite (18/11, via Claude dans Jarvis))"}
 {"date": "2026-11-19T17:08:33+00:00", "quoi": "contacts", "resultat": "refuse", "bloquant": "en pause (pilote, par jules : Jules veut discuter avant la suite (18/11, via Claude dans Jarvis))"}
 {"date": "2026-11-19T17:08:33+00:00", "quoi": "guichet", "resultat": "refuse", "bloquant": "en pause (pilote, par jules : Jules veut discuter avant la suite (18/11, via Claude dans Jarvis))"}
+{"date": "2026-11-19T23:07:57+00:00", "quoi": "reponses", "resultat": "ok", "code": 0, "duree_s": 1, "sortie": "ok : 0 réponse(s) de Jules"}
+{"date": "2026-11-19T23:07:57+00:00", "quoi": "stats", "resultat": "refuse", "bloquant": "en pause (pilote, par jules : Jules veut discuter avant la suite (18/11, via Claude dans Jarvis))"}
+{"date": "2026-11-19T23:07:58+00:00", "quoi": "garde_fous", "resultat": "ok", "code": 0, "duree_s": 0, "sortie": "Semaine du 2026-11-13 : 88.41 $ équivalent Claude, 25.3 % de ta limite (auteur 27.71 $, direction 3.84 $, ingenierie 17.56 $, pilote 37.71 $, stratege 1.58 $), 72 appels gratuits\nok : 88.41 $ cette semaine, 0 alerte(s) envoyée(s)"}
+{"date": "2026-11-19T23:07:58+00:00", "quoi": "flux", "resultat": "refuse", "bloquant": "en pause (pilote, par jules : Jules veut discuter avant la suite (18/11, via Claude dans Jarvis))"}
+{"date": "2026-11-19T23:07:58+00:00", "quoi": "contacts", "resultat": "refuse", "bloquant": "en pause (pilote, par jules : Jules veut discuter avant la suite (18/11, via Claude dans Jarvis))"}
+{"date": "2026-11-19T23:07:58+00:00", "quoi": "guichet", "resultat": "refuse", "bloquant": "en pause (pilote, par jules : Jules veut discuter avant la suite (18/11, via Claude dans Jarvis))"}

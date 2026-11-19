@@ -1,4 +1,4 @@
-# Tableau de bord (19/11/2026 17:08 UTC)
+# Tableau de bord (19/11/2026 23:08 UTC)
 
 Écrit par les scripts à partir du registre. Ne pas modifier à la main.
 
@@ -10,9 +10,9 @@
 
 | chaîne | vues totales | vues gagnées 7 j | vidéos | relevé |
 |---|---|---|---|---|
-| en | 19768 | 12961 | 32 | 2026-11-18T05:07 |
+| en | 19768 | 12814 | 32 | 2026-11-18T05:07 |
 | es | 8 | 5 | 32 | 2026-11-18T05:07 |
-| pt | 5472 | 3654 | 32 | 2026-11-18T05:07 |
+| pt | 5472 | 3618 | 32 | 2026-11-18T05:07 |
 
 ## Diffusions des 7 derniers jours
 
