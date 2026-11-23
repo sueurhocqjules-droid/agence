@@ -23,6 +23,15 @@ description = "la lecture de tes réponses Telegram"
 secrets = ["TELEGRAM_BOT_TOKEN", "ALARME_SECRET", "FUSION_TOKEN"]  # FUSION_TOKEN : Oui de Jules sur une PR du Pilote
 hors_pause = true
 
+# Relais temporaire (23/11, Jules via Claude dans Jarvis) : publie le planning organisation/planning-diffusion.csv
+# (2D retenues les 23 et 24/11, puis 3D d'Every Second) pendant que le Pilote, donc flux, est en pause.
+[diffusion]
+proprietaire = "pilote"
+module = "agents.diffusion"
+description = "la publication du planning de diffusion sur Instagram, Facebook et TikTok"
+secrets = ["META_TOKEN", "BUFFER_API_KEY"]
+hors_pause = true
+
 [garde_fous]
 proprietaire = "pilote"
 module = "agents.surete"

@@ -155,6 +155,15 @@ jobs:
           RENDU_DIR: rendu
           PYTHONUTF8: "1"
         run: python -m agence.lancer flux
+      # Relais temporaire hors pause : publie le planning de diffusion (organisation/planning-diffusion.csv)
+      - name: Diffusion planifiée (Instagram, Facebook, TikTok)
+        if: ${{ !cancelled() }}
+        timeout-minutes: 20
+        env:
+          META_TOKEN: ${{ secrets.META_TOKEN }}
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+          PYTHONUTF8: "1"
+        run: python -m agence.lancer diffusion
       # Après les stats (vues sur 90 jours) : seuils de monétisation et commentaires, clé publique en lecture seule
       - name: Guetteur (seuils, commentaires)
         if: ${{ !cancelled() }}
