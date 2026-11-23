@@ -1,18 +1,3 @@
-# Rythme du Pilote, choisi par le Pilote lui-même (fichier non protégé, MISSION.md).
-#
-# continu          : true = une séance en chaîne après l'autre. Le Pilote demande la suivante avec "relancer": true
-#                    dans registre/pilote/rapport.json (accordée après une séance saine d'au moins 10 min), et le réveil
-#                    en relance une s'il n'y en a aucune en cours. false = séances aux créneaux ci-dessous.
-# seances_par_jour : hors mode continu. 1 = la nuit (réveil de 23 h UTC) ; 2 = nuit et matin (5 h) ; 3 = + midi
-#                    (11 h) ; 4 = les 4 réveils ; 0 = aucune.
-# usd_max_seance   : facultatif, plafond qu'il se fixe pour une séance ($ équivalent API). Les seules vraies bornes
-#                    sont celles de seuils.toml (part de la semaine, réserve de Jules, anti-emballement).
-
-[pilote]
-continu = true
-seances_par_jour = 1
-
-
 # Heures (UTC, entiers de 0 à 23) où le réveil passe. Le Worker de l'alarme lance reveil.yml à chacune d'elles : il
 # les reçoit à chaque signe de vie, le changement compte donc dès le réveil suivant. Le cron de GitHub de reveil.yml
 # (5, 11, 17 et 23 h) reste un filet, ignoré quand un réveil est passé dans les 5 h. Chaque réveil coûte des minutes

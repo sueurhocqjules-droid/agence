@@ -1,4 +1,4 @@
-# Seuils fixés par Jules (fichier protégé : le Pilote demande au guichet pour en changer un).
+# Seuils fixés par Jules (fichier protégé).
 # Semaine = celle de l'abonnement Claude de Jules : depuis le vendredi 23 h UTC (agence/lancer.py, debut_semaine).
 
 [claude]
@@ -14,17 +14,7 @@ reserve_pourcent = 15
 part_pourcent = 30
 # Alerte à Jules quand l'agence passe ce pourcentage de sa part
 alerte_part_pourcent = 85
-pause_cibles = ["pilote"]
-
-[emballement]
-# Garde-fou 4 (MISSION.md) : arrêts d'une séance qui s'emballe. Chaque arrêt est dit à Jules sur Telegram, la séance
-# suivante repart normalement. Aucun plafond de travail.
-# Une séance seule ne dépasse pas cette part de la limite hebdomadaire (25 % ≈ 87 $)
-seance_max_pourcent = 25
-# La même action (même outil, même entrée) en échec tant de fois de suite
-echecs_identiques_max = 10
-# Minutes sans écrire un fichier (Edit, Write) : une séance qui tourne en rond
-minutes_sans_ecrire_max = 120
+pause_cibles = []   # plus d'agent Claude à mettre en pause depuis le 23/11 : alerte seulement
 
 [echecs]
 # Passages en échec d'affilée d'un même agent ou script avant d'alerter Jules

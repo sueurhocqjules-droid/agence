@@ -86,7 +86,7 @@ class Diffuser(unittest.TestCase):
                         echec=meta.ErreurMeta("POST ig1/media : Media upload has failed", 2207026, reponse))
         noter.assert_called_once()
         agent, entree = noter.call_args[0]
-        self.assertEqual(agent, "pilote")
+        self.assertEqual(agent, "flux")
         for morceau in ("volt-en", "2207026", "AbC123", "OAuthException"):
             self.assertIn(morceau, entree["bloquant"])
 
@@ -119,7 +119,7 @@ class RefusInstagram(unittest.TestCase):
             flux.diffusion("instagram", "en", "volt-en", "erreur", note="code 2207003 : adresse illisible")
             flux.diffusion("facebook", "en", "volt-en", "erreur", note="autre")
         journal.assert_called_once()
-        self.assertEqual(journal.call_args[0][0], "pilote")
+        self.assertEqual(journal.call_args[0][0], "flux")
         self.assertIn("code 2207003", journal.call_args[0][1]["bloquant"])
 
     def test_conteneur_en_erreur_garde_le_code(self):

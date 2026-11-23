@@ -33,7 +33,7 @@ def quand(texte):
 
 
 def heures_de_sortie():
-    """Heures de sortie (Paris) par chaîne, réglées par le Pilote. Fichier ou chaîne illisible : aucune heure (la
+    """Heures de sortie (Paris) par chaîne, réglées dans organisation/creneaux.toml. Fichier ou chaîne illisible : aucune heure (la
     chaîne ne reçoit rien, les autres continuent ; agents/flux.py borne et filtre les heures)."""
     try:
         with open(organisation.DOSSIER / "creneaux.toml", "rb") as f:

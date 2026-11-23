@@ -75,7 +75,7 @@ def compteur(maintenant, couts, atelier, reglages, fin=None):
 
 def part_semaine(maintenant, reglages):
     """Dollars que l'agence peut dépenser cette semaine. None pendant le lancement (carte blanche : seule la réserve de
-    Jules compte, lue en direct par l'anti-emballement du Pilote)."""
+    Jules compte, lue par la Sûreté)."""
     cl = reglages["claude"]
     if maintenant < cl["lancement_jusqu_au"]:
         return None
@@ -165,8 +165,8 @@ def alerter_portee(s, stats, maintenant):
     """Une alerte par chaîne mal diffusée et par semaine, tant que ça dure ; la suite dit qui s'en occupe."""
     semaine = f"{lancer.debut_semaine(maintenant):%Y-%m-%d}"
     for p in mesures.signaux_portee(stats, maintenant):
-        suite = ("Le Pilote le voit dans le tableau de bord et décide de la suite (refonte, pause ou fermeture)."
-                 if p["semaines"] >= mesures.SEMAINES_AVANT_JULES else "Le Pilote cherche la cause. Rien à faire pour l'instant.")
+        suite = ("À voir avec l'agence : refonte, pause ou fermeture de la chaîne."
+                 if p["semaines"] >= mesures.SEMAINES_AVANT_JULES else "Rien à faire pour l'instant, à surveiller.")
         s.alerter(f"portee:{p['chaine']}:{p['signal']}:{semaine}", "diffusion",
                   f"{p['texte'][0].upper() + p['texte'][1:]}. {suite}")
 

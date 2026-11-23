@@ -7,10 +7,10 @@ Lancement : python -m agents.flux [--essai]
 1. Compare les sujets du moteur (studio-rendu) aux vidéos déjà sur les chaînes (titre exact) : ce qui manque.
 2. Ce qui manque et a un rendu sur studio-rendu : téléchargé, contrôlé (agence/controle.py), programmé au prochain créneau.
 3. Diffusion : chaque vidéo déjà publique sur YouTube part en Reel sur le compte Instagram et la Page Facebook de sa
-   langue (agence/meta.py), la plus ancienne d'abord, au rythme fixé par le Programmateur (organisation/diffusion.toml).
+   langue (agence/meta.py), la plus ancienne d'abord, au rythme fixé (organisation/diffusion.toml).
    Facebook n'accepte pas plus de 90 s : une vidéo plus longue y est notée « hors_format » et sautée.
    Instagram : on ne publie qu'une fois le conteneur FINISHED. Un envoi refusé note le code et le message de Meta
-   au registre des diffusions et, comme bloquant, au journal du Pilote ; il est retenté au réveil suivant,
+   au registre des diffusions et, comme bloquant, au journal de flux ; il est retenté au réveil suivant,
    3 fois au plus par vidéo, puis la suivante passe.
    TikTok : par Buffer (agence/buffer.py), même règle, même cadence ; une chaîne pas encore branchée sur Buffer est sautée.
    Threads : agence/threads.py, un jeton par compte (renouvelé ici même) ; un compte pas encore branché est sauté.
@@ -38,7 +38,7 @@ RENDU = Path(os.environ.get("RENDU_DIR") or Path(__file__).resolve().parents[2] 
 PARIS = ZoneInfo("Europe/Paris")
 DELAI_MIN = timedelta(hours=2)    # jamais de sortie plus tôt : une date passée publierait aussitôt
 ENVOIS_MAX = 4                    # par chaîne et par passage (Studio bloquait au-delà de 3 ou 4 par jour)
-# Plafonds par jour, quoi que disent creneaux.toml et diffusion.toml (réglages du Pilote) : ce fichier est protégé
+# Plafonds par jour, quoi que disent creneaux.toml et diffusion.toml (réglages de l'agence) : ce fichier est protégé
 SORTIES_JOUR_MAX = 4              # sorties YouTube par chaîne : limite d'envoi de YouTube vécue le 11/11 (uploadLimitExceeded, téléphone non vérifié)
 DIFFUSION_JOUR_MAX = 25           # diffusions par réseau et par chaîne : anti-emballement, sous Buffer (25 TikTok / 24 h) et Facebook (30 Reels / 24 h)
 RENDUS_MAX = 12                   # par passage, une machine par vidéo
@@ -203,7 +203,7 @@ def stock(nom, langue, sujet, etat, sortie="", video_id="", note=""):
 
 
 def cadence_diffusion():
-    """{reseau: sorties par jour}, réglé par le Pilote, borné à DIFFUSION_JOUR_MAX (valeur illisible : 0)."""
+    """{reseau: sorties par jour}, réglé dans diffusion.toml, borné à DIFFUSION_JOUR_MAX (valeur illisible : 0)."""
     with open(DIFFUSION, "rb") as f:
         reglage = tomllib.load(f)
     cadence = {}
@@ -224,8 +224,8 @@ def essais_rates(lignes, reseau, nom):
 def diffusion(reseau, langue, nom, etat, media_id="", note=""):
     registre.ajouter("diffusions", [{"date": registre.maintenant(), "reseau": reseau, "chaine": langue, "nom": nom,
                                      "etat": etat, "media_id": media_id, "note": note}])
-    if reseau == "instagram" and etat == "erreur":  # un envoi refusé est un bloquant au journal du Pilote
-        lancer.noter_journal("pilote", {"date": registre.maintenant(), "quoi": f"diffusion instagram {nom}",
+    if reseau == "instagram" and etat == "erreur":  # un envoi refusé est un bloquant au journal de flux
+        lancer.noter_journal("flux", {"date": registre.maintenant(), "quoi": f"diffusion instagram {nom}",
                                               "resultat": "erreur",
                                               "bloquant": f"envoi instagram refusé pour {nom} ({note})"[:400]})
 
@@ -243,10 +243,10 @@ def a_diffuser(sujets, titres_publics, deja, sautes, langue):
 
 
 def noter_refus_instagram(nom, erreur):
-    """Un envoi Instagram refusé remonte comme bloquant au journal du Pilote, avec la réponse complète de l'API :
+    """Un envoi Instagram refusé remonte comme bloquant au journal de flux, avec la réponse complète de l'API :
     sans la cause on ne peut rien corriger."""
     reponse = getattr(erreur, "reponse", None) or {"message": str(erreur)}
-    lancer.noter_journal("pilote", {"date": registre.maintenant(), "quoi": "diffusion", "resultat": "erreur",
+    lancer.noter_journal("flux", {"date": registre.maintenant(), "quoi": "diffusion", "resultat": "erreur",
                                           "bloquant": f"Instagram a refusé {nom} : "
                                                       f"{json.dumps(reponse, ensure_ascii=False)}"})
 

@@ -1,7 +1,7 @@
 +++
 id = "guetteur"
 titre = "Guetteur (Argent)"
-superieur = "pilote"
+superieur = "jules"
 objectifs = [1]
 statut = "en_service"
 module = "agents.guetteur"

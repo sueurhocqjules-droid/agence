@@ -431,7 +431,7 @@ class Reveil(unittest.TestCase):
         scripts = organisation.scripts()
         for nom, module in (("guichet", "agence.guichet"), ("contacts", "agence.contacts")):
             self.assertEqual(scripts[nom]["module"], module)
-            self.assertIn(nom, organisation.fiches()[scripts[nom]["proprietaire"]]["scripts"])
+            self.assertEqual(scripts[nom]["proprietaire"], organisation.SOMMET)
 
 
 if __name__ == "__main__":

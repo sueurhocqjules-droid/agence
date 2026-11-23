@@ -2,3 +2,10 @@ date,cible,action,par,raison
 2026-11-11T20:44:42+00:00,flux,pause,surete,test étape 6 : la pause doit bloquer le flux
 2026-11-11T21:02:47+00:00,flux,reprise,jules,"réponse oui de Jules à : Test étape 6 : le flux est en pause (posée par la Sûreté), et la pause l'a bien bloqué. Je la lève ?"
 2026-11-18T10:00:00+00:00,pilote,pause,jules,"Jules veut discuter avant la suite (18/11, via Claude dans Jarvis)"
+2026-11-23T11:14:13+00:00,stats,pause,jules,"arrêté avec le Pilote le 18/11, en pause jusqu'à la décision de Jules avec l'agence (nettoyage du 23/11, via Claude dans Jarvis)"
+2026-11-23T11:14:13+00:00,flux,pause,jules,"arrêté avec le Pilote le 18/11, en pause jusqu'à la décision de Jules avec l'agence (nettoyage du 23/11, via Claude dans Jarvis)"
+2026-11-23T11:14:13+00:00,guetteur,pause,jules,"arrêté avec le Pilote le 18/11, en pause jusqu'à la décision de Jules avec l'agence (nettoyage du 23/11, via Claude dans Jarvis)"
+2026-11-23T11:14:13+00:00,courrier,pause,jules,"arrêté avec le Pilote le 18/11, en pause jusqu'à la décision de Jules avec l'agence (nettoyage du 23/11, via Claude dans Jarvis)"
+2026-11-23T11:14:13+00:00,contacts,pause,jules,"arrêté avec le Pilote le 18/11, en pause jusqu'à la décision de Jules avec l'agence (nettoyage du 23/11, via Claude dans Jarvis)"
+2026-11-23T11:14:13+00:00,guichet,pause,jules,"arrêté avec le Pilote le 18/11, en pause jusqu'à la décision de Jules avec l'agence (nettoyage du 23/11, via Claude dans Jarvis)"
+2026-11-23T11:14:13+00:00,gabarits,pause,jules,"arrêté avec le Pilote le 18/11, en pause jusqu'à la décision de Jules avec l'agence (nettoyage du 23/11, via Claude dans Jarvis)"

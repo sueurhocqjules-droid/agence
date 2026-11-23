@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://every-second-posters.pages.dev/sitemap.xml

@@ -74,6 +74,8 @@ def preparer(nom, postes, liste_scripts):
     """Renvoie (responsable, module, secrets autorisés, budget) pour un agent ou un script."""
     if nom in liste_scripts:
         s = liste_scripts[nom]
+        if s["proprietaire"] == organisation.SOMMET:  # outil sans agent au-dessus : son propre journal
+            return nom, s["module"], set(s.get("secrets", [])), s.get("budget")
         if s["proprietaire"] not in postes:
             raise ValueError(f"Script {nom} : propriétaire inconnu {s['proprietaire']!r}")
         return s["proprietaire"], s["module"], set(s.get("secrets", [])), s.get("budget")
@@ -123,7 +125,8 @@ def lancer(nom, arguments):
     autorises, non_accordes = organisation.cles_accordees(nom, declares)
     if non_accordes:
         print(f"{nom} : clés déclarées mais pas accordées par Jules, non transmises : {' '.join(non_accordes)}")
-    cibles = [nom] + organisation.chaine_de_commandement(responsable, postes) + [TOUT]
+    chaine = organisation.chaine_de_commandement(responsable, postes) if responsable in postes else []
+    cibles = list(dict.fromkeys([nom] + chaine + [TOUT]))
     if liste_scripts.get(nom, {}).get("hors_pause"):
         cibles = [nom]  # sûreté et réponses de Jules : une pause générale ne doit pas couper le moyen de la lever
     maintenant = datetime.now(timezone.utc)

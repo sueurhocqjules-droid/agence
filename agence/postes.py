@@ -18,16 +18,12 @@ POSTES = {
     # Gabarits Remotion (agence/gabarits.py) : un JSON de données par sujet, contrôlé par schéma. Jamais Claude.
     "gabarits": [("groq", "openai/gpt-oss-120b", 4000), ("gemini", "gemini-flash-latest", 4000),
                  ("openrouter", "nvidia/nemotron-3-ultra-550b-a55b:free", 4000)],
-    # Relecture du code d'une séance du Pilote (agence/relecture.py) : un avis pour le juge, jamais Claude.
-    "relecteur-pr": [("gemini", "gemini-flash-lite-latest", 3000), ("gemini", "gemini-flash-latest", 3000),
-                     ("groq", "openai/gpt-oss-120b", 3000)],
-    # Les membres de l'équipe du Pilote (equipe/) ajoutent ici leur entrée à leur nom.
 }
 
 
 def demander(poste, consigne, temperature=None, eviter=None):
     """Renvoie (texte, modele, jetons_entree, jetons_sortie, duree_s) du premier modèle qui répond.
-    `eviter` : modèle à n'essayer qu'en dernier (le juge du banc évite le modèle qui a écrit ce qu'il juge)."""
+    `eviter` : modèle à n'essayer qu'en dernier."""
     erreurs = []
     pannes = json.loads(PANNES.read_text(encoding="utf-8")) if PANNES.exists() else {}
     for fournisseur, modele, plafond in sorted(POSTES[poste], key=lambda m: (m[1] in pannes, m[1] == eviter)):  # tri stable

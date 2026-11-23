@@ -12,13 +12,13 @@ on:
   workflow_dispatch:
     inputs:
       programme:
-        description: "Réveil programmé (lancé par le Worker à son heure) : compte pour la séance du Pilote"
+        description: "Réveil programmé (lancé par le Worker à son heure)"
         type: boolean
         default: false
 
 permissions:
   contents: write
-  actions: write      # la Sûreté compte les minutes GitHub du mois ; le réveil lance la séance du Pilote
+  actions: write      # la Sûreté compte les minutes GitHub du mois
   issues: write       # guichet et contacts : demandes écrites par l'agence, commentaire et fermeture d'un contact envoyé
 
 concurrency:
@@ -105,7 +105,6 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ALARME_SECRET: ${{ secrets.ALARME_SECRET }} # lecture des clics gardés par le Worker de l'alarme
-          FUSION_TOKEN: ${{ secrets.FUSION_TOKEN }}     # Oui de Jules : fusion d'une PR du Pilote (agence/accords.py)
           PYTHONUTF8: "1"
         run: python -m agence.lancer reponses relever
       - name: Stats des chaînes
@@ -114,7 +113,7 @@ jobs:
           YT_TOKEN_EN: ${{ secrets.YT_TOKEN_EN }}
           YT_TOKEN_ES: ${{ secrets.YT_TOKEN_ES }}
           YT_TOKEN_PT: ${{ secrets.YT_TOKEN_PT }}
-          YT_TOKEN_SCALE: ${{ secrets.YT_TOKEN_SCALE }}   # Scale of Everything (17/11), à brancher par le Pilote
+          YT_TOKEN_SCALE: ${{ secrets.YT_TOKEN_SCALE }}   # Scale of Everything (17/11)
           PYTHONUTF8: "1"
         run: python -m agence.lancer stats
       # Après les stats (une vidéo rejetée met sa chaîne en pause), avant le flux (qui respecte cette pause)
@@ -147,7 +146,7 @@ jobs:
           YT_TOKEN_EN: ${{ secrets.YT_TOKEN_EN }}
           YT_TOKEN_ES: ${{ secrets.YT_TOKEN_ES }}
           YT_TOKEN_PT: ${{ secrets.YT_TOKEN_PT }}
-          YT_TOKEN_SCALE: ${{ secrets.YT_TOKEN_SCALE }}   # Scale of Everything (17/11), à brancher par le Pilote
+          YT_TOKEN_SCALE: ${{ secrets.YT_TOKEN_SCALE }}   # Scale of Everything (17/11)
           GH_TOKEN: ${{ github.token }}   # lecture des artefacts du dépôt public studio-rendu
           META_TOKEN: ${{ secrets.META_TOKEN }}   # utilisateur système Meta : 3 comptes Instagram, 3 Pages
           BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}   # Buffer (offre Free) : publication TikTok sur les 3 comptes
@@ -155,7 +154,7 @@ jobs:
           RENDU_DIR: rendu
           PYTHONUTF8: "1"
         run: python -m agence.lancer flux
-      # Relais temporaire hors pause : publie le planning de diffusion (organisation/planning-diffusion.csv)
+      # Hors pause : publie le planning de diffusion (organisation/planning-diffusion.csv)
       - name: Diffusion planifiée (Instagram, Facebook, TikTok)
         if: ${{ !cancelled() }}
         timeout-minutes: 20
@@ -197,56 +196,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}   # lecture des issues `guichet` et `contact`
           PYTHONUTF8: "1"
         run: python -m agence.lancer guichet recap
-      # Séance du Pilote au rythme qu'il choisit (organisation/rythme.toml, [pilote]). pilote.yml commence après ce
-      # réveil pour la partie qui écrit le registre (même groupe de concurrence). Seulement sur un réveil programmé,
-      # pour qu'une relance à la main ne déclenche pas de séance. Nuit et matin d'abord : la limite de 5 h de
-      # l'abonnement est partagée avec Jules, qui s'en sert surtout le soir.
-      - name: Séance du Pilote (rythme choisi)
-        if: ${{ !cancelled() && (github.event_name == 'schedule' || inputs.programme) }}
-        timeout-minutes: 2
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PYTHONUTF8: "1"
-        run: |
-          continu=$(python -c "import tomllib; print(tomllib.load(open('organisation/rythme.toml','rb')).get('pilote', {}).get('continu') is True)" || echo False)
-          if [ "$continu" = True ]; then
-            # Mode continu : les séances s'enchaînent d'elles-mêmes ; le réveil relance seulement si la chaîne s'est
-            # arrêtée (arrêt anti-emballement, échec, séance sans demande de relance).
-            actives=$(gh run list -w pilote.yml -L 20 --json status --jq '[.[] | select(.status != "completed")] | length' || echo 1)
-            if [ "${actives:-1}" -eq 0 ]; then gh workflow run pilote.yml && echo "Séance du Pilote relancée (mode continu)"
-            else echo "Séance du Pilote déjà en cours (mode continu)"; fi
-            exit 0
-          fi
-          n=$(python -c "import tomllib; print(int(tomllib.load(open('organisation/rythme.toml','rb')).get('pilote', {}).get('seances_par_jour', 1)))" || echo 1)
-          h=$((10#$(date -u +%H)))
-          if   [ $h -ge 5 ]  && [ $h -lt 11 ]; then creneau=matin
-          elif [ $h -ge 11 ] && [ $h -lt 17 ]; then creneau=midi
-          elif [ $h -ge 17 ] && [ $h -lt 23 ]; then creneau=soir
-          else creneau=nuit; fi
-          case "$n" in
-            1) creneaux="nuit" ;;
-            2) creneaux="nuit matin" ;;
-            3) creneaux="nuit matin midi" ;;
-            4) creneaux="nuit matin midi soir" ;;
-            *) creneaux="" ;;
-          esac
-          # Une séance au plus par créneau : un autre réveil du même créneau l'a peut-être déjà lancée
-          case "$creneau" in
-            matin) debut=$(date -u +%Y-%m-%dT05:00:00Z) ;;
-            midi)  debut=$(date -u +%Y-%m-%dT11:00:00Z) ;;
-            soir)  debut=$(date -u +%Y-%m-%dT17:00:00Z) ;;
-            *) if [ $h -ge 23 ]; then debut=$(date -u +%Y-%m-%dT23:00:00Z); else debut=$(date -u -d yesterday +%Y-%m-%dT23:00:00Z); fi ;;
-          esac
-          deja=$(gh run list -w pilote.yml -L 10 --json createdAt --jq "[.[] | select(.createdAt >= \"$debut\")] | length" || echo 0)
-          if [ "${deja:-0}" -gt 0 ]; then
-            echo "Séance déjà lancée depuis $debut ($creneau)"
-            creneaux=""
-          fi
-          case " $creneaux " in
-            *" $creneau "*) gh workflow run pilote.yml && echo "Séance du Pilote lancée ($creneau, $n par jour)" ;;
-            *) echo "Pas de séance à ce créneau ($creneau, $n par jour)" ;;
-          esac
-      - name: Tableau de bord (registre/tableau.md, lu par le Pilote, le juge et Jules)
+      - name: Tableau de bord (registre/tableau.md)
         if: ${{ !cancelled() }}
         timeout-minutes: 2
         env:
@@ -264,7 +214,7 @@ jobs:
           git -c http.https://github.com/.extraheader="$auth" push -q
       # Alarme hors de GitHub (Worker Cloudflare, alarme/worker.js) : sans signe de vie pendant 24 h, Jules est prévenu
       # sur Telegram. Ne casse jamais le réveil ; ne fait rien tant que ALARME_SECRET n'est pas posé
-      # Seul un réveil programmé (Worker ou cron) vaut pour son créneau : un lancement à la main ne fait pas de séance.
+      # Seul un réveil programmé (Worker ou cron) vaut pour son créneau.
       # Le signe transmet aussi les heures du réveil au Worker.
       - name: Signe de vie (alarme hors de GitHub)
         if: always()
@@ -275,83 +225,3 @@ jobs:
           PYTHONUTF8: "1"
         run: python -m agence.alarme signe "$SOURCE"
 
-  # Équipe du Pilote : ses propres scripts (equipe/, organisation/equipe.toml), sans Claude. Job à part, en lecture
-  # seule : aucune clé d'écriture sur la machine (ni jeton du dépôt, ni clé de studio-rendu). Seul ce qu'ils écrivent
-  # dans registre/equipe/ est gardé, par le job suivant, qui n'exécute pas leur code.
-  equipe:
-    needs: [garde, agents]
-    if: ${{ !cancelled() && needs.garde.outputs.lancer == 'true' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    permissions:
-      contents: read
-    outputs:
-      produit: ${{ steps.equipe.outputs.produit }}   # vide tant que l'équipe n'a rien écrit : rien à garder
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-          ref: main     # avec le registre que le job agents vient de pousser
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.13"
-      - run: pip install -q -r requirements.txt
-      - name: Équipe du Pilote
-        id: equipe
-        env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-          PYTHONUTF8: "1"
-        run: |
-          python -m agence.equipe
-          mkdir -p registre/equipe
-          if [ -n "$(ls -A registre/equipe)" ]; then echo "produit=oui" >> "$GITHUB_OUTPUT"; fi
-      - uses: actions/upload-artifact@v7
-        if: steps.equipe.outputs.produit == 'oui'
-        with:
-          name: equipe
-          path: registre/equipe/
-          include-hidden-files: true
-          retention-days: 2
-
-  equipe-registre:
-    needs: [garde, equipe]
-    if: ${{ !cancelled() && needs.equipe.result == 'success' && needs.equipe.outputs.produit == 'oui' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-          ref: main
-      - uses: actions/download-artifact@v8
-        with:
-          name: equipe
-          path: ${{ runner.temp }}/equipe
-      - name: Garder registre/equipe/ seulement
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
-          git config user.name "agence-robot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          rm -rf registre/equipe && mkdir -p registre/equipe
-          cp -r "$RUNNER_TEMP/equipe/." registre/equipe/
-          find registre/equipe -type l -delete
-          git add registre/equipe
-          git diff --cached --quiet && exit 0
-          git commit -q -m "Équipe du Pilote : $(date -u +%Y-%m-%dT%H:%MZ)"
-          for essai in 1 2 3; do
-            # -X theirs : sur un conflit (tableau.md, réécrit par chaque run), la version de ce run, la plus récente, gagne
-            if git -c http.https://github.com/.extraheader="$auth" pull -q --rebase -X theirs origin main; then
-              git -c http.https://github.com/.extraheader="$auth" push -q origin HEAD:main && exit 0
-            else
-              git rebase --abort 2>/dev/null || true
-            fi
-            sleep 5
-          done
-          exit 1

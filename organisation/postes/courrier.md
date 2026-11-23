@@ -1,7 +1,7 @@
 +++
 id = "courrier"
 titre = "Courrier (tri de boite-chaines)"
-superieur = "pilote"
+superieur = "jules"
 objectifs = [3]
 statut = "en_service"
 module = "agents.courrier"

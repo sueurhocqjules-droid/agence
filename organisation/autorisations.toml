@@ -1,7 +1,6 @@
 # Autorisations des clés : quelle clé va à quel poste ou script (nom passé à `python -m agence.lancer <nom>`).
 #
-# Fichier protégé (MISSION.md, règle 9 et Gouvernance) : seul Jules l'élargit, avec Claude dans Jarvis. Aucun agent,
-# ni le Pilote, ne le modifie (agence/pilote.py retire tout changement de ce fichier).
+# Fichier protégé : seul Jules l'élargit, avec Claude dans Jarvis. Aucun script ne le modifie.
 #
 # Le lanceur ne transmet une clé que si elle est à la fois déclarée par la fiche (champ `env`) ou le script
 # (`secrets` de scripts.toml) ET accordée ici à ce nom. Une clé déclarée sans accord n'est pas transmise : elle
@@ -29,4 +28,3 @@ GROQ_API_KEY = ["courrier", "guetteur", "gabarits"]
 GEMINI_API_KEY = ["courrier", "guetteur", "gabarits"]
 OPENROUTER_API_KEY = ["courrier", "guetteur", "gabarits"]
 ALARME_SECRET = ["reponses"]
-FUSION_TOKEN = ["reponses"]          # fusion des PR du Pilote sur le Oui de Jules (agence/accords.py, 17/11)

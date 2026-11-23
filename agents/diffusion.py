@@ -1,7 +1,8 @@
 """Diffusion planifiée : publie sur Instagram, Facebook et TikTok les vidéos de organisation/planning-diffusion.csv.
 
-Relais temporaire, posé par Claude dans Jarvis le 23/11 : le Pilote est en pause depuis le 18/11 et flux avec lui,
-donc plus rien ne partait sur les réseaux. Ce script tourne hors pause, ne fabrique rien et ne touche pas à YouTube :
+Posé par Claude dans Jarvis le 23/11, base du futur workflow de diffusion commun à toutes les chaînes (les workflows
+de fabrication s'arrêtent à « public sur YouTube + ligne de planning »). Tourne hors pause, ne fabrique rien et ne
+touche pas à YouTube :
 il lit le planning (une ligne par réseau et par vidéo, avec l'heure à partir de laquelle elle peut partir et l'adresse
 de la vidéo hébergée sur studio-rendu), publie ce qui est dû et le note dans registre/diffusions.csv.
 

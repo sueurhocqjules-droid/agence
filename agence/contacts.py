@@ -3,7 +3,7 @@
     python -m agence.lancer contacts    à chaque réveil : envoie les messages validés, ou demande le droit d'envoi
     python -m agence.contacts           affiche les messages en attente de validation
 
-MISSION.md, Gouvernance : un message (reçu ou à envoyer) est préparé par l'agence, adapté à son destinataire, avec
+Un message (reçu ou à envoyer) est préparé par l'agence, adapté à son destinataire, avec
 le contexte, et mis en attente dans une issue étiquetée `contact`. Claude pose l'étiquette `valide` après en avoir
 parlé avec Jules : seule une pose par le compte de Jules compte. Le message part au réveil suivant, au nom de la
 chaîne, signé par l'équipe, jamais sous un faux prénom ni au nom de Jules. Un démarchage groupé est un seul lot :

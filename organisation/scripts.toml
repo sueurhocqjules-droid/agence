@@ -1,14 +1,14 @@
-# Scripts de l'agence : rien à juger, donc pas d'agent. Tous rattachés au Pilote (seul agent qui décide).
+# Scripts de l'agence : des outils sans agent, rattachés directement à Jules (le Pilote a été retiré le 23/11).
 # Le lanceur (python -m agence.lancer <nom>) ne leur transmet que les secrets listés ici.
 
 [stats]
-proprietaire = "pilote"
+proprietaire = "jules"
 module = "agents.stats"
 description = "le relevé des vues des chaînes"
 secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT", "YT_TOKEN_SCALE"]
 
 [flux]
-proprietaire = "pilote"
+proprietaire = "jules"
 module = "agents.flux"
 description = "le rendu, le contrôle, la programmation des vidéos et leur diffusion sur Instagram, Facebook, TikTok et Threads"
 secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT", "YT_TOKEN_SCALE", "GH_TOKEN", "META_TOKEN", "BUFFER_API_KEY", "THREADS_CLE"]
@@ -17,23 +17,23 @@ secrets = ["YT_TOKEN_EN", "YT_TOKEN_ES", "YT_TOKEN_PT", "YT_TOKEN_SCALE", "GH_TO
 # continue de surveiller et que Jules puisse toujours lever une pause par Telegram.
 
 [reponses]
-proprietaire = "pilote"
+proprietaire = "jules"
 module = "agence.questions"
 description = "la lecture de tes réponses Telegram"
-secrets = ["TELEGRAM_BOT_TOKEN", "ALARME_SECRET", "FUSION_TOKEN"]  # FUSION_TOKEN : Oui de Jules sur une PR du Pilote
+secrets = ["TELEGRAM_BOT_TOKEN", "ALARME_SECRET"]
 hors_pause = true
 
-# Relais temporaire (23/11, Jules via Claude dans Jarvis) : publie le planning organisation/planning-diffusion.csv
-# (2D retenues les 23 et 24/11, puis 3D d'Every Second) pendant que le Pilote, donc flux, est en pause.
+# Diffusion planifiée (23/11, Jules via Claude dans Jarvis) : publie organisation/planning-diffusion.csv sur Instagram,
+# Facebook et TikTok. Base du futur workflow de diffusion commun à toutes les chaînes.
 [diffusion]
-proprietaire = "pilote"
+proprietaire = "jules"
 module = "agents.diffusion"
 description = "la publication du planning de diffusion sur Instagram, Facebook et TikTok"
 secrets = ["META_TOKEN", "BUFFER_API_KEY"]
 hors_pause = true
 
 [garde_fous]
-proprietaire = "pilote"
+proprietaire = "jules"
 module = "agents.surete"
 description = "la surveillance des coûts et des sanctions"
 secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
@@ -41,7 +41,7 @@ hors_pause = true
 
 # Le guichet (agence/guichet.py) : ce que l'agence demande à Jules. Récapitulatif une fois par jour, urgent tout de suite.
 [guichet]
-proprietaire = "pilote"
+proprietaire = "jules"
 module = "agence.guichet"
 description = "le récapitulatif quotidien des demandes du guichet et des contacts à valider"
 secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
@@ -49,7 +49,7 @@ secrets = ["TELEGRAM_BOT_TOKEN", "GH_TOKEN"]
 # Les contacts (agence/contacts.py) : envoie les messages validés par Jules. GMAIL_SEND_TOKEN (droit gmail.send seul)
 # accordé le 15/11/2026 dans autorisations.toml (guichet #13).
 [contacts]
-proprietaire = "pilote"
+proprietaire = "jules"
 module = "agence.contacts"
 description = "l'envoi des messages aux personnes, une fois validés par toi"
 secrets = ["GMAIL_SEND_TOKEN", "GH_TOKEN"]
@@ -57,7 +57,7 @@ secrets = ["GMAIL_SEND_TOKEN", "GH_TOKEN"]
 # Les gabarits Remotion (agence/gabarits.py) : un JSON de données par sujet écrit par un modèle gratuit, contrôlé par
 # schéma, voix edge-tts, rendu Remotion en 9:16 de 30 s. Voie possible pour des vidéos sans Claude par sujet.
 [gabarits]
-proprietaire = "pilote"
+proprietaire = "jules"
 module = "agence.gabarits"
 description = "des vidéos à gabarit écrites par un modèle gratuit, sans appel Claude par sujet"
 secrets = ["GROQ_API_KEY", "GEMINI_API_KEY", "OPENROUTER_API_KEY"]

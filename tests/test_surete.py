@@ -63,7 +63,7 @@ class Echecs(unittest.TestCase):
 
 class Questions(unittest.TestCase):
     def test_actions_fermees(self):
-        for bonne in ("rien", "pause:flux", "reprise:chaine:en", "pause:tout", "reprise:pilote"):
+        for bonne in ("rien", "pause:flux", "reprise:chaine:en", "pause:tout", "reprise:diffusion"):
             questions.verifier(bonne)
         for mauvaise in ("supprimer:flux", "pause:inconnu", "reprise:chaine:fr", "pause:", "rm -rf /", "reprise:flux;rien"):
             with self.assertRaises(ValueError):

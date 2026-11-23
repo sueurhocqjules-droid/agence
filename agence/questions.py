@@ -6,7 +6,7 @@
                                      [--conseil "<ce qui aide Jules à choisir>"] [--par <agent>]
 
 Une action est `rien`, `pause:<cible>` ou `reprise:<cible>`, avec une cible connue : agent, script, `tout`
-ou `chaine:<langue>`, ou `accord:<n>` / `refus:<n>` sur une PR de code du Pilote (agence/accords.py).
+ou `chaine:<langue>`.
 Rien d'autre ne peut sortir d'un clic. Questions dans registre/questions.csv
 (la dernière ligne d'une question fait foi).
 
@@ -39,19 +39,14 @@ def verifier(action):
     if action == "rien":
         return
     genre, _, cible = action.partition(":")
-    if genre in ("accord", "refus") and cible.isdigit():
-        return
     if genre not in ("pause", "reprise") or cible not in cibles_connues():
-        raise ValueError(f"Action refusée : {action!r} (rien, pause:<cible>, reprise:<cible>, accord:<n> ou refus:<n>)")
+        raise ValueError(f"Action refusée : {action!r} (rien, pause:<cible> ou reprise:<cible>)")
 
 
 def appliquer(action, raison):
     verifier(action)
     genre, _, cible = action.partition(":")
-    if genre in ("accord", "refus"):
-        from agence import accords
-        (accords.accepter if genre == "accord" else accords.refuser)(int(cible))
-    elif action != "rien":
+    if action != "rien":
         registre.pause(cible, "jules", raison, action=genre)
 
 
@@ -81,10 +76,6 @@ def en_clair(action):
     if action == "rien":
         return "rien ne change"
     genre, _, cible = action.partition(":")
-    if genre == "accord":
-        return f"je fusionne la PR #{cible}, son code tournera au prochain réveil"
-    if genre == "refus":
-        return f"je ferme la PR #{cible}, le Pilote le verra à sa séance suivante"
     return f"{'je relance' if genre == 'reprise' else 'je mets en pause'} {decrire(cible)}"
 
 
@@ -112,7 +103,7 @@ def message(texte, pourquoi, si_oui, si_non, par, conseil="", maintenant=None):
     return "\n\n".join(morceaux)
 
 
-def poser(texte, si_oui, si_non="rien", par="pilote", pourquoi="", conseil=""):
+def poser(texte, si_oui, si_non="rien", par="agence", pourquoi="", conseil=""):
     if not pourquoi:
         raise ValueError("Une question à Jules dit toujours pourquoi elle est posée")
     verifier(si_oui)
@@ -173,7 +164,7 @@ def relever():
         try:
             appliquer(action, f"réponse {reponse} de Jules à : {question['texte']}")
             fait = f"C'est fait : {en_clair(action)}."
-        except RuntimeError as e:  # fusion refusée par GitHub, clé absente : Jules le voit, le clic n'est pas rejoué
+        except RuntimeError as e:  # action impossible : Jules le voit, le clic n'est pas rejoué
             fait = f"Pas pu le faire ({e})."
             print(f"Réponse {reponse} à {question['id']} non appliquée : {e}")
         question = {**question, "date": registre.maintenant(), "etat": "repondue", "reponse": reponse}
@@ -205,7 +196,7 @@ def main():
     q.add_argument("--conseil", default="")
     q.add_argument("--oui", required=True)
     q.add_argument("--non", default="rien")
-    q.add_argument("--par", default="pilote")
+    q.add_argument("--par", default="agence")
     args = p.parse_args()
     if args.commande == "poser":
         print(f"Question posée : {poser(args.texte, args.oui, args.non, args.par, args.pourquoi, args.conseil)}")

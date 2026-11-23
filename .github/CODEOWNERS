@@ -1,15 +1,6 @@
-# Fichiers protégés (MISSION.md, règle 9). Sans effet tant que le dépôt privé est en GitHub Free : il servira le jour où
-# GitHub Pro (Student Pack) permet une règle de branche avec « Require review from Code Owners ». D'ici là, le contrôle
-# agence/protege.py (workflow protege.yml) fait le travail. Même liste que TOUJOURS et EXISTANTS dans agence/protege.py.
-# CODEOWNERS ne distingue pas un ajout d'une modification : avec Pro, un test ajouté par l'Ingénierie demandera aussi
-# Jules. À trancher le jour où la règle de branche est posée (garder, ou retirer /tests/ et /banc/ et laisser le contrôle).
+# Fichiers protégés : seul Jules les change. Sans effet tant que le dépôt est en GitHub Free, servira le jour où une
+# règle de branche « Require review from Code Owners » est posée.
 /.github/                         @sueurhocqjules-droid
-/organisation/MISSION.md          @sueurhocqjules-droid
 /organisation/autorisations.toml  @sueurhocqjules-droid
-/agence/protege.py                @sueurhocqjules-droid
-/agence/relecture.py              @sueurhocqjules-droid
-/agence/banc_agents.py            @sueurhocqjules-droid
-/agence/ingenierie.py             @sueurhocqjules-droid
-/organisation/postes/ingenierie.md @sueurhocqjules-droid
+/organisation/seuils.toml         @sueurhocqjules-droid
 /tests/                           @sueurhocqjules-droid
-/banc/                            @sueurhocqjules-droid

@@ -1,9 +1,7 @@
 # Mémoire de l'entreprise
 
-> Les leçons apprises, une par ligne (MISSION.md, règle 7). Tenue par le Critique (`agents/critique.py`, par
-> `agence/memoire.py`) : n'importe quel agent propose une leçon, lui seul écrit ici. Lue avant toute décision
-> engageante par la Direction, le Responsable de l'organisation, l'Ingénierie, le Chef de contenu et le
-> Responsable du revenu. Elle reste courte : une leçon qui ne change plus aucune décision en sort.
+> Les leçons apprises, une par ligne, gardées après le retrait du Pilote (23/11). À relire avant de toucher à un
+> réseau ou à un service. Elle reste courte : une leçon qui ne change plus aucune décision en sort.
 
 | Fait | Preuve | Date | Ce que ça change | À revoir le |
 |---|---|---|---|---|

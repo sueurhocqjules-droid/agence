@@ -1,5 +1,5 @@
 """Guichet : ce que l'agence ne peut pas faire seule (créer un compte, installer un dépôt, poser une clé, ouvrir
-une machine, fusionner une PR qui touche un fichier protégé). MISSION.md, Gouvernance.
+une machine, poser une clé).
 
     python -m agence.lancer guichet     récapitulatif Telegram, une fois par jour, et message immédiat pour l'urgent
     python -m agence.guichet            affiche les demandes ouvertes et les clés déclarées sans autorisation

@@ -1,5 +1,5 @@
 # Réponses de Jules, tout de suite : le Worker de l'alarme lance ce workflow dès que Jules clique sur Oui ou Non
-# (alarme/worker.js, demande #46), pour qu'une fusion n'attende pas le prochain réveil. Le réveil relève aussi
+# (alarme/worker.js, demande #46), pour qu'une réponse n'attende pas le prochain réveil. Le réveil relève aussi
 # les clics à chaque passage : si cette relance manque, rien n'est perdu.
 name: Reponses
 
@@ -8,8 +8,6 @@ on:
 
 permissions:
   contents: write     # commit du registre (questions.csv)
-  actions: write      # mode continu : séance du Pilote relancée après une fusion
-  pull-requests: read
 
 # Groupe à part : partager « registre » ferait annuler un réveil en attente par une relance (GitHub ne garde qu'un
 # run en attente par groupe). Deux écrivains à la fois restent sûrs : les journaux du registre sont en ajout seul,
@@ -40,7 +38,6 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ALARME_SECRET: ${{ secrets.ALARME_SECRET }}   # lecture des clics gardés par le Worker
-          FUSION_TOKEN: ${{ secrets.FUSION_TOKEN }}     # Oui de Jules : fusion d'une PR du Pilote (agence/accords.py)
           PYTHONUTF8: "1"
         run: python -m agence.lancer reponses relever
       - name: Commiter le registre
@@ -53,17 +50,3 @@ jobs:
           git diff --cached --quiet || git commit -q -m "Registre : réponses de Jules du $(date -u +%Y-%m-%dT%H:%MZ)"
           git -c http.https://github.com/.extraheader="$auth" pull -q --rebase -X theirs   # conflit : ce run gagne
           git -c http.https://github.com/.extraheader="$auth" push -q
-      # Mode continu : un Oui de Jules relance tout de suite une séance, qui repart du code fusionné, au lieu
-      # d'attendre la fin de la chaîne ou le réveil (avis extérieur du 17/11 : la PR ne doit pas freiner le Pilote).
-      - name: Séance du Pilote après une fusion (mode continu)
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          continu=$(python -c "import tomllib; print(tomllib.load(open('organisation/rythme.toml','rb')).get('pilote', {}).get('continu') is True)" || echo False)
-          [ "$continu" = True ] || exit 0
-          fusions=$(gh pr list --state merged -L 20 --json headRefName,mergedAt --jq '[.[] | select((.headRefName | startswith("pilote/")) and (now - (.mergedAt | fromdateiso8601)) < 900)] | length' || echo 0)
-          [ "${fusions:-0}" -gt 0 ] || exit 0
-          actives=$(gh run list -w pilote.yml -L 20 --json status --jq '[.[] | select(.status != "completed")] | length' || echo 1)
-          if [ "${actives:-1}" -eq 0 ]; then gh workflow run pilote.yml && echo "Séance du Pilote relancée après la fusion"
-          else echo "Séance du Pilote déjà en cours : elle verra la fusion à la suivante"; fi

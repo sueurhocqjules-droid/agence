@@ -98,9 +98,6 @@ class Signe(unittest.TestCase):
     def test_seul_un_reveil_programme_compte_pour_son_creneau(self):
         texte = (RACINE / ".github/workflows/reveil.yml").read_text(encoding="utf-8")
         self.assertIn("type: boolean", texte.split("programme:")[1].split("jobs:")[0])
-        seance = texte.split("- name: Séance du Pilote")[1].split("- name:")[0]
-        self.assertIn("github.event_name == 'schedule' || inputs.programme", seance)
-        self.assertIn("gh run list -w pilote.yml", seance)   # une séance au plus par créneau
         etape = texte.split("- name: Signe de vie")[1]
         self.assertIn("'réveil' || 'réveil à la main'", etape)
         self.assertIn('signe "$SOURCE"', etape)

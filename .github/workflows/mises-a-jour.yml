@@ -1,5 +1,5 @@
 # Maintenance : une mise à jour de Dependabot est fusionnée seule si elle est mineure ou corrective et que
-# le contrôle passe. Une version majeure reste ouverte pour la Direction. Méthode de la doc GitHub
+# le contrôle passe. Une version majeure reste ouverte pour Jules. Méthode de la doc GitHub
 # (« Automating Dependabot with GitHub Actions »), fusion directe faute de protection de branche en dépôt privé gratuit.
 name: Mises à jour
 on: pull_request

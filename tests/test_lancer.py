@@ -95,7 +95,11 @@ class Hierarchie(unittest.TestCase):
         for agent in postes:
             organisation.chaine_de_commandement(agent, postes)
         for nom, s in organisation.scripts().items():
-            self.assertIn(s["proprietaire"], postes, nom)
+            self.assertIn(s["proprietaire"], [*postes, organisation.SOMMET], nom)
+
+    def test_script_rattache_a_jules_tient_son_propre_journal(self):
+        scripts = {"outil": {"proprietaire": organisation.SOMMET, "module": "m", "secrets": ["CLE"]}}
+        self.assertEqual(lancer.preparer("outil", POSTES, scripts), ("outil", "m", {"CLE"}, None))
 
     def test_agent_non_construit_refuse(self):
         with self.assertRaises(ValueError):

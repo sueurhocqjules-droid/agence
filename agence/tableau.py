@@ -1,9 +1,8 @@
-"""Tableau de bord de l'agence : registre/tableau.md, réécrit à chaque réveil et après chaque séance du Pilote.
+"""Tableau de bord de l'agence : registre/tableau.md, réécrit à chaque réveil.
 
-Lu par le Pilote (où en est-on), par le juge (les faits) et par Jules. Seulement des chiffres tirés du registre, écrits
+Lu par Jules et par Claude. Seulement des chiffres tirés du registre, écrits
 par les scripts : l'agent ne peut pas les changer (fichier protégé).   python -m agence.tableau
 """
-import json
 import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
@@ -70,13 +69,6 @@ def ecrire(maintenant=None):
     depenses = couts(registre.lire("couts"), semaine)
     total = sum(depenses.values())
     revenus = registre.lire("revenus")
-    seances = [s for s in registre.lire_jsonl("journal/pilote")
-               if s.get("quoi") == "pilote" and (_date(s.get("date")) or sept_jours) > sept_jours] \
-        if (registre.DOSSIER / "journal" / "pilote.jsonl").exists() else []
-    juge = []
-    historique = registre.DOSSIER / "juge" / "historique.jsonl"
-    if historique.exists():
-        juge = [json.loads(l) for l in historique.read_text(encoding="utf-8").splitlines() if l.strip()][-5:]
 
     t = [f"# Tableau de bord ({maintenant.strftime('%d/%m/%Y %H:%M')} UTC)", "",
          "Écrit par les scripts à partir du registre. Ne pas modifier à la main.", "",
@@ -95,17 +87,6 @@ def ecrire(maintenant=None):
                                      else f"lancement, carte blanche jusqu'au {reglages['lancement_jusqu_au']} "
                                           f"(réserve de Jules : {reglages['reserve_pourcent']} %)")]
     t += [f"  - {a} : {d:.2f} $" for a, d in sorted(depenses.items(), key=lambda x: -x[1]) if d]
-    t += ["", "## Séances du Pilote (7 jours)", "",
-          f"- {len(seances)} séance(s), {sum(1 for s in seances if s.get('resultat') == 'ok')} sans erreur, "
-          f"{sum(1 for s in seances if s.get('arret'))} arrêtée(s) par l'anti-emballement",
-          f"- Code gardé : {sum(int(s.get('gardes') or 0) for s in seances)} fichier(s), retiré par le tri : "
-          f"{sum(int(s.get('retires') or 0) for s in seances)}"]
-    t += [f"  - {s.get('date', '')[:16]} : {s.get('resultat')}, {s.get('cout_usd')} $, juge {s.get('juge')}/10"
-          + (f", arrêt : {s['arret']}" if s.get("arret") else "") for s in seances[-5:]]
-    if juge:
-        t += ["", "## Derniers avis du juge", ""]
-        t += [f"- {j.get('date', '')[:16]} ({j.get('modele')}) {j.get('note')}/10, code {j.get('code')} : "
-              f"{j.get('resume')}" for j in juge]
     SORTIE.write_text("\n".join(t) + "\n", encoding="utf-8")
     return SORTIE
 
