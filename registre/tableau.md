@@ -1,4 +1,4 @@
-# Tableau de bord (23/11/2026 17:20 UTC)
+# Tableau de bord (23/11/2026 23:13 UTC)
 
 Écrit par les scripts à partir du registre. Ne pas modifier à la main.
 
@@ -18,9 +18,9 @@
 
 | réseau | publiées | erreurs |
 |---|---|---|
-| facebook | 18 | 0 |
-| instagram | 18 | 0 |
-| tiktok | 21 | 0 |
+| facebook | 20 | 0 |
+| instagram | 20 | 0 |
+| tiktok | 23 | 0 |
 
 ## Consommation de l'agence cette semaine (depuis le 20/11 23:00 UTC)
 
