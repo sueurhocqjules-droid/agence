@@ -91,6 +91,8 @@
 
 - Listes de ressources gratuites (vues le 20/11 dans les enregistrements) : `awesomedata/awesome-public-datasets` (jeux de données ouverts, MIT), `ripienaar/free-for-dev` (services en ligne avec offre gratuite), `awesome-selfhosted/awesome-selfhosted` (logiciels à héberger soi-même). Domaine gratuit pour un test : DigitalPlat FreeDomain (`.dpdns.org`, `domain.digitalplat.org`, AGPL ; nombre de domaines et renouvellement non vérifiés)
 
+- Bibliothèques universitaires de l'Université catholique de Lille (ajouté le 25/11), par le profil Chrome étudiant de Jules (deviceId dans le tableau « Profils Chrome » de CONTEXT.md), usage libre : portail Vauban `https://bibliotheque.univ-catholille.fr/` et Scholarvox `https://univ.scholarvox.com/`. Pour les études de marché et toute recherche de fond : études Xerfi (accès par le lien de la liste des bases de données, recherche `/rechercheretude/<mots>` ; aucune étude sur les logiciels médicaux au 25/11), articles scientifiques en texte intégral (ScienceDirect, Springer, etc., par le bouton « Consulter en ligne » du catalogue, qui passe par le proxy EZproxy de l'université). N'aller que sur les adresses données ou liées depuis le portail, jamais une adresse devinée. Cliquer sur le titre d'une étude Xerfi télécharge le PDF : demander à Jules avant. Les études Xerfi sont en « diffusion interdite » : elles restent dans Téléchargements, jamais dans le workspace ni ailleurs
+
 - Gratos.app (`gratos.app`) : 55 outils open source qui remplacent des abonnements (CRM, mails, formulaires, programmation de posts, stats de site, montage, voix…). Catalogue trié et usages par projet : `gratos.md`. À regarder avant de payer ou de choisir un logiciel (règle du 2/11)
 
 ## Pour plus tard
