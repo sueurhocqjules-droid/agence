@@ -1,4 +1,4 @@
-# Tableau de bord (27/11/2026 17:10 UTC)
+# Tableau de bord (27/11/2026 23:10 UTC)
 
 Écrit par les scripts à partir du registre. Ne pas modifier à la main.
 
@@ -18,11 +18,11 @@
 
 | réseau | publiées | erreurs |
 |---|---|---|
-| facebook | 21 | 0 |
-| instagram | 21 | 0 |
-| tiktok | 21 | 0 |
+| facebook | 22 | 0 |
+| instagram | 22 | 0 |
+| tiktok | 22 | 0 |
 
-## Consommation de l'agence cette semaine (depuis le 20/11 23:00 UTC)
+## Consommation de l'agence cette semaine (depuis le 27/11 23:00 UTC)
 
 - Total : **0.00 $** équivalent API (≈ 0.0 % de la limite hebdo de Jules)
 - Part de l'agence : 105 $ (30 %)
